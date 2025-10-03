@@ -12,7 +12,7 @@ export class StatsController {
                 return res.status(400).json({ error: "statId is required" });
             }
 
-            const stat = await prisma.users.findUnique({
+            const stat = await prisma.stats.findUnique({
                 where: { id: parseInt(statId) }
             });
 
@@ -27,14 +27,28 @@ export class StatsController {
         try {
             const { time, number_of_categories_completed, total_number_of_trials_administrated, correct_trials, errors_trials, user_id } = req.body;
 
-            if (!time || 
-                !number_of_categories_completed || 
-                !total_number_of_trials_administrated || 
-                correct_trials || 
-                errors_trials || 
-                user_id
-            ) {
-                return res.status(400).json({ error: "All fields are required" })
+            if (!time) {
+                return res.status(400).json({ error: "time is required" });
+            }
+
+            if (!number_of_categories_completed) {
+                return res.status(400).json({ error: "number_of_categories_completed is required" });
+            }
+
+            if (!total_number_of_trials_administrated) {
+                return res.status(400).json({ error: "total_number_of_trials_administrated is required" });
+            }
+
+            if (!correct_trials) {
+                return res.status(400).json({ error: "correct_trials is required" });
+            }
+
+            if (!errors_trials) {
+                return res.status(400).json({ error: "errors_trials is required" });
+            }
+
+            if (!user_id) {
+                return res.status(400).json({ error: "user_id is required" });
             }
 
             const stat = await prisma.stats.create({

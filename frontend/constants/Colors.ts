@@ -20,7 +20,8 @@ export default {
 
 // nový export COLORS
 export const COLORS = {
-  // primary: "#8B593E",
+  primary: "#8B593E",
+  secondary_background: "#DCDCDC",
   background: "#FFF8F3",
   text: "#4A3428",
   border: "#E5D3B7",

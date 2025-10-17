@@ -19,7 +19,7 @@ export default function TabOneScreen() {
             marginTop: 'auto',
             marginLeft: '5%',
             marginBottom: '5%',
-          }]}>Log In</Text>
+          }]}>Sign Up</Text>
         </View>
 
         <View style={{ flex: 3 }}>
@@ -44,7 +44,7 @@ export default function TabOneScreen() {
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
 
-          <Text style={styles.bottomMessage}>Don't have an account? Sign up</Text>
+          <Text style={styles.bottomMessage}>Already have an account? Log in</Text>
         </View>
 
     </View>

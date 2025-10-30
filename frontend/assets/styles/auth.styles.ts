@@ -20,7 +20,6 @@ export const styles = StyleSheet.create({
         padding: 15,
         // paddingHorizontal: "15%",
         // toto budem chciet dat na tie prvy asi nie na ten text
-        marginTop: height * 0.04,
     },
     header: {
         backgroundColor: COLORS.secondary_background,
@@ -34,12 +33,14 @@ export const styles = StyleSheet.create({
         fontWeight: "500",
         marginBottom: 5,
         color: "#333",
+        marginHorizontal: "5%",
     },
     button: {
         backgroundColor: COLORS.primary,
         borderRadius: 12,
         padding: 16,
         alignItems: "center",
+        marginHorizontal: "5%",
         marginTop: height * 0.02,
         marginBottom: 20,
     },
@@ -47,5 +48,13 @@ export const styles = StyleSheet.create({
         color: COLORS.white,
         fontSize: 16,
         fontWeight: "600",
+    },
+    bottomMessage: {
+        textAlign: "center",
+        marginTop: height * 0.05,
+    },
+    inputGroup: {
+        marginHorizontal: "5%",
+        marginTop: height * 0.02,
     }
 });

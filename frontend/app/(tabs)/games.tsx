@@ -5,22 +5,9 @@ import { styles } from "../../assets/styles/mainScreens.styles";
 import { GameCard } from "@/components/GameComponent";
 
 const gamesData = [
-  { id: "1", title: "Game 1", description: "Description for Game 1" },
-  { id: "2", title: "Game 2", description: "Description for Game 2" },
-  { id: "3", title: "Game 3", description: "Description for Game 3" },
-  { id: "4", title: "Game 4", description: "Description for Game 4" },
-  { id: "5", title: "Game 5", description: "Description for Game 5" },
-  { id: "6", title: "Game 6", description: "Description for Game 6" },
-  { id: "7", title: "Game 7", description: "Description for Game 7" },
-  { id: "8", title: "Game 8", description: "Description for Game 8" },
+  { id: "1", title: "Wisconsin Card\nSorting Test", image: require('../../assets/images/wisconsinCardSortingTest2.png') },
 ];
 
-// const GameCard = ({ title, description }: {title: string; description: string }) => (
-//     <TouchableOpacity style={localStyles.card}>
-//         <Text style={localStyles.cardTitle}>{title}</Text>
-//         <Text style={localStyles.cardDescription}>{description}</Text>
-//     </TouchableOpacity>
-// );
 
 export default function GamesScreen() {
     return (
@@ -32,20 +19,32 @@ export default function GamesScreen() {
 
             {/* vrchna cast pred upravou */}
             <View style={styles.bgTop}>
-                <Text style={localStyles.header}> Nadpis </Text>
+                <Text style={styles.header}> Hi, John </Text>
+                <Text style={styles.subheader}> Let's start practising </Text>
             </View>
             
             {/* spodna cast pred upravou */}
             <View style={styles.bgBottom}>
-                <Text> Games </Text>
 
-                <FlatList
+                {/* <FlatList
                     data = {gamesData}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <GameCard title={item.title} description={item.description} />
                     )}
                     contentContainerStyle={{ padding: 16 }}
+                /> */}
+                <FlatList
+                    data={gamesData}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <GameCard
+                        title={item.title}
+                        // description={item.description}
+                        image={item.image} // TU posielame obrázok
+                        />
+                    )}
+                    // contentContainerStyle={{ padding: 16 }}
                 />
             </View>
 

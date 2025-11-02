@@ -21,6 +21,12 @@ export const styles = StyleSheet.create({
         marginLeft: width * 0.05,
         color: "white",
     },
+    subheader: {
+        fontSize: 14,
+        textAlign: "left",
+        marginLeft: width * 0.05,
+        color: "white",
+    },
     userID: {
         color: "#666666"
     },
@@ -66,6 +72,18 @@ export const styles = StyleSheet.create({
     //     paddingBottom: height * 0.03,
     //     gap: width * 0.03,
     // },
+    button: {
+        flexDirection: 'row',
+        alignItems: "center",     
+        justifyContent: "center",
+        backgroundColor: "#FF1E1E",
+        paddingVertical: height * 0.02,
+        paddingHorizontal: width * 0.04,
+        borderRadius: 10,
+        width: width * 0.2,       // tlačidlo bude mať cca 20% šírky obrazovky
+        alignSelf: "flex-end", 
+
+    },
     editButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -88,6 +106,12 @@ export const styles = StyleSheet.create({
     },
     buttonText: {
         color: "black",
+        fontWeight: "bold",
+        fontSize: 12,
+        textAlign: "center",
+    },
+    buttonTextWhite: {
+        color: "white",
         fontWeight: "bold",
         fontSize: 12,
         textAlign: "center",

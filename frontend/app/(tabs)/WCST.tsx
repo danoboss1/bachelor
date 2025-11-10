@@ -1,78 +1,135 @@
+import { Blue_Circles_Card, Card, Green_Stars_Card, Red_Triangle_Card, Yellow_Pluses_Card } from "@/components/Card";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Card, Red_Triangle_Card, Green_Stars_Card, Yellow_Pluses_Card, Blue_Circles_Card } from "@/components/Card";
+import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
 
 export default function WCST_Screen() {
-    // karty do ktorych budem ukladat
-    const rows = [
-        {
-            cards: [
-                { value: "A", suit: "♠" },
-                { value: "K", suit: "♥" },
-            ],
-            backgroundColor: "red",
-        },
-        {
-            cards: [
-                { value: "10", suit: "♦" },
-                { value: "3", suit: "♣" },
-            ],
-            backgroundColor: "darkorange",
-        },
-    ];
+    // const [cardPack, setCardPack] = React.useState([{ value: "7", suit: "♠" }]);
+    const [cardPack, setCardPack] = React.useState([
+        { value: "7", suit: "♠" },
+        { value: "K", suit: "♥" },
+        { value: "3", suit: "♦" },
+        { value: "A", suit: "♣" },
+    ]);
+    
+    const redTriangleRef = React.useRef<View>(null);
+    const greenStarsRef = React.useRef<View>(null);
+    const yellowPlusesRef = React.useRef<View>(null);
+    const blueCirclesRef = React.useRef<View>(null);
 
-    // balicek kariet
-    const cardPack = {
-        cards: [
-            { value: "7", suit: "♠" },
-        ],
-        backgroundColor: "green",
+    const packRef = React.useRef<View>(null);
+
+    const targetPos = React.useRef({ x: 0, y: 0 }).current;
+
+    const animPos = React.useRef(new Animated.ValueXY({ x: 0, y: 0})).current;
+    // karty do ktorych budem ukladat
+    React.useEffect(() => {
+        // animPos.setValue({ x: rowCenterX - (width * 0.25 / 2), y: (4 * rowCenterY) });
+        packRef.current?.measure((fx, fy, w, h, px, py) => {
+            animPos.setValue({ x: px, y: py });
+        });
+        redTriangleRef.current?.measure((fx, fy, w, h, px, py) => {
+            targetPos.x = px;
+            targetPos.y = py;
+        });
+    });
+
+    const moveCard = () => {
+        if (cardPack.length === 0 ) return;
+
+        const card = cardPack[0];
+
+        Animated.timing(animPos, {
+            toValue: { x: targetPos.x, y: targetPos.y },
+            duration: 1000,
+            useNativeDriver: false,
+        }).start(() => {
+            console.log("Animated finished");
+        });
+    };
+
+    const moveCardTo = (targetRef: React.RefObject<View | null>) => {
+        targetRef.current?.measure((fx, fy, w, h, px, py) => {
+            Animated.timing(animPos, {
+            toValue: { x: px, y: py },
+            duration: 1000,
+            useNativeDriver: false,
+            }).start(() => {
+                console.log("Animated finished");
+
+                 setCardPack(prevPack => prevPack.slice(1));
+
+                // reset animPos pre ďalšiu kartu
+                packRef.current?.measure((fx, fy, w, h, px, py) => {
+                    animPos.setValue({ x: px, y: py });
+                });
+            });
+        })
     }
 
     return (
         <View style={styles.container}>
             <View style={[styles.row, { backgroundColor: "red" }]}>
-                <Red_Triangle_Card></Red_Triangle_Card>
-                <Green_Stars_Card></Green_Stars_Card>
+                <TouchableOpacity
+                    ref={redTriangleRef}
+                    activeOpacity={0.8}
+                    onPress={() => moveCardTo(redTriangleRef)}
+                >
+                    <Red_Triangle_Card />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    ref={greenStarsRef}
+                    activeOpacity={0.8}
+                    onPress={() => moveCardTo(greenStarsRef)}
+                >
+                    <Green_Stars_Card />
+                </TouchableOpacity>
             </View>
 
             <View style={[styles.row, { backgroundColor: "darkorange" }]}>
-                <Yellow_Pluses_Card></Yellow_Pluses_Card>
-                <Blue_Circles_Card></Blue_Circles_Card>
+                <TouchableOpacity
+                    ref={yellowPlusesRef}
+                    activeOpacity={0.8}
+                    onPress={() => moveCardTo(yellowPlusesRef)}
+                >
+                    <Yellow_Pluses_Card />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    ref={blueCirclesRef}
+                    activeOpacity={0.8}
+                    onPress={() => moveCardTo(blueCirclesRef)}
+                >
+                    <Blue_Circles_Card />
+                </TouchableOpacity>
             </View>
 
-             {/* Samostatný tretí riadok */}
-            <View style={[styles.row, { backgroundColor: cardPack.backgroundColor }]}>
-                {cardPack.cards.map((card, cardIndex) => (
-                    <Card
-                        key={cardIndex}
-                        value={card.value}
-                        suit={card.suit}
-                    />
-                ))}
+            <View style={[styles.row, { backgroundColor: "green" }]}>
+                <View
+                    ref={packRef}
+                >
+                    <Card value={cardPack[0].value} suit={cardPack[0].suit} />
+                </View>
             </View>
+            {/* Samostatný tretí riadok */}
+            <Animated.View
+                // style={[styles.row, { backgroundColor: "green" }]}
+                style={{
+                    position: "absolute",
+                    left: animPos.x,
+                    top: animPos.y,
+                }}
+            >
+                {cardPack.length > 0 && <Card value={cardPack[0].value} suit={cardPack[0].suit} />}
+            </Animated.View>
+
+            {/* <Animated.View>
+                style=
+                <Card value={cardPack[0].value} suit={cardPack[0].suit} />
+            </Animated.View> */}
         </View>
     );
-
-    // return (
-    //     <View style={styles.container}>
-    //         <View style={styles.row}>
-    //             {cards.map((c, index) => (
-    //                 <Card key={index} value={c.value} suit={c.suit} />
-    //             ))}
-    //         </View>
-    //         <View style={styles.row2}>
-    //             {cards2.map((c, index) => (
-    //                 <Card key={index} value={c.value} suit={c.suit} />
-    //             ))}
-    //         </View>
-    //         <View style={styles.row3}>
-    //             {cards3.map((c, index) => (
-    //                 <Card key={index} value={c.value} suit={c.suit} />
-    //             ))}
-    //         </View>
-    //     </View>
-    // );
 }
 
 const styles = StyleSheet.create({
@@ -87,18 +144,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",       // vertikálne zarovnanie kariet
         justifyContent: "center",   // horizontálne zarovnanie kariet
-        marginVertical: 4,          // odsadenie medzi riadkami
+        gap: 20,
     },
-    triangle: {
-        width: 0,
-        height: 0,
-        backgroundColor: 'transparent',
-        borderStyle: 'solid',
-        borderLeftWidth: 50,
-        borderRightWidth: 50,
-        borderBottomWidth: 100,
-        borderBottomColor: 'red',
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
-    }
 });

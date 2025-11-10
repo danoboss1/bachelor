@@ -5,7 +5,10 @@ import { styles } from "../../assets/styles/mainScreens.styles";
 import { GameCard } from "@/components/GameComponent";
 
 const gamesData = [
-  { id: "1", title: "Wisconsin Card\nSorting Test", image: require('../../assets/images/wisconsinCardSortingTest2.png') },
+  { id: "1", 
+    title: "Wisconsin Card\nSorting Test", 
+    image: require('../../assets/images/wisconsinCardSortingTest2.png'),
+    path: "/wcst/WCST_info" as const, },
 ];
 
 
@@ -42,6 +45,7 @@ export default function GamesScreen() {
                         title={item.title}
                         // description={item.description}
                         image={item.image} // TU posielame obrázok
+                        path={item.path}
                         />
                     )}
                     // contentContainerStyle={{ padding: 16 }}

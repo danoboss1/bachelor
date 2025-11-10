@@ -82,7 +82,6 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         width: width * 0.2,       // tlačidlo bude mať cca 20% šírky obrazovky
         alignSelf: "flex-end", 
-
     },
     editButton: {
         flexDirection: 'row',

@@ -1,5 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 interface CardProps {
     value: string;    // napr. "A", "K", "10"
@@ -8,11 +10,12 @@ interface CardProps {
 
 export function Card({ value, suit }: CardProps) {
     return (
-        <View style={styles.card}>
+        <View style={styles.packCard}>
             <Text style={styles.text}>{value}{suit}</Text>
         </View>
     );
 }
+
 
 export function Red_Triangle_Card() { 
     const [cardSize, setCardSize] = React.useState({ width: 0, height: 0});
@@ -28,9 +31,9 @@ export function Red_Triangle_Card() {
                 style={{
                     width: 0,
                     height: 0,
-                    borderLeftWidth: cardSize.width * 0.2,
-                    borderRightWidth: cardSize.width * 0.2,
-                    borderBottomWidth: cardSize.height * 0.25,
+                    borderLeftWidth: cardSize.width * 0.15,
+                    borderRightWidth: cardSize.width * 0.15,
+                    borderBottomWidth: cardSize.height * 0.15,
                     borderBottomColor: 'red',
                     borderLeftColor: 'transparent',
                     borderRightColor: 'transparent',
@@ -38,8 +41,8 @@ export function Red_Triangle_Card() {
                     top: '50%',
                     left: '50%',
                     transform: [
-                        { translateX: -cardSize.width * 0.2 },
-                        { translateY: -cardSize.height * 0.125 },
+                        { translateX: -cardSize.width * 0.15 },
+                        { translateY: -cardSize.height * 0.075 },
                     ],
                 }} 
             /> 
@@ -88,26 +91,40 @@ export function Blue_Circles_Card() {
 }
 
 const styles = StyleSheet.create({
-    card: {
-        width: "25%",
-        height: "70%",
+    packCard: {
+        width: width * 0.25,
+        height: height * 0.2,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: "#333",
         alignItems: "center",
         justifyContent: "center",
-        margin: 5,
         backgroundColor: "white",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
+        // marginTop: (height / 6) - height * 0.1,
+    },
+    card: {
+        width: width * 0.25,
+        height: height * 0.2,
+        // width: "25%",
+        // height: "70%",
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: "#333",
+        alignItems: "center",
+        justifyContent: "center",
+        // margin: 5,
+        backgroundColor: "white",
+        shadowColor: "#000",
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.3,
+        // shadowRadius: 2,
     },
     text: {
         fontSize: 24,
         fontWeight: "bold",
     },
-        triangle: {
+    triangle: {
         width: 0,
         height: 0,
         backgroundColor: 'transparent',
@@ -129,7 +146,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     star: {
-        fontSize: 20,
+        fontSize: 32,
         color: "green",
         marginHorizontal: 2,
     },
@@ -140,18 +157,19 @@ const styles = StyleSheet.create({
         marginVertical: 2,  
     },
     plus: {
-        fontSize: 40,
+        fontSize: 45,
         color: "orange",
-        marginHorizontal: 2,
+        marginHorizontal: 6,
         fontWeight: "bold",
         lineHeight: 40,
     },
     circle: {
-        width: 20,
-        height: 20,
-        borderRadius: 10, // polovica width/height → kruh
+        width: 24,
+        height: 24,
+        borderRadius: 12, // polovica width/height → kruh
         backgroundColor: "blue",
-        marginHorizontal: 4,
+        marginHorizontal: 6,
+        marginVertical: 10,
     },
     
 });

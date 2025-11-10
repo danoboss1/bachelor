@@ -1,7 +1,8 @@
 // import React from "react";
 
+import { router } from "expo-router";
 import React from "react";
-import { Dimensions, ImageBackground, ImageSourcePropType, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Dimensions, ImageBackground, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../assets/styles/mainScreens.styles";
 
 const { width, height } = Dimensions.get("window");
@@ -9,33 +10,44 @@ const { width, height } = Dimensions.get("window");
 type GameCardProps = {
     title: string;
     image?: ImageSourcePropType;
+    path: "/wcst/WCST_info";
 }
 
-export function GameCard({ image, title }: GameCardProps) {
+export function GameCard({ image, title, path }: GameCardProps) {
   return (
-    <TouchableOpacity style={localStyles.card}>
+    <View style={localStyles.card}>
       {image ? (
         <ImageBackground
           source={image}
           style={localStyles.imageBackground}
           imageStyle={{ borderRadius: 16 }} // zaoblenie rohov
-        >
-          <Text style={localStyles.cardTitle}>{title}</Text>
-          {/* <Text style={localStyles.cardDescription}>{description}</Text> */}
-          <TouchableOpacity style={localStyles.button}>
-            <Text style={styles.buttonTextWhite}> Play </Text>
-          </TouchableOpacity>
+        > 
+          <View style={localStyles.rowContainer}>
+            <Text style={localStyles.cardTitle}>{title}</Text>
+            {/* <Text style={localStyles.cardDescription}>{description}</Text> */}
+            <TouchableOpacity 
+              style={localStyles.button}
+              onPress={() => router.push(path)}
+            >
+              <Text style={styles.buttonTextWhite}> Play </Text>
+            </TouchableOpacity>
+          </View>
         </ImageBackground>
       ) : (
         <>
-          <Text style={localStyles.cardTitle}>{title}</Text>
-          {/* <Text style={localStyles.cardDescription}>{description}</Text> */}
-          <TouchableOpacity style={localStyles.button}>
-            <Text style={styles.buttonTextWhite}> Play </Text>
-          </TouchableOpacity>
+          <View style={localStyles.rowContainer}>
+            <Text style={localStyles.cardTitle}>{title}</Text>
+            {/* <Text style={localStyles.cardDescription}>{description}</Text> */}
+            <TouchableOpacity 
+              style={localStyles.button}
+              onPress={() => router.push(path)}
+            >
+              <Text style={styles.buttonTextWhite}> Play </Text>
+            </TouchableOpacity>
+          </View>
         </>
       )}
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -63,6 +75,11 @@ const localStyles = StyleSheet.create({
     justifyContent: "flex-end", // text dole
     padding: 16,
   },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
   cardTitle: {
     fontWeight: "bold",
     alignSelf: "flex-start",
@@ -71,6 +88,7 @@ const localStyles = StyleSheet.create({
     textAlign: "center", 
     marginLeft: width * 0.1,
     fontFamily: "Gagalin",
+    marginBottom: height * 0.04,
   },
   cardDescription: {
     fontSize: 14,

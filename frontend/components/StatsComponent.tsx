@@ -16,6 +16,46 @@ type StatsComponentProps = {
     image?: ImageSourcePropType;
 }
 
+type StatMiniProps = {
+    label: string;
+    value: number;
+    max?: number;
+};
+
+type StatMiniSupplementaryProps = {
+    label: string;
+    value: number | string;
+};
+
+export function StatMini({ label, value, max = 100 }: StatMiniProps) {
+    const percentage = Math.min((value / max) * 100, 100);
+
+    return (
+        <View style={stylesMini.container}>
+            <Text style={stylesMini.label}>{label}</Text>
+
+            <View style={stylesMini.row}>
+                <Text style={stylesMini.value}>{value}</Text>
+
+                <View style={stylesMini.barBackground}>
+                    <View style={[stylesMini.barFill, { width: `${percentage}%` }]} />
+                </View>
+
+                <Text style={stylesMini.percent}>{Math.round(percentage)}%</Text>
+            </View>
+        </View>
+    );
+}
+
+export function StatMiniSupplementary({ label, value }: StatMiniSupplementaryProps) {
+    return (
+        <View style={stylesSupplementary.container}>
+            <Text style={stylesSupplementary.label}>{label}</Text>
+            <Text style={stylesSupplementary.value}>{value}</Text>
+        </View>
+    );
+}
+
 export function StatsComponent({ title, stats, image }: StatsComponentProps) {
     return (
         <View style={localStyles.card}>
@@ -142,5 +182,72 @@ const localStyles = StyleSheet.create({
         alignContent: "center",
         justifyContent: "center",
         padding: 16,
+    },
+});
+
+const stylesMini = StyleSheet.create({
+    container: {
+        // width: width * 0.85,
+        // alignSelf: "center",
+        width: width,
+        marginVertical: height * 0.02,
+        paddingHorizontal: width * 0.05,
+        // marginHorizontal: width * 0.01
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "black",
+        marginBottom: 4,
+        alignSelf: "flex-start",
+    },
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    value: {
+        width: 45,
+        color: "black",
+        fontWeight: "600",
+    },
+    barBackground: {
+        flex: 1,
+        height: 18,
+        backgroundColor: "#444",
+        borderRadius: 9,
+        marginHorizontal: 8,
+        overflow: "hidden",
+    },
+    barFill: {
+        height: "100%",
+        backgroundColor: "#4caf50",
+    },
+    percent: {
+        width: 45,
+        color: "black",
+        textAlign: "right",
+        fontWeight: "600",
+    },
+});
+
+const stylesSupplementary = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        justifyContent: "flex-start", // label bude úplne vľavo
+        alignItems: "center",
+        marginVertical: 6,
+        paddingVertical: 12,
+        paddingHorizontal: width * 0.05,
+    },
+    label: {
+        fontSize: 16,
+        color: "black",
+        flex: 1, // label zaberie čo najviac miesta
+    },
+    value: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "black",
+        textAlign: "right", // hodnota bude zarovnaná doprava
     },
 });

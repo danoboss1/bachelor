@@ -6,13 +6,13 @@ const prisma = new PrismaClient();
 export class LeaderboardController {
     static getLeaderboard = async (req: Request, res: Response) => {
         try {
-            const leaderboard = await prisma.leaderboard.findMany({
+            const leaderboard = await prisma.leaderboard_wcst.findMany({
                 include: {
                     users: {select: { id: true, username: true } },
-                    stats: {select: { correct_trials: true, errors_trials: true, time: true} }
+                    stats_wcst: {select: { total_correct: true, total_error: true, time: true} }
                 },
                 orderBy: {
-                    stats: { correct_trials: 'desc' }
+                    stats_wcst: { total_correct: 'desc' }
                 }
             })
 

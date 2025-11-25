@@ -20,6 +20,7 @@ type StatMiniProps = {
     label: string;
     value: number;
     max?: number;
+    showPercentSign?: boolean; // nový voliteľný prop
 };
 
 type StatMiniSupplementaryProps = {
@@ -27,20 +28,24 @@ type StatMiniSupplementaryProps = {
     value: number | string;
 };
 
-export function StatMini({ label, value, max = 100 }: StatMiniProps) {
+export function StatMini({ label, value, max = 100, showPercentSign }: StatMiniProps) {
     const percentage = Math.min((value / max) * 100, 100);
 
     return (
         <View style={stylesMini.container}>
+            {/* 1. Label */}
             <Text style={stylesMini.label}>{label}</Text>
 
-            <View style={stylesMini.row}>
-                <Text style={stylesMini.value}>{value}</Text>
+            {/* 2. Hodnota v strede */}
+            <Text style={stylesMini.valueCentered}>
+                {value}{showPercentSign ? "%" : ""}
+            </Text>
 
+            {/* 3. Bar + percentil */}
+            <View style={stylesMini.barRow}>
                 <View style={stylesMini.barBackground}>
                     <View style={[stylesMini.barFill, { width: `${percentage}%` }]} />
                 </View>
-
                 <Text style={stylesMini.percent}>{Math.round(percentage)}%</Text>
             </View>
         </View>
@@ -187,35 +192,33 @@ const localStyles = StyleSheet.create({
 
 const stylesMini = StyleSheet.create({
     container: {
-        // width: width * 0.85,
-        // alignSelf: "center",
         width: width,
         marginVertical: height * 0.02,
         paddingHorizontal: width * 0.05,
-        // marginHorizontal: width * 0.01
     },
     label: {
         fontSize: 16,
         fontWeight: "600",
         color: "black",
+        textAlign: "center", // label do stredu
         marginBottom: 4,
-        alignSelf: "flex-start",
     },
-    row: {
+    valueCentered: {
+        fontSize: 16,
+        fontWeight: "700",
+        color: "black",
+        textAlign: "center", // hodnota do stredu
+        marginBottom: 8,
+    },
+    barRow: {
         flexDirection: "row",
         alignItems: "center",
-    },
-    value: {
-        width: 45,
-        color: "black",
-        fontWeight: "600",
     },
     barBackground: {
         flex: 1,
         height: 18,
         backgroundColor: "#444",
         borderRadius: 9,
-        marginHorizontal: 8,
         overflow: "hidden",
     },
     barFill: {
@@ -227,6 +230,7 @@ const stylesMini = StyleSheet.create({
         color: "black",
         textAlign: "right",
         fontWeight: "600",
+        marginLeft: 8,
     },
 });
 

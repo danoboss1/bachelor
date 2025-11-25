@@ -1,9 +1,9 @@
 import express from 'express';
-import { StatsController } from '../controllers/statsController.js';
+import { StatsController } from '../controllers/wcstStatsController.js';
 
 const router = express.Router();
 
 router.get('/:statId', StatsController.getStat);
-router.post('', StatsController.saveStat);
+router.post('/', StatsController.saveStat);
 
 export default router;

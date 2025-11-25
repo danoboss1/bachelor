@@ -1,5 +1,5 @@
 import express from 'express';
-import { LeaderboardController } from '../controllers/leaderboardController.js';
+import { LeaderboardController } from '../controllers/wcstLeaderboardController.js';
 
 const router = express.Router();
 

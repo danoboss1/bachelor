@@ -1,8 +1,8 @@
 import express from 'express';
 import type { Application, Request, Response } from 'express';
 import userRoutes from './routes/userRoutes.js';
-import statRoutes from './routes/statsRouter.js';
-import leaderboardRoutes from './routes/leaderboardRouter.js';
+import statRoutes from './routes/wcstStatsRouter.js';
+import leaderboardRoutes from './routes/wcstLeaderboardRouter.js';
 
 
 const app: Application = express();

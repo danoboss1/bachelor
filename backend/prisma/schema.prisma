@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id               Int                @id @default(autoincrement())
+  username         String             @unique @db.VarChar(50)
+  password         String
+  leaderboard_wcst leaderboard_wcst[]
+  stats_wcst       stats_wcst[]
+}
+
+model leaderboard_wcst {
+  id         Int         @id @default(autoincrement())
+  user_id    Int?
+  stats_id   Int?
+  stats_wcst stats_wcst? @relation(fields: [stats_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_wcst_stats_id")
+  users      users?      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_wcst_user_id")
+}
+
+model stats_wcst {
+  id                           Int                @id @default(autoincrement())
+  time                         DateTime?          @db.Timestamp(6)
+  categories_completed         Int?               @db.SmallInt
+  trials_administered          Int?               @db.SmallInt
+  total_correct                Int?               @db.SmallInt
+  total_error                  Int?               @db.SmallInt
+  perseverative_responses      Int?               @db.SmallInt
+  perseverative_errors         Int?               @db.SmallInt
+  non_perseverative_errors     Int?               @db.SmallInt
+  failure_to_maintain_set      Int?               @db.SmallInt
+  trials_to_first_category     Int?               @db.SmallInt
+  perseverativepercent         Decimal?           @db.Decimal(5, 2)
+  perseverativeerrorpercent    Decimal?           @db.Decimal(5, 2)
+  nonperseverativeerrorpercent Decimal?           @db.Decimal(5, 2)
+  errorpercent                 Decimal?           @db.Decimal(5, 2)
+  user_id                      Int?
+  leaderboard_wcst             leaderboard_wcst[]
+  users                        users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_wcst_user_id")
+}

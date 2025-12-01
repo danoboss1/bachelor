@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.get('/:statId', StatsController.getStat);
 router.post('/', StatsController.saveStat);
+router.get('/percentile/trials-administered', StatsController.getTrialsAdministeredPercentile);
 
 export default router;

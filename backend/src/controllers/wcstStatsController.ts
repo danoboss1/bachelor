@@ -108,5 +108,47 @@ export class StatsController {
             console.error("Error saving statistics", error);
             res.status(500).json({ error: "Server error"});
         }
-    }
+    };
+
+    static getTrialsAdministeredPercentile = async (req: Request, res: Response) => {
+        try {
+            const { value } = req.query
+
+            if (value == undefined) {
+                return res.status(400).json({ error: "value is required" });
+            }
+
+            const numericValue = Number(value);
+
+            if (isNaN(numericValue)) {
+                return res.status(400).json({ error: "value must be a number"});
+            }
+
+            const total = await prisma.stats_wcst.count();
+
+            if (total === 0) {
+                return res.json({
+                    metric: "trials_administered",
+                    value: numericValue,
+                    percentile: 0
+                })
+            }
+
+            const lessOrEqual = await prisma.stats_wcst.count({
+                where: { trials_administered: { lte: numericValue }}
+            });
+
+            const percentile = Number(((lessOrEqual / total) * 100).toFixed(2));
+
+            return res.json({
+                metric: "trials_administered",
+                value: numericValue,
+                percentile
+            })
+
+        } catch (error) {
+            console.error("Error calculating percentile for trials_administered:", error);
+            return res.status(500).json({ error: "Server error" });
+        }
+    };
 }

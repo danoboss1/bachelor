@@ -1,6 +1,7 @@
 import { StatMini, StatMiniSupplementary } from '@/components/StatsComponent';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "../../constants/Colors";
@@ -42,6 +43,29 @@ export default function WCST_ENDSCREEN() {
     const perseverativeErrorPercent = Number(params.perseverativeErrorPercent) || 0;
     const nonPerseverativeErrorPercent = Number(params.nonPerseverativeErrorPercent) || 0;
     const errorPercent = Number(params.errorPercent) || 0;
+
+    const [trialsPercentile, setTrialsPercentile] = useState<number | null>(null);
+
+    useEffect(() => {
+        async function fetchTrialsPercentile() {
+            try {
+                const response = await fetch(
+                    `https://bachelor-6zigep6fn-daniel-sehnouteks-projects.vercel.app/stats/percentile/trials-administered?value=${trials}`
+                );
+                const data = await response.json();
+                setTrialsPercentile(data.percentile);
+            } catch (error) {
+                console.error("Failed to fetch trials percentile:", error);
+                setTrialsPercentile(null);
+            }
+        }
+
+        if (trials > 0) {
+            fetchTrialsPercentile();
+        } else {
+            setTrialsPercentile(0);
+        }
+    }, [trials]);
 
     return (
         <LinearGradient

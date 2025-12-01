@@ -18,7 +18,6 @@ export default {
   },
 };
 
-// nový export COLORS
 export const COLORS = {
   primary: "#8B593E",
   secondary_background: "#DCDCDC",
@@ -26,6 +25,10 @@ export const COLORS = {
   text: "#4A3428",
   border: "#E5D3B7",
   white: "#FFFFFF",
+  gradient_orange: "#FF8C00",
+  gradient_yellow: "#FFD700",
+  green_button: "#0E8A39",
+  blue_button: "#1E90FF",
   // textLight: "#9A8478",
   // expense: "#E74C3C",
   // income: "#2ECC71",

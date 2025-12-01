@@ -6,10 +6,11 @@ const WCST_ROUTE = "/wcst/WCST";
 
 const { width, height } = Dimensions.get("window");
 
+
 export default function GameInfo() {
     return (
         <ScrollView contentContainerStyle={localStyles.container}>
-            <Text style={localStyles.title}>🧩 Wisconsin Card Sorting Test (WCST)</Text>
+            <Text style={localStyles.title_info}>🧩 Wisconsin Card Sorting Test (WCST)</Text>
 
             <Text style={localStyles.section}>
                 Sort the cards according to a hidden rule.
@@ -53,9 +54,8 @@ const localStyles = StyleSheet.create({
         padding: 20,
         backgroundColor: "#fff",
         justifyContent: "center",
-        // alignItems: "center",
     },
-    title: {
+    title_info: {
         fontSize: 22,
         fontWeight: "bold",
         marginBottom: 10,
@@ -76,14 +76,9 @@ const localStyles = StyleSheet.create({
         marginTop: 4,
     },
     separator: {
-        marginVertical: 20,
-        height: 1,
+        marginVertical: height * 0.027,
+        height: StyleSheet.hairlineWidth,
         backgroundColor: "#ccc",
-    },
-    ready: {
-        fontSize: 20,
-        fontWeight: "bold",
-        textAlign: "center",
     },
     button: {
         flexDirection: 'row',
@@ -91,9 +86,8 @@ const localStyles = StyleSheet.create({
         justifyContent: "center",
         backgroundColor: "#0E8A39",
         paddingVertical: height * 0.02,
-        // paddingHorizontal: width * 0.04,
-        borderRadius: 10,
-        width: width * 0.4,       // tlačidlo bude mať cca 20% šírky obrazovky
+        borderRadius: width * 0.025,
+        width: width * 0.4,       
         alignSelf: "center", 
     },
 });

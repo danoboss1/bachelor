@@ -3,10 +3,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
-
-const RETURN_HOME = "/(tabs)/games";
+import { COLORS } from "../../constants/Colors";
+import { Theme } from "../../constants/Theme";
 
 const { width, height } = Dimensions.get("window");
+
+const RETURN_HOME = "/(tabs)/games";
+const PLAY_AGAIN = "/wcst/WCST_info";
+
 
 export default function WCST_ENDSCREEN() {
     const params = useLocalSearchParams<{
@@ -34,7 +38,6 @@ export default function WCST_ENDSCREEN() {
     const categoriesCompleted = Number(params.categoriesCompleted) || 0;
     const failureToMaintainSet = Number(params.failureToMaintainSet) || 0;
     const trialsToFirstCategory = Number(params.trialsToFirstCategory) || 0;
-
     const perseverativePercent = Number(params.perseverativePercent) || 0;
     const perseverativeErrorPercent = Number(params.perseverativeErrorPercent) || 0;
     const nonPerseverativeErrorPercent = Number(params.nonPerseverativeErrorPercent) || 0;
@@ -42,19 +45,17 @@ export default function WCST_ENDSCREEN() {
 
     return (
         <LinearGradient
-            colors={["#FF8C00", "#FFD700"]} // žltá → oranžová
+            colors={[COLORS.gradient_orange, COLORS.gradient_yellow]} 
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={styles.container}
         >
             <View style={localStyles.container}>
 
-                {/* Nadpis */}
                 <Text style={localStyles.title}>Test Completed</Text>
 
-                {/* Scroll iba pre štatistiky */}
+                {/* Hlavné štatistiky */}
                 <ScrollView contentContainerStyle={localStyles.statsScroll}>
-                    {/* Hlavné štatistiky */}
                     <StatMini 
                         label="Total number of trials administered" 
                         value={trials} 
@@ -79,7 +80,6 @@ export default function WCST_ENDSCREEN() {
                         showPercentSign={true}
                     />
 
-                    {/* <Text style={localStyles.subTitle}>Vedľajšie štatistiky</Text> */}
                     <View style={localStyles.separator} />
 
                     {/* Vedľajšie štatistiky */}
@@ -97,15 +97,15 @@ export default function WCST_ENDSCREEN() {
                 {/* Tlačidlá stále viditeľné */}
                 <View style={localStyles.buttonContainer}>
                     <TouchableOpacity 
-                        style={[localStyles.button, { backgroundColor: "#0E8A39" }]}
-                        onPress={() => router.push(RETURN_HOME)}
+                        style={[localStyles.button, { backgroundColor: COLORS.green_button }]}
+                        onPress={() => router.replace(RETURN_HOME)}
                     >
                         <Text style={styles.buttonTextWhite}>Return Home</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        style={[localStyles.button, { backgroundColor: "#1E90FF" }]}
-                        onPress={() => router.replace("/wcst/WCST_info")}
+                        style={[localStyles.button, { backgroundColor: COLORS.blue_button }]}
+                        onPress={() => router.replace(PLAY_AGAIN)}
                     >
                         <Text style={styles.buttonTextWhite}>Play Again</Text>
                     </TouchableOpacity>
@@ -118,39 +118,26 @@ export default function WCST_ENDSCREEN() {
 const localStyles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: "#fff",
-        paddingTop: 20,
+        paddingTop: height * 0.026,
         alignItems: "center",
         justifyContent: "space-between",
     },
     title: {
-        fontSize: 28,
+        fontSize: Theme.typography.h1,
         fontWeight: "bold",
         color: "#000",
         marginBottom: height * 0.03,
         textAlign: "center",
         marginTop: height * 0.04,
     },
-    subTitle: {
-        fontSize: 22,
-        fontWeight: "600",
-        color: "#333",
-        marginVertical: 15,
-        textAlign: "center",
-    },
     statsScroll: {
         width: "100%",
-        // paddingHorizontal: 20,
-        // paddingBottom: 20,
     },
     buttonContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        // width: width * 0.9,
-        // marginBottom: 20,
         marginBottom: height * 0.05,
         textAlign: "center",
-        // marginTop: height * 0.01,
     },
     button: {
         flex: 1,
@@ -158,14 +145,18 @@ const localStyles = StyleSheet.create({
         alignItems: "center",     
         justifyContent: "center",
         paddingVertical: height * 0.02,
-        borderRadius: 10,
-        marginHorizontal: 5,
+        borderRadius: Theme.button.radius,
+        marginHorizontal: width * 0.015,
     },
     separator: {
-        marginVertical: 20,
-        height: 1,
+        marginVertical: height * 0.025,
+        height: StyleSheet.hairlineWidth,
         backgroundColor: "#ccc",
         marginHorizontal: width * 0.05,
         width: width * 0.9,
     },
 });
+
+// nativne skalovanie textu bez width, height. Vyskusat potom neskor
+// fontSize: RFValue(22), // text bude škálovaný podľa veľkosti obrazovky
+// import { RFValue } from "react-native-responsive-fontsize";

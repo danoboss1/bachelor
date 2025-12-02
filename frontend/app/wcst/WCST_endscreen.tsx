@@ -44,28 +44,55 @@ export default function WCST_ENDSCREEN() {
     const nonPerseverativeErrorPercent = Number(params.nonPerseverativeErrorPercent) || 0;
     const errorPercent = Number(params.errorPercent) || 0;
 
-    const [trialsPercentile, setTrialsPercentile] = useState<number | null>(null);
+    const [percentiles, setPercentiles] = useState<{
+        trials: number | null;
+        perseverativeResponses: number | null;
+        perseverativeErrors: number | null;
+        nonPerseverativeErrors: number | null;
+    }>({
+        trials: null,
+        perseverativeResponses: null,
+        perseverativeErrors: null,
+        nonPerseverativeErrors: null,
+    });
 
     useEffect(() => {
-        async function fetchTrialsPercentile() {
+        async function fetchPercentile(metric: string, value: number) {
             try {
                 const response = await fetch(
-                    `https://bachelor-6zigep6fn-daniel-sehnouteks-projects.vercel.app/stats/percentile/trials-administered?value=${trials}`
+                    `https://bachelor-pi.vercel.app/stats/percentile?metric=${metric}&value=${value}`
                 );
                 const data = await response.json();
-                setTrialsPercentile(data.percentile);
+                return data.percentile;
             } catch (error) {
-                console.error("Failed to fetch trials percentile:", error);
-                setTrialsPercentile(null);
+                console.error(`Failed to fetch percentile for ${metric}:`, error);
+                return null;
             }
         }
 
-        if (trials > 0) {
-            fetchTrialsPercentile();
-        } else {
-            setTrialsPercentile(0);
+        async function fetchAllPercentiles() {
+            const [
+                trialsPercentile,
+                perseverativeResponsesPercentile,
+                perseverativeErrorsPercentile,
+                nonPerseverativeErrorsPercentile
+            ] = await Promise.all([
+                fetchPercentile("trials_administered", trials),
+                fetchPercentile("perseverative_responses", perseverativeResponses),
+                fetchPercentile("perseverative_errors", perseverativeErrors),
+                fetchPercentile("non_perseverative_errors", nonPerseverativeErrors),
+            ]);
+
+            setPercentiles({
+                trials: trialsPercentile ?? 0,
+                perseverativeResponses: perseverativeResponsesPercentile ?? 0,
+                perseverativeErrors: perseverativeErrorsPercentile ?? 0,
+                nonPerseverativeErrors: nonPerseverativeErrorsPercentile ?? 0,
+            });
         }
-    }, [trials]);
+
+        fetchAllPercentiles();
+    }, [trials, perseverativeResponses, perseverativeErrors, nonPerseverativeErrors]);
 
     return (
         <LinearGradient
@@ -82,25 +109,29 @@ export default function WCST_ENDSCREEN() {
                 <ScrollView contentContainerStyle={localStyles.statsScroll}>
                     <StatMini 
                         label="Total number of trials administered" 
-                        value={trialsPercentile ?? 0} 
+                        value={trials}
+                        percentile={percentiles.trials ?? 0} 
                         max={100} 
                     />
                     <StatMini 
                         label="Percentage of perseverative responses" 
-                        value={perseverativePercent} 
-                        max={52} 
+                        value={perseverativePercent}
+                        percentile={percentiles.perseverativeResponses ?? 0} 
+                        max={100} 
                         showPercentSign={true}
                     />
                     <StatMini 
                         label="Percentage of perseverative errors" 
-                        value={perseverativeErrorPercent} 
-                        max={85} 
+                        value={perseverativeErrorPercent}
+                        percentile={percentiles.perseverativeErrors ?? 0} 
+                        max={100} 
                         showPercentSign={true}
                     />
                     <StatMini 
                         label="Percentage of non-perseverative errors" 
-                        value={nonPerseverativeErrorPercent} 
-                        max={14} 
+                        value={nonPerseverativeErrorPercent}
+                        percentile={percentiles.nonPerseverativeErrors ?? 0} 
+                        max={100} 
                         showPercentSign={true}
                     />
 

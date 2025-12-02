@@ -19,6 +19,7 @@ type StatsComponentProps = {
 type StatMiniProps = {
     label: string;
     value: number;
+    percentile: number;
     max?: number;
     showPercentSign?: boolean; // nový voliteľný prop
 };
@@ -28,8 +29,8 @@ type StatMiniSupplementaryProps = {
     value: number | string;
 };
 
-export function StatMini({ label, value, max = 100, showPercentSign }: StatMiniProps) {
-    const percentage = Math.min((value / max) * 100, 100);
+export function StatMini({ label, value, percentile, max = 100, showPercentSign }: StatMiniProps) {
+    const percentage = Math.min((percentile / max) * 100, 100);
 
     return (
         <View style={stylesMini.container}>

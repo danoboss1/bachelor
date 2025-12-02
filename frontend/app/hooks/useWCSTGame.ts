@@ -149,7 +149,7 @@ export function useWCSTGame() {
     const [finished, setFinished] = React.useState(false);
 
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
-        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
+        if (newCategoriesCompleted >= 3 || newAttemptsUsed >= 128) {
             setIsLocked(true);
             setFinished(true);
             if (newCategoriesCompleted >= 1) setFeedback("category");
@@ -184,7 +184,7 @@ export function useWCSTGame() {
         };
 
         try {
-            await axios.post("https://bachelor-6zigep6fn-daniel-sehnouteks-projects.vercel.app/stats", payload);
+            await axios.post("https://bachelor-pi.vercel.app/stats", payload);
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }
@@ -252,7 +252,7 @@ export function useWCSTGame() {
                             const newCompleted = completedRef.current + 1;
                             setCategoriesCompleted(newCompleted);
                             setConsecutiveCorrect(0);
-                            showFeedback("category");
+                            // showFeedback("category");
 
                             previousRuleRef.current = currentRule;
 

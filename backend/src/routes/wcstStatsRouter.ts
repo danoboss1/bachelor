@@ -3,7 +3,10 @@ import { StatsController } from '../controllers/wcstStatsController.js';
 
 const router = express.Router();
 
-router.get('/percentile/trials-administered', StatsController.getTrialsAdministeredPercentile);
+router.get('/percentile/trials-administered', (req, res) => {
+    console.log("Percentile route hit");
+    res.send("ok");
+});
 
 router.get('/:statId', StatsController.getStat);
 router.post('/', StatsController.saveStat);

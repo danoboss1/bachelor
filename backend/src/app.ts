@@ -1,8 +1,11 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import userRoutes from '../src/routes/userRoutes.js';
-import statRoutes from '../src/routes/wcstStatsRouter.js';
-import leaderboardRoutes from '../src/routes/wcstLeaderboardRouter.js';
+// import userRoutes from '../src/routes/userRoutes.js';
+// import statRoutes from '../src/routes/wcstStatsRouter.js';
+// import leaderboardRoutes from '../src/routes/wcstLeaderboardRouter.js';
+import userRoutes from './routes/userRoutes.js';
+import statRoutes from './routes/wcstStatsRouter.js';
+import leaderboardRoutes from './routes/wcstLeaderboardRouter.js';
 
 const app = express();
 app.use(express.json());
@@ -14,6 +17,12 @@ app.use('/leaderboard', leaderboardRoutes);
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello world!');
 });
+
+// const port: number = 3000;
+// // Spustenie servera na všetkých sieťových rozhraniach
+// app.listen(port, '0.0.0.0', () => {
+//     console.log(`Server running successfully on port ${port}`);
+// });
 
 export default app;
 

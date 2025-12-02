@@ -82,8 +82,8 @@ export default function WCST_ENDSCREEN() {
                 <ScrollView contentContainerStyle={localStyles.statsScroll}>
                     <StatMini 
                         label="Total number of trials administered" 
-                        value={trials} 
-                        max={26} 
+                        value={trialsPercentile ?? 0} 
+                        max={100} 
                     />
                     <StatMini 
                         label="Percentage of perseverative responses" 

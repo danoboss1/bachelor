@@ -110,44 +110,46 @@ export class StatsController {
         }
     };
 
-    static getTrialsAdministeredPercentile = async (req: Request, res: Response) => {
+    static getPercentile = async (req: Request, res: Response) => {
         try {
-            const { value } = req.query
+            const { metric, value } = req.query;
 
-            if (value == undefined) {
-                return res.status(400).json({ error: "value is required" });
+            if (!metric || value === undefined) {
+                return res.status(400).json({ error: "metric and value are required" });
+            }
+
+            const validMetrics = [
+                "trials_administered",
+                "perseverative_responses",
+                "perseverative_errors",
+                "non_perseverative_errors"
+            ];
+
+            const metricKey = String(metric);
+
+            if (!validMetrics.includes(metricKey)) {
+                return res.status(400).json({ error: "Invalid metric" });
             }
 
             const numericValue = Number(value);
-
             if (isNaN(numericValue)) {
-                return res.status(400).json({ error: "value must be a number"});
+                return res.status(400).json({ error: "value must be a number" });
             }
 
             const total = await prisma.stats_wcst.count();
-
             if (total === 0) {
-                return res.json({
-                    metric: "trials_administered",
-                    value: numericValue,
-                    percentile: 0
-                })
+                return res.json({ metric: metricKey, value: numericValue, percentile: 0 });
             }
 
             const lessOrEqual = await prisma.stats_wcst.count({
-                where: { trials_administered: { lte: numericValue }}
+                where: { [metricKey]: { lte: numericValue } }
             });
 
             const percentile = Number(((lessOrEqual / total) * 100).toFixed(2));
 
-            return res.json({
-                metric: "trials_administered",
-                value: numericValue,
-                percentile
-            })
-
+            return res.json({ metric: metricKey, value: numericValue, percentile });
         } catch (error) {
-            console.error("Error calculating percentile for trials_administered:", error);
+            console.error("Error calculating percentile:", error);
             return res.status(500).json({ error: "Server error" });
         }
     };

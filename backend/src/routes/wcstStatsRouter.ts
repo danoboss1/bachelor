@@ -8,8 +8,7 @@ const router = express.Router();
 //     res.send("ok");
 // });
 
-router.get('/percentile/trials-administered', StatsController.getTrialsAdministeredPercentile);
-
+router.get('/percentile', StatsController.getPercentile);
 router.get('/:statId', StatsController.getStat);
 router.post('/', StatsController.saveStat);
 

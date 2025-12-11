@@ -81,7 +81,7 @@ const localStyles = StyleSheet.create({
         backgroundColor: "#ccc",
     },
     button: {
-        flexDirection: 'row',
+        flexDirection: "row",
         alignItems: "center",     
         justifyContent: "center",
         backgroundColor: "#0E8A39",

@@ -149,7 +149,7 @@ export function useWCSTGame() {
     const [finished, setFinished] = React.useState(false);
 
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
-        if (newCategoriesCompleted >= 3 || newAttemptsUsed >= 128) {
+        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
             setIsLocked(true);
             setFinished(true);
             if (newCategoriesCompleted >= 1) setFeedback("category");

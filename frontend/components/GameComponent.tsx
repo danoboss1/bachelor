@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get("window");
 type GameCardProps = {
     title: string;
     image?: ImageSourcePropType;
-    path: "/wcst/WCST_info";
+    path: "/wcst/WCST_info" | "/tol/TOL_info";
 }
 
 export function GameCard({ image, title, path }: GameCardProps) {
@@ -69,10 +69,8 @@ const localStyles = StyleSheet.create({
     marginVertical: height * 0.03,
   },
   imageBackground: {
-    // width: "100%",
-    // height: 150,
     flex: 1,
-    justifyContent: "flex-end", // text dole
+    justifyContent: "flex-end", 
     padding: 16,
   },
   rowContainer: {

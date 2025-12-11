@@ -5,21 +5,27 @@ import { styles } from "../../assets/styles/mainScreens.styles";
 import { GameCard } from "@/components/GameComponent";
 
 const gamesData = [
-  { id: "1", 
-    title: "Wisconsin Card\nSorting Test", 
-    image: require('../../assets/images/wisconsinCardSortingTest2.png'),
-    path: "/wcst/WCST_info" as const, },
+    {
+        id: "1",
+        title: "Wisconsin Card\nSorting Test",
+        image: require('../../assets/images/wisconsinCardSortingTest2.png'),
+        path: "/wcst/WCST_info" as const,
+    },
+    {   
+        // takato farba bielej to je #f9f9f9
+        // velkost toho obrazku ako funguje skontrolovat
+        id: "2",
+        title: "Tower of London",
+        image: require('../../assets/images/TowerOfLondon.png'),
+        path: "/tol/TOL_info" as const,
+    }
 ];
+
 
 
 export default function GamesScreen() {
     return (
         <View style={styles.container}>
-            {/* <View style={styles.background}>
-                <View style={styles.bgTop}></View>
-                <View style={styles.bgBottom}></View>
-            </View> */}
-
             {/* vrchna cast pred upravou */}
             <View style={styles.bgTop}>
                 <Text style={styles.header}> Hi, John </Text>
@@ -28,35 +34,20 @@ export default function GamesScreen() {
             
             {/* spodna cast pred upravou */}
             <View style={styles.bgBottom}>
-
-                {/* <FlatList
-                    data = {gamesData}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <GameCard title={item.title} description={item.description} />
-                    )}
-                    contentContainerStyle={{ padding: 16 }}
-                /> */}
                 <FlatList
                     data={gamesData}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <GameCard
                         title={item.title}
-                        // description={item.description}
-                        image={item.image} // TU posielame obrázok
+                        image={item.image} 
                         path={item.path}
                         />
                     )}
-                    // contentContainerStyle={{ padding: 16 }}
                 />
             </View>
 
-            {/* <View style={styles.content}>
-                <Text>Games</Text>
 
-                <View style={styles.rectangle} />
-            </View> */}
         </View>
     )
 }

@@ -51,7 +51,7 @@ export default function GameInfo() {
 const localStyles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        padding: 20,
+        padding: width * 0.052,
         backgroundColor: "#fff",
         justifyContent: "center",
     },

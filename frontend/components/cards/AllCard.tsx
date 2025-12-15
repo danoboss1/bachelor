@@ -1,6 +1,7 @@
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { cardStyles as styles } from "./Card.styles";
+
 const { width, height } = Dimensions.get("window");
 
 

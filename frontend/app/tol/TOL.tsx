@@ -1,77 +1,27 @@
-import { Hand, PegStack } from "@/components/tol/ToLComponents";
+import { DiscInHand, Hand, LongStack, SimpleDisc, StackWithDiscs } from "@/components/tol/ToLComponents";
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
+import { useTOLGame } from "../hooks/useTOLGAME";
 
 const { width, height } = Dimensions.get("window");
 
-
-
-/* =========================
-   DISC
-========================= */
-
-type DiscProps = {
-    size: number;
-    color: string;
-    bottomOffset: number;
-};
-
-const Disc: React.FC<DiscProps> = ({ size, color, bottomOffset }) => {
-    return (
-        <View
-            style={[
-                localStyles.disc,
-                {
-                    width: size,
-                    backgroundColor: color,
-                    bottom: bottomOffset,
-                },
-            ]}
-        />
-    );
-};
-
-/* =========================
-   STACK WITH DISCS
-========================= */
-
-type StackWithDiscsProps = {
-    stackHeight: number;
-    backgroundColor: string;
-    discs: { id: number; size: number; color: string }[];
-};
-
-const StackWithDiscs: React.FC<StackWithDiscsProps> = ({
-    stackHeight,
-    backgroundColor,
-    discs,
-}) => {
-    return (
-        <View style={{ width: width * 0.29, height: stackHeight }}>
-            {/* PEG */}
-            <PegStack
-                stackHeight={stackHeight}
-                backgroundColor={backgroundColor}
-            />
-
-            {/* DISCS – CEZ PALICKU */}
-            {discs.map((disc, index) => (
-                <Disc
-                    key={disc.id}
-                    size={disc.size}
-                    color={disc.color}
-                    bottomOffset={height * 0.005 + 2 * index * (height * 0.03)}
-                />
-            ))}
-        </View>
-    );
-};
 
 /* =========================
    SCREEN
 ========================= */
 
 export default function TOL_Screen() {
+    const {
+        moveDisc,
+        selectedDiscId,
+        handPosition,
+        handRef,
+        registerDiscRef,
+    } = useTOLGame();
+
+
+    // const handRef = React.useRef<View>(null);
+  
     return (
         <View style={localStyles.container}>
 
@@ -98,7 +48,7 @@ export default function TOL_Screen() {
                 </View>
             </View>
 
-            <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
+            <View ref={handRef} style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
                 <Hand size={150} color="#E0B899" secondaryColor="#C89B7B" />
             </View>
 
@@ -106,8 +56,18 @@ export default function TOL_Screen() {
             <View style={localStyles.userPegs}>
                 <View style={localStyles.stacksRow}>
 
+                    <LongStack
+                        stackHeight={height * 0.27}
+                        backgroundColor="#FFCC80"
+                    />
+
+                    <SimpleDisc
+                        size={width * 0.28} 
+                        color={"red"}
+                    />
+
                     {/* LONG – 3 DISCS */}
-                    <StackWithDiscs
+                    {/* <StackWithDiscs
                         stackHeight={height * 0.27}
                         backgroundColor="#FFCC80"
                         discs={[
@@ -115,7 +75,11 @@ export default function TOL_Screen() {
                             { id: 2, size: width * 0.28, color: "blue" },
                             { id: 3, size: width * 0.28, color: "green" },
                         ]}
-                    />
+                        selectedDiscId={selectedDiscId}
+                        onDiscPress={moveDisc}
+                        handPosition={handPosition}
+                        registerDiscRef={registerDiscRef}
+                    /> */}
 
                     {/* MID – 2 DISCS */}
                     <StackWithDiscs
@@ -138,6 +102,16 @@ export default function TOL_Screen() {
 
                 </View>
             </View>
+
+            <SimpleDisc
+                size={width * 0.28} 
+                color={"red"}
+            />
+
+            <DiscInHand
+                size={width * 0.28} 
+                color={"green"}
+            />
 
             <View style={localStyles.footer} />
         </View>
@@ -174,14 +148,6 @@ const localStyles = StyleSheet.create({
         justifyContent: "space-around",
         paddingBottom: height * 0.03,
     },
-    stackBase: {
-        width: width * 0.29,
-        borderRadius: 6,
-        justifyContent: "flex-end",
-        alignItems: "center",
-        position: "absolute",
-        bottom: 0,
-    },
     peg: {
         width: width * 0.035,
         height: "90%",
@@ -189,12 +155,5 @@ const localStyles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 6,
         zIndex: 1,
-    },
-    disc: {
-        position: "absolute",
-        height: height * 0.040,
-        borderRadius: 6,
-        alignSelf: "center",
-        zIndex: 2,
     },
 });

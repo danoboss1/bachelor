@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get("window");
 type GameCardProps = {
     title: string;
     image?: ImageSourcePropType;
-    path: "/wcst/WCST_info" | "/tol/TOL_info";
+    path: "/wcst/WCST_info" | "/tol/TOL_info" | "/knox/KNOX_info";
 }
 
 export function GameCard({ image, title, path }: GameCardProps) {

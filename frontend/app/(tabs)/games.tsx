@@ -18,7 +18,15 @@ const gamesData = [
         title: "Tower of London",
         image: require('../../assets/images/TowerOfLondon.png'),
         path: "/tol/TOL_info" as const,
-    }
+    },
+    {
+        // #EAF4FF
+        // #DCEEFF
+        id: "3",
+        title: "Knox's Cube\nTest",
+        image: require('../../assets/images/knoxsCubeTest2.png'),
+        path: "/knox/KNOX_info" as const,
+    },
 ];
 
 

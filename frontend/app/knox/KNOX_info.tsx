@@ -23,7 +23,8 @@ export default function KNOXInfoScreen() {
             <Text style={localStyles.subtitle}>🔄 Game Info</Text>
             <Text style={localStyles.item}>• The test consists of 18 sequences, ranging from 2-step to 7-step sequences</Text>
             <Text style={localStyles.item}>• The test ends after completing all sequences</Text>
-
+            <Text style={localStyles.item}>• Time limit per problem: 1 minute</Text>
+            
             <Text style={localStyles.subtitle}>🎮 Controls</Text>
             <Text style={localStyles.section}>
                 Watch the cubes light up, then tap the cubes with your finger in the same order as presented.

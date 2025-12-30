@@ -32,8 +32,8 @@ export default function WCST_Screen() {
             end={{ x: 1, y: 0.5 }}
             style={styles.container}
         >
-            <View style={[styles.timer, { justifyContent: "center", alignItems: "center" }]}>
-                <Text style={{ fontSize: 24, color: "black" }}>Timer: {formatTime(timeLeft)}</Text>
+            <View style={styles.timer}>
+                <Text style={styles.timerText}>Timer: {formatTime(timeLeft)}</Text>
             </View>
 
             <View style={styles.row}>
@@ -78,13 +78,13 @@ export default function WCST_Screen() {
 
             <View style={[styles.message, { justifyContent: "center", alignItems: "center" }]}>
                 {feedback === "correct" && (
-                    <Text style={{ fontSize: 28, color: "lime", fontWeight: "bold" }}>Correct!</Text>
+                    <Text style={styles.feedbackCorrectText}>Correct!</Text>
                 )}
                 {feedback === "wrong" && (
-                    <Text style={{ fontSize: 28, color: "red", fontWeight: "bold" }}>Wrong!</Text>
+                    <Text style={styles.feedbackWrongText}>Wrong!</Text>
                 )}
                 {feedback === "category" && (
-                    <Text style={{ fontSize: 24, color: "yellow", fontWeight: "bold" }}>Category Completed!</Text>
+                    <Text style={styles.feedbackCategoryText}>Category Completed!</Text>
                 )}
             </View>
 
@@ -134,5 +134,26 @@ const styles = StyleSheet.create({
     timer: {
         flex: 1,
         width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    timerText: {
+        fontSize: 24, 
+        color: "black" 
+    },
+    feedbackCorrectText: { 
+        fontSize: 28, 
+        color: "lime", 
+        fontWeight: "bold", 
+    },
+    feedbackWrongText: { 
+        fontSize: 28, 
+        color: "red", 
+        fontWeight: "bold", 
+    },
+    feedbackCategoryText: { 
+        fontSize: 24, 
+        color: "yellow", 
+        fontWeight: "bold",
     },
 });

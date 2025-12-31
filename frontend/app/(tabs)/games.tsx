@@ -8,7 +8,7 @@ const gamesData = [
     {
         id: "1",
         title: "Wisconsin Card\nSorting Test",
-        image: require('../../assets/images/wisconsinCardSortingTest2.png'),
+        image: require('../../assets/images/wisconsinCardSortingTest.png'),
         path: "/wcst/WCST_info" as const,
     },
     {   
@@ -24,7 +24,7 @@ const gamesData = [
         // #DCEEFF
         id: "3",
         title: "Knox's Cube\nTest",
-        image: require('../../assets/images/knoxsCubeTest2.png'),
+        image: require('../../assets/images/knoxsCubeTest.png'),
         path: "/knox/KNOX_info" as const,
     },
 ];

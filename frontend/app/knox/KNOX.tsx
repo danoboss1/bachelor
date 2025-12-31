@@ -8,6 +8,8 @@ export default function KNOX_Screen() {
         timeLeft,
         formatTime,
         feedback,
+        activeSquare,
+        lightUpSquare,
     } = useKNOXGame();
 
     return (
@@ -33,19 +35,44 @@ export default function KNOX_Screen() {
                 {feedback === "Incorrect" && (
                     <Text style={localStyles.feedbackIncorrectText}>Incorrect!</Text>
                 )}
-                {feedback === "You have completed the test" && (
-                    <Text style={localStyles.feedbackTestFinishedText}>You have{"\n"}completed the test!</Text>
+                {feedback === "Well done. You have completed the test" && (
+                    <View>
+                        <Text style={localStyles.feedbackCorrectText}>Well done!</Text>
+                        <Text style={localStyles.feedbackTestFinishedText}>You have{"\n"}completed the test!</Text>
+                    </View>
+                )}
+                {feedback === "Incorrect. You have completed the test" && (
+                    <View>
+                        <Text style={localStyles.feedbackIncorrectText}>Incorrect!</Text>
+                        <Text style={localStyles.feedbackTestFinishedText}>You have{"\n"}completed the test!</Text>
+                    </View>
                 )}
             </View>
             
             <View style={localStyles.squaresBox}>
                 <View style={localStyles.squaresRow}>
-                    <Square id={1}/>
-                    <Square id={2}/>
+                    <Square 
+                        id={0} 
+                        active={activeSquare === 0} 
+                        onPress={() => lightUpSquare(0)}
+                    />
+                    <Square 
+                        id={1} 
+                        active={activeSquare === 1} 
+                        onPress={() => lightUpSquare(1)}
+                    />
                 </View>
                 <View style={localStyles.squaresRow}>
-                    <Square id={3}/>
-                    <Square id={4}/>
+                    <Square 
+                        id={2} 
+                        active={activeSquare === 2} 
+                        onPress={() => lightUpSquare(2)}
+                    />
+                    <Square 
+                        id={3} 
+                        active={activeSquare === 3} 
+                        onPress={() => lightUpSquare(3)}
+                    />
                 </View>
             </View>
 

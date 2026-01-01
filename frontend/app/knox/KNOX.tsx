@@ -9,7 +9,11 @@ export default function KNOX_Screen() {
         formatTime,
         feedback,
         activeSquare,
+        activeUserTap,
+        incorrectUserTap,
+        correctLastUserTap,
         lightUpSquare,
+        startGame,
     } = useKNOXGame();
 
     return (
@@ -21,7 +25,12 @@ export default function KNOX_Screen() {
 
             <View style={localStyles.infoBox}>
                 {feedback === "Tap here when you are ready" && (
-                    <Text style={localStyles.feedbackStartText}>Tap here{"\n"}when you are ready</Text>
+                    <Text 
+                        style={localStyles.feedbackStartText}
+                        onPress={startGame}
+                    >
+                        Tap here{"\n"}when you are ready
+                    </Text>
                 )}
                 {feedback === "Watch carefully and remember the sequence" && (
                     <Text style={localStyles.feedbackGameText}>Watch carefully and{"\n"}remember the sequence</Text>
@@ -53,24 +62,36 @@ export default function KNOX_Screen() {
                 <View style={localStyles.squaresRow}>
                     <Square 
                         id={0} 
-                        active={activeSquare === 0} 
+                        activeTargetSequence={activeSquare === 0} 
+                        activeUserTap={activeUserTap === 0}
+                        incorrectUserTap={incorrectUserTap === 0}
+                        correctLastUserTap={correctLastUserTap === 0}
                         onPress={() => lightUpSquare(0)}
                     />
                     <Square 
                         id={1} 
-                        active={activeSquare === 1} 
+                        activeTargetSequence={activeSquare === 1} 
+                        activeUserTap={activeUserTap === 1}
+                        incorrectUserTap={incorrectUserTap === 1}
+                        correctLastUserTap={correctLastUserTap === 1}
                         onPress={() => lightUpSquare(1)}
                     />
                 </View>
                 <View style={localStyles.squaresRow}>
                     <Square 
                         id={2} 
-                        active={activeSquare === 2} 
+                        activeTargetSequence={activeSquare === 2}
+                        activeUserTap={activeUserTap === 2}
+                        incorrectUserTap={incorrectUserTap === 2}
+                        correctLastUserTap={correctLastUserTap === 2}
                         onPress={() => lightUpSquare(2)}
                     />
                     <Square 
                         id={3} 
-                        active={activeSquare === 3} 
+                        activeTargetSequence={activeSquare === 3}
+                        activeUserTap={activeUserTap === 3}
+                        incorrectUserTap={incorrectUserTap === 3}
+                        correctLastUserTap={correctLastUserTap === 3}
                         onPress={() => lightUpSquare(3)}
                     />
                 </View>

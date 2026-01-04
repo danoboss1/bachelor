@@ -1,7 +1,7 @@
 import { StatMini, StatMiniSupplementary } from '@/components/StatsComponent';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "../../constants/Colors";

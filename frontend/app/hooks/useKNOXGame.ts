@@ -1,8 +1,11 @@
+import { useRouter } from "expo-router";
 import React from "react";
 
-// export type TapStatus = "correct" | "incorrect" | null;
+const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
 
 export function useKNOXGame() {
+    const router = useRouter();
+
     const [timeLeft, setTimeLeft] = React.useState(60);
     const [feedback, setFeedback] = React.useState<
         | ""
@@ -17,7 +20,6 @@ export function useKNOXGame() {
 
     const [activeSquare, setActiveSquare] = React.useState<number | null>(null);
     const [activeUserTap, setActiveUserTap] = React.useState<number | null>(null);
-    // const [tapStatus, setTapStatus] = React.useState<TapStatus>(null);
     const [incorrectUserTap, setIncorrectUserTap] = React.useState<number | null>(null);
     const [correctLastUserTap, setCorrectLastUserTap] = React.useState<number | null>(null);
 
@@ -25,13 +27,40 @@ export function useKNOXGame() {
     const [userSequence, setUserSequence] = React.useState<number[]>([]);
     const userSequenceRef = React.useRef<number[]>([]);
 
+    const [sequenceLengths] = React.useState([
+        // testovacie sekvencie
+        3, 3, 3,
+        // 4,
+        // 5,
+
+        // skutocne sekvencie
+        // 3, 3,
+        // 4, 4, 4, 4,
+        // 5, 5, 5, 5,
+        // 6, 6, 6,
+        // 7, 7, 7,
+        // 8, 8,
+    ]);
+
+    const [threeStepSequencesCorrect, setThreeStepSequencesCorrect] = React.useState(0);
+    const [fourStepSequencesCorrect, setFourStepSequencesCorrect] = React.useState(0);
+    const [fiveStepSequencesCorrect, setFiveStepSequencesCorrect] = React.useState(0);
+    const [sixStepSequencesCorrect, setSixStepSequencesCorrect] = React.useState(0);
+    const [sevenStepSequencesCorrect, setSevenStepSequencesCorrect] = React.useState(0);
+    const [eightStepSequencesCorrect, setEightStepSequencesCorrect] = React.useState(0);
+
+    const [totalCorrect, setTotalCorrect] = React.useState(0);
+
     const timeoutRef = React.useRef<number | null>(null);
 
     const [isAnimating, setIsAnimating] = React.useState(true);
     const [userAnswered, setUserAnswered] = React.useState(false);
 
-    // toto tiez lepsie pochopit
     const userAnsweredResolve = React.useRef<() => void | null>(null);
+
+    const [isLastSequence, setIsLastSequence] = React.useState(false);
+
+    const [finished, setFinished] = React.useState(false);
     
     function formatTime(sec: number) {
         const m = Math.floor(sec / 60).toString().padStart(2, "0");
@@ -68,7 +97,15 @@ export function useKNOXGame() {
         const indexNext = userSequenceRef.current.length;
 
         if (id !== sequence[indexNext]) {
-            setFeedback("Incorrect");
+            // vycistenie odpovede pred zlych vyberom
+            setActiveUserTap(null);
+
+            if (isLastSequence) {
+                setFeedback("Incorrect. You have completed the test");
+            } else {
+                setFeedback("Incorrect");
+            }
+
             setIncorrectUserTap(id);
             setIsAnimating(true);
             setUserAnswered(true);
@@ -76,16 +113,35 @@ export function useKNOXGame() {
             setTimeout(() => {
                 setIncorrectUserTap(null);
                 timeoutRef.current = null;
-            }, 600);
+            }, 1000);
 
-            // co znamena toto?
             userAnsweredResolve.current?.();
             return;
         }
 
         // lebo este tam nie je pridany ten posledny, tak musim zvysit o jedna
         if (userSequenceRef.current.length + 1 === sequence.length) {
-            setFeedback("Well done");
+            // vycistenie odpovede pred spravnym uhadnutim sekvencie
+            setActiveUserTap(null);
+
+            if (sequence.length === 3) setThreeStepSequencesCorrect(prev => prev + 1);
+            else if (sequence.length === 4) setFourStepSequencesCorrect(prev => prev + 1);
+            else if (sequence.length === 5) setFiveStepSequencesCorrect(prev => prev + 1);
+            else if (sequence.length === 6) setSixStepSequencesCorrect(prev => prev + 1);
+            else if (sequence.length === 7) setSevenStepSequencesCorrect(prev => prev + 1);
+            else if (sequence.length === 8) setEightStepSequencesCorrect(prev => prev + 1);
+
+            setTotalCorrect(prev => prev + 1)
+
+            console.log("3-step Sequence rigth after: ", threeStepSequencesCorrect);
+            console.log("total correct right after: ", totalCorrect);
+
+            if (isLastSequence) {
+                setFeedback("Well done. You have completed the test");
+            } else {
+                setFeedback("Well done");
+            }
+
             setCorrectLastUserTap(id);
             setIsAnimating(true);
             setUserAnswered(true);
@@ -93,16 +149,15 @@ export function useKNOXGame() {
             setTimeout(() => {
                 setCorrectLastUserTap(null);
                 timeoutRef.current = null;
-            }, 600);
+            }, 1000);
 
-            // co znamena toto?
             userAnsweredResolve.current?.();
             return;
         }
 
         setActiveUserTap(id);
 
-        if (userSequenceRef.current.length < 5) {
+        if (userSequenceRef.current.length < sequence.length) {
             userSequenceRef.current = [...userSequenceRef.current, id];
             setUserSequence(userSequenceRef.current);
         }
@@ -115,8 +170,7 @@ export function useKNOXGame() {
         }, 600);
     }
 
-    // vytvor náhodnú sekvenciu (napr. 5 krokov)
-    function generateSequence(length = 5) {
+    function generateSequence(length: number) {
         const seq = Array.from({ length }, () =>
             Math.floor(Math.random() * 4)
         );
@@ -126,10 +180,8 @@ export function useKNOXGame() {
         return seq;
     }
 
-    // prehra sekvenciu (rozsvietenie)
     async function playSequence(seq: number []) {
         setIsAnimating(true);
-        // setTapStatus(null);
 
         for (const id of seq) {
             setActiveSquare(id);
@@ -146,7 +198,14 @@ export function useKNOXGame() {
     }
 
     async function startGame() {
-        for(let i = 0; i < 4; i++) {
+        // reset flagu na začiatku každej hry
+        setIsLastSequence(false);
+
+        for(let i = 0; i < sequenceLengths.length; i++) {
+            if (i + 1 === sequenceLengths.length) {
+                setIsLastSequence(true);
+            }
+
             setUserAnswered(false);
             setUserSequence([]);
             userSequenceRef.current = [];
@@ -155,22 +214,55 @@ export function useKNOXGame() {
 
             await delay(300);
 
-            const seq = generateSequence();
+            const seq = generateSequence(sequenceLengths[i]);
             await playSequence(seq);
 
             setFeedback("Repeat the sequence by tapping the cubes");
 
             await waitForUser();
-            await delay(1000);
+            await delay(1500);
         }
+
+        setFinished(true);
     }
 
-    // preco sa uklada resolve do toho Refu?
     function waitForUser() {
         return new Promise<void>(resolve => {
             userAnsweredResolve.current = resolve;
         });
     }
+
+    // React.useEffect(() => {
+    //     if (finished) {
+    //         saveStatsToBackend().then(() => {
+    //             router.push(WCST_ROUTE_ENDSCREEN); // bez params
+    //         });
+    //     }
+    // }, [finished]);
+    React.useEffect(() => {
+        if (finished) {
+            router.push({
+                pathname: KNOX_ROUTE_ENDSCREEN,
+                params: {
+                    threeStepSequencesCorrect,
+                    fourStepSequencesCorrect,
+                    fiveStepSequencesCorrect,
+                    sixStepSequencesCorrect,
+                    sevenStepSequencesCorrect,
+                    eightStepSequencesCorrect,
+                    totalCorrect,
+                }
+            });
+        };
+    }, [finished]);
+
+    React.useEffect(() => {
+        console.log("3-step Sequence updated:", threeStepSequencesCorrect);
+    }, [threeStepSequencesCorrect]);
+
+    React.useEffect(() => {
+        console.log("total correct updated:", totalCorrect);
+    }, [totalCorrect]);
 
     return {
         timeLeft,

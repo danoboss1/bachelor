@@ -27,6 +27,7 @@ type StatMiniProps = {
 type StatMiniSupplementaryProps = {
     label: string;
     value: number | string;
+    whole?: number;
 };
 
 export function StatMini({ label, value, percentile, max = 100, showPercentSign }: StatMiniProps) {
@@ -44,20 +45,29 @@ export function StatMini({ label, value, percentile, max = 100, showPercentSign 
 
             {/* 3. Bar + percentil */}
             <View style={stylesMini.barRow}>
+                {/* <Text> percentile </Text> */}
                 <View style={stylesMini.barBackground}>
                     <View style={[stylesMini.barFill, { width: `${percentage}%` }]} />
                 </View>
-                <Text style={stylesMini.percent}>{Math.round(percentage)}%</Text>
+
+                <Text style={stylesMini.barText} numberOfLines={1}>
+                    {Math.round(percentage)}% percentile
+                </Text>
+                {/* <Text style={stylesMini.percent}>{Math.round(percentage)}% percentile</Text> */}
             </View>
+
+            {/* <Text style={stylesMini.percent}>{Math.round(percentage)}% percentile</Text> */}
         </View>
     );
 }
 
-export function StatMiniSupplementary({ label, value }: StatMiniSupplementaryProps) {
+export function StatMiniSupplementary({ label, value, whole }: StatMiniSupplementaryProps) {
     return (
         <View style={stylesSupplementary.container}>
             <Text style={stylesSupplementary.label}>{label}</Text>
-            <Text style={stylesSupplementary.value}>{value}</Text>
+            <Text style={stylesSupplementary.value}>
+                {whole !== undefined ? `${value}/${whole}` : value}
+            </Text>
         </View>
     );
 }
@@ -227,11 +237,20 @@ const stylesMini = StyleSheet.create({
         backgroundColor: "#4caf50",
     },
     percent: {
-        width: 45,
+        // width: 45,
         color: "black",
-        textAlign: "right",
+        textAlign: "center",
         fontWeight: "600",
         marginLeft: 8,
+    },
+    barText: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        textAlign: "center",
+        color: "white",
+        fontWeight: "700",
+        fontSize: 12,
     },
 });
 

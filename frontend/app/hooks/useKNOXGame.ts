@@ -1,7 +1,19 @@
+import axios from "axios";
 import { useRouter } from "expo-router";
 import React from "react";
 
 const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
+
+type KnoxStatsPayload = {
+    threeStepSequencesCorrect: number,
+    fourStepSequencesCorrect: number,
+    fiveStepSequencesCorrect: number,
+    sixStepSequencesCorrect: number,
+    sevenStepSequencesCorrect: number,
+    eightStepSequencesCorrect: number,
+    totalCorrect: number,
+    user_id: number,
+}
 
 export function useKNOXGame() {
     const router = useRouter();
@@ -62,6 +74,25 @@ export function useKNOXGame() {
 
     const [finished, setFinished] = React.useState(false);
     
+    async function saveKnoxStatstoBackend() {
+        const payload: KnoxStatsPayload = {
+            threeStepSequencesCorrect: threeStepSequencesCorrect,
+            fourStepSequencesCorrect: fourStepSequencesCorrect,
+            fiveStepSequencesCorrect: fiveStepSequencesCorrect,
+            sixStepSequencesCorrect: sixStepSequencesCorrect,
+            sevenStepSequencesCorrect: sevenStepSequencesCorrect,
+            eightStepSequencesCorrect: eightStepSequencesCorrect,
+            totalCorrect: totalCorrect,
+            user_id: 1,
+        };
+
+        try {
+            await axios.post("https://bachelor-pi.vercel.app/knoxStats", payload);
+        } catch (err: any) {
+            console.error("Error saving stats:", err);
+        }
+    }
+
     function formatTime(sec: number) {
         const m = Math.floor(sec / 60).toString().padStart(2, "0");
         const s = (sec % 60).toString().padStart(2, "0");
@@ -241,18 +272,20 @@ export function useKNOXGame() {
     // }, [finished]);
     React.useEffect(() => {
         if (finished) {
-            router.push({
-                pathname: KNOX_ROUTE_ENDSCREEN,
-                params: {
-                    threeStepSequencesCorrect,
-                    fourStepSequencesCorrect,
-                    fiveStepSequencesCorrect,
-                    sixStepSequencesCorrect,
-                    sevenStepSequencesCorrect,
-                    eightStepSequencesCorrect,
-                    totalCorrect,
-                }
-            });
+            saveKnoxStatstoBackend().then(() => {
+                router.push({
+                    pathname: KNOX_ROUTE_ENDSCREEN,
+                    params: {
+                        threeStepSequencesCorrect,
+                        fourStepSequencesCorrect,
+                        fiveStepSequencesCorrect,
+                        sixStepSequencesCorrect,
+                        sevenStepSequencesCorrect,
+                        eightStepSequencesCorrect,
+                        totalCorrect,
+                    }
+                });
+            })
         };
     }, [finished]);
 

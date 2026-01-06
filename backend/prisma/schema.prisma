@@ -3,15 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model users {
   id               Int                @id @default(autoincrement())
   username         String             @unique @db.VarChar(50)
   password         String
+  leaderboard_knox leaderboard_knox[]
   leaderboard_wcst leaderboard_wcst[]
+  stats_knox       stats_knox[]
   stats_wcst       stats_wcst[]
 }
 
@@ -42,4 +45,27 @@ model stats_wcst {
   user_id                      Int?
   leaderboard_wcst             leaderboard_wcst[]
   users                        users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_wcst_user_id")
+}
+
+model leaderboard_knox {
+  id         Int         @id @default(autoincrement())
+  user_id    Int?
+  stats_id   Int?
+  stats_knox stats_knox? @relation(fields: [stats_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_knox_stats_id")
+  users      users?      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_knox_user_id")
+}
+
+model stats_knox {
+  id                        Int                @id @default(autoincrement())
+  time                      DateTime?          @db.Timestamp(6)
+  threestepsequencescorrect Int?               @db.SmallInt
+  fourstepsequencescorrect  Int?               @db.SmallInt
+  fivestepsequencescorrect  Int?               @db.SmallInt
+  sixstepsequencescorrect   Int?               @db.SmallInt
+  sevenstepsequencescorrect Int?               @db.SmallInt
+  eightstepsequencescorrect Int?               @db.SmallInt
+  totalcorrect              Int?               @db.SmallInt
+  user_id                   Int?
+  leaderboard_knox          leaderboard_knox[]
+  users                     users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_knox_user_id")
 }

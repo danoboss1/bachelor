@@ -4,15 +4,19 @@ import type { Request, Response } from 'express';
 // import statRoutes from '../src/routes/wcstStatsRouter.js';
 // import leaderboardRoutes from '../src/routes/wcstLeaderboardRouter.js';
 import userRoutes from './routes/userRoutes.js';
-import statRoutes from './routes/wcstStatsRouter.js';
+import wcstStatRoutes from './routes/wcstStatsRouter.js';
 import leaderboardRoutes from './routes/wcstLeaderboardRouter.js';
+
+import knoxStatRouter from './routes/knoxStatsRouter.js';
 
 const app = express();
 app.use(express.json());
 
 app.use('/users', userRoutes);
-app.use('/stats', statRoutes);
+app.use('/wcstStats', wcstStatRoutes);
 app.use('/leaderboard', leaderboardRoutes);
+
+app.use('/knoxStats', knoxStatRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello world!');
@@ -29,7 +33,7 @@ export default app;
 // import express from 'express';
 // import type { Application, Request, Response } from 'express';
 // import userRoutes from './routes/userRoutes.js';
-// import statRoutes from './routes/wcstStatsRouter.js';
+// import wcstStatRoutes from './routes/wcstStatsRouter.js';
 // import leaderboardRoutes from './routes/wcstLeaderboardRouter.js';
 
 
@@ -41,7 +45,7 @@ export default app;
 
 // // toto bude treba este vysvetlit ako presne funguje
 // app.use('/users', userRoutes);
-// app.use('/stats', statRoutes);
+// app.use('/stats', wcstStatRoutes);
 // app.use('/leaderboard', leaderboardRoutes);
 
 // // toto bude treba este vysvetlit ako presne funguje

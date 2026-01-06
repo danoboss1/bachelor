@@ -270,14 +270,16 @@ export function useKNOXGame() {
             await delay(1500);
         }
 
-        setTotalScore(
+        const finalScore = 
             threeStepSequencesCorrect * COEFFICIENTS[3] +
             fourStepSequencesCorrect * COEFFICIENTS[4] +
             fiveStepSequencesCorrect * COEFFICIENTS[5] +
             sixStepSequencesCorrect * COEFFICIENTS[6] + 
             sevenStepSequencesCorrect * COEFFICIENTS[7] +
-            eightStepSequencesCorrect * COEFFICIENTS[8]
-        )
+            eightStepSequencesCorrect * COEFFICIENTS[8];
+        
+        setTotalScore(finalScore);
+
 
         setFinished(true);
     }

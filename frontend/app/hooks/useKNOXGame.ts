@@ -13,6 +13,7 @@ type KnoxStatsPayload = {
     sevenStepSequencesCorrect: number,
     eightStepSequencesCorrect: number,
     totalCorrect: number,
+    totalScore: number,
     user_id: number,
 }
 
@@ -55,6 +56,16 @@ export function useKNOXGame() {
         // 8, 8,
     ]);
 
+    // tieto koeficienty budem neskor ratat cez nejaku metriku ako je Rasch model
+    const COEFFICIENTS = {
+        3: 0.1,
+        4: 0.15,
+        5: 0.2,
+        6: 0.3,
+        7: 0.5,
+        8: 1.2,
+    };
+
     const [threeStepSequencesCorrect, setThreeStepSequencesCorrect] = React.useState(0);
     const [fourStepSequencesCorrect, setFourStepSequencesCorrect] = React.useState(0);
     const [fiveStepSequencesCorrect, setFiveStepSequencesCorrect] = React.useState(0);
@@ -73,6 +84,8 @@ export function useKNOXGame() {
 
     const [isLastSequence, setIsLastSequence] = React.useState(false);
 
+    const [totalScore, setTotalScore] = React.useState(0);
+
     const [finished, setFinished] = React.useState(false);
     
     async function saveKnoxStatstoBackend() {
@@ -85,6 +98,7 @@ export function useKNOXGame() {
             sevenStepSequencesCorrect: sevenStepSequencesCorrect,
             eightStepSequencesCorrect: eightStepSequencesCorrect,
             totalCorrect: totalCorrect,
+            totalScore: totalScore,
             user_id: 1,
         };
 
@@ -256,6 +270,15 @@ export function useKNOXGame() {
             await delay(1500);
         }
 
+        setTotalScore(
+            threeStepSequencesCorrect * COEFFICIENTS[3] +
+            fourStepSequencesCorrect * COEFFICIENTS[4] +
+            fiveStepSequencesCorrect * COEFFICIENTS[5] +
+            sixStepSequencesCorrect * COEFFICIENTS[6] + 
+            sevenStepSequencesCorrect * COEFFICIENTS[7] +
+            eightStepSequencesCorrect * COEFFICIENTS[8]
+        )
+
         setFinished(true);
     }
 
@@ -285,6 +308,7 @@ export function useKNOXGame() {
                         sevenStepSequencesCorrect,
                         eightStepSequencesCorrect,
                         totalCorrect,
+                        totalScore,
                     }
                 });
             })

@@ -19,6 +19,7 @@ export default function KNOX_ENDSCREEN() {
         sevenStepSequencesCorrect?: string,
         eightStepSequencesCorrect?: string,
         totalCorrect?: string,
+        totalScore?: string,
     }>();
 
     const threeStepSequencesCorrect = Number(params.threeStepSequencesCorrect) || 0;
@@ -28,6 +29,7 @@ export default function KNOX_ENDSCREEN() {
     const sevenStepSequencesCorrect = Number(params.sevenStepSequencesCorrect) || 0;
     const eightStepSequencesCorrect = Number(params.eightStepSequencesCorrect) || 0;
     const totalCorrect = Number(params.totalCorrect) || 0;
+    const totalScore = Number(params.totalScore) || 0;
     
     return (
         <View style={localStyles.container}>
@@ -38,7 +40,7 @@ export default function KNOX_ENDSCREEN() {
             <ScrollView contentContainerStyle={localStyles.statsScroll}>
                 <StatMini 
                     label="Total score"
-                    value={5.6}
+                    value={totalScore}
                     percentile={73}
                     max={100}
                 />

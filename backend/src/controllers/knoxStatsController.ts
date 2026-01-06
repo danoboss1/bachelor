@@ -34,6 +34,7 @@ export class KnoxStatsController {
                 sevenStepSequencesCorrect,
                 eightStepSequencesCorrect,
                 totalCorrect,
+                totalScore,
                 user_id,
             } = req.body;
 
@@ -45,6 +46,7 @@ export class KnoxStatsController {
             if (sevenStepSequencesCorrect == null) return res.status(400).json({ error: "sevenStepSequencesCorrect is required" });
             if (eightStepSequencesCorrect == null) return res.status(400).json({ error: "eightStepSequencesCorrect is required" });
             if (totalCorrect == null) return res.status(400).json({ error: "totalCorrect is required" });
+            if (totalScore == null) return res.status(400).json({ error: "totalScore is required" });
             if (user_id == null) return res.status(400).json({ error: "user_id is required" });
 
             const stat = await prisma.stats_knox.create({
@@ -57,6 +59,7 @@ export class KnoxStatsController {
                     sevenstepsequencescorrect: sevenStepSequencesCorrect,
                     eightstepsequencescorrect: eightStepSequencesCorrect,
                     totalcorrect: totalCorrect,
+                    totalscore: totalScore, 
                     user_id: user_id,
                 },
                 select: {
@@ -69,6 +72,7 @@ export class KnoxStatsController {
                     sevenstepsequencescorrect: true,
                     eightstepsequencescorrect: true,
                     totalcorrect: true,
+                    totalscore: true,
                     user_id: true
                 }
             });
@@ -79,4 +83,6 @@ export class KnoxStatsController {
             res.status(500).json({ error: "Server error"});
         }
     };
+
+    // static 
 }

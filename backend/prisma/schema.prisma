@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model users {
@@ -65,6 +65,7 @@ model stats_knox {
   eightstepsequencescorrect Int?               @db.SmallInt
   totalcorrect              Int?               @db.SmallInt
   user_id                   Int?
+  totalscore                Int?               @db.SmallInt
   leaderboard_knox          leaderboard_knox[]
   users                     users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_knox_user_id")
 }

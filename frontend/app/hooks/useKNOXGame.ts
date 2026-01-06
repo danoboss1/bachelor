@@ -5,6 +5,7 @@ import React from "react";
 const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
 
 type KnoxStatsPayload = {
+    time: string;
     threeStepSequencesCorrect: number,
     fourStepSequencesCorrect: number,
     fiveStepSequencesCorrect: number,
@@ -76,6 +77,7 @@ export function useKNOXGame() {
     
     async function saveKnoxStatstoBackend() {
         const payload: KnoxStatsPayload = {
+            time: new Date().toISOString(),
             threeStepSequencesCorrect: threeStepSequencesCorrect,
             fourStepSequencesCorrect: fourStepSequencesCorrect,
             fiveStepSequencesCorrect: fiveStepSequencesCorrect,

@@ -4,6 +4,25 @@ import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export class KnoxStatsController {
+    static getStat = async (req: Request, res: Response) => {
+        try {
+            const { statId } = req.params;
+
+            if (statId == null) {
+                return res.status(400).json({ error: "statId is required" });
+            }
+
+            const stat = await prisma.stats_knox.findUnique({
+                where: { id: parseInt(statId) }
+            });
+
+            res.json(stat);
+        } catch (error) {
+            console.error("Error fetching statistics", error);
+            res.status(500).json({ error: "Server error"});
+        }
+    };
+
     static saveStat = async (req: Request, res: Response) => {
         try {
             const {

@@ -4,6 +4,10 @@ import Svg, { Path } from "react-native-svg";
 
 const { width, height } = Dimensions.get("window");
 
+// const firstPositionLeft = width * (0.13 / 6 + 0.005);
+// const firstPositionBottom = height * 1/9 + (height * 1/10 / 3);
+
+
 
 type HandProps = {
     size?: number;
@@ -121,90 +125,160 @@ export function SimpleDisc({
         <Pressable
         style={[
             localStyles.simpledisc,
-            {
+                {
                     width: size,
                     backgroundColor: color,
+                    left: width * (0.13 / 6 + 0.005),
+                    bottom: height * 1/9 + (height * 1/10 / 3),
                 },
             ]}
         />
     );
 };
 
+// od spodu potialto to chapem
 type DiscInHandProps = {
     size: number;
     color: string;
 };
 
-export function DiscInHand({
-    size,
-    color,
-}: DiscInHandProps) {
+export function DiscInHand({ size, color }: DiscInHandProps) {
     return (
-        <Pressable
-        style={[
-            localStyles.discInHand,
-            {
+        <View
+            style={[
+                localStyles.discInHand,
+                {
                     width: size,
                     backgroundColor: color,
                 },
             ]}
         />
     );
+}
+
+// type DiscInHandProps = {
+//     size: number;
+//     color: string;
+// };
+
+// export function DiscInHand({
+//     size,
+//     color,
+// }: DiscInHandProps) {
+//     return (
+//         <Pressable
+//         style={[
+//             localStyles.discInHand,
+//             {
+//                     width: size,
+//                     backgroundColor: color,
+//                 },
+//             ]}
+//         />
+//     );
+// };
+
+// type StackWithDiscsProps = {
+//     stackHeight: number;
+//     backgroundColor: string;
+//     discs: { id: number; size: number; color: string }[];
+//     selectedDiscId?: number | null;
+//     onDiscPress?: (discId: number) => void;
+//     handPosition?: { x: number, y: number },
+//     registerDiscRef?: (id: number, ref: React.RefObject<View | null>) => void;
+// };
+
+// export function StackWithDiscs({ 
+//     stackHeight, 
+//     backgroundColor, 
+//     discs,
+//     selectedDiscId = null,
+//     onDiscPress, 
+//     handPosition,
+//     registerDiscRef,
+// }: StackWithDiscsProps) {
+
+//     // Udržíme refy stabilné
+//     const discRefs = React.useRef<Map<number, React.RefObject<View | null>>>(new Map());
+
+//     return (
+//         <View style={{ width: width * 0.29, height: stackHeight }}>
+//             <PegStack stackHeight={stackHeight} backgroundColor={backgroundColor} />
+//             {discs.map((disc, index) => {
+//                 // vytvoríme ref iba raz pre každý disc
+//                 if (!discRefs.current.has(disc.id)) {
+//                     discRefs.current.set(disc.id, React.createRef<View>());
+//                 }
+//                 const discRef = discRefs.current.get(disc.id)!;
+
+//                 // registrácia refu
+//                 registerDiscRef?.(disc.id, discRef);
+
+//                 return (
+//                     <Disc
+//                         key={disc.id}
+//                         size={disc.size}
+//                         color={disc.color}
+//                         bottomOffset={height * 0.005 + 2 * index * (height * 0.03)}
+//                         isSelected={disc.id === selectedDiscId}
+//                         onPress={() => onDiscPress?.(disc.id)}
+//                         handPosition={disc.id === selectedDiscId ? handPosition : undefined}
+//                         discRef={discRef}
+//                     />
+//                 );
+//             })}
+//         </View>
+//     );
+// };
+
+
+type DiscData = {
+    id: number;
+    size: number;
+    color: string;
 };
 
 type StackWithDiscsProps = {
     stackHeight: number;
     backgroundColor: string;
-    discs: { id: number; size: number; color: string }[];
-    selectedDiscId?: number | null;
-    onDiscPress?: (discId: number) => void;
-    handPosition?: { x: number, y: number },
-    registerDiscRef?: (id: number, ref: React.RefObject<View | null>) => void;
+    discs: DiscData[];
+    onPress: () => void;
 };
 
-export function StackWithDiscs({ 
-    stackHeight, 
-    backgroundColor, 
+export function StackWithDiscs({
+    stackHeight,
+    backgroundColor,
     discs,
-    selectedDiscId = null,
-    onDiscPress, 
-    handPosition,
-    registerDiscRef,
+    onPress,
 }: StackWithDiscsProps) {
-
-    // Udržíme refy stabilné
-    const discRefs = React.useRef<Map<number, React.RefObject<View | null>>>(new Map());
-
     return (
-        <View style={{ width: width * 0.29, height: stackHeight }}>
-            <PegStack stackHeight={stackHeight} backgroundColor={backgroundColor} />
-            {discs.map((disc, index) => {
-                // vytvoríme ref iba raz pre každý disc
-                if (!discRefs.current.has(disc.id)) {
-                    discRefs.current.set(disc.id, React.createRef<View>());
-                }
-                const discRef = discRefs.current.get(disc.id)!;
+        <Pressable onPress={onPress} style={{ width: width * 0.29, height: stackHeight }}>
+            <View
+                style={[
+                    localStyles.stackBase,
+                    { height: stackHeight, backgroundColor },
+                ]}
+            >
+                <View style={localStyles.peg} />
+            </View>
 
-                // registrácia refu
-                registerDiscRef?.(disc.id, discRef);
-
-                return (
-                    <Disc
-                        key={disc.id}
-                        size={disc.size}
-                        color={disc.color}
-                        bottomOffset={height * 0.005 + 2 * index * (height * 0.03)}
-                        isSelected={disc.id === selectedDiscId}
-                        onPress={() => onDiscPress?.(disc.id)}
-                        handPosition={disc.id === selectedDiscId ? handPosition : undefined}
-                        discRef={discRef}
-                    />
-                );
-            })}
-        </View>
+            {discs.map((disc, index) => (
+                <View
+                    key={disc.id}
+                    style={[
+                        localStyles.disc,
+                        {
+                            width: disc.size,
+                            backgroundColor: disc.color,
+                            // zakladny offset + 1,5 nasobok vysky disku, aby to vyzeralo v pohode
+                            bottom: height * 0.005 + index * (height * 0.06),
+                        },
+                    ]}
+                />
+            ))}
+        </Pressable>
     );
-};
-
+}
 
 type LongStackProps = {
     stackHeight: number;
@@ -254,17 +328,15 @@ const localStyles = StyleSheet.create({
         borderRadius: 6,
         // alignSelf: "center",
         zIndex: 2,
-        left: width * (0.13 / 6 + 0.005),
-        bottom: height * 1/9 + (height * 1/10 / 3),
+        // left: width * (0.13 / 6 + 0.005),
+        // bottom: height * 1/9 + (height * 1/10 / 3),
     },
     discInHand: {
         position: "absolute",
-        height: height * 0.040,
+        height: height * 0.04,
         borderRadius: 6,
+        zIndex: 10,
+        bottom: height * 0.5,
         alignSelf: "center",
-        zIndex: 3,
-        // left: width * (0.13 / 6 + 0.005),
-        // bottom: height * 3/9 + (height * 1/10 / 3),
-        bottom: height * 5/9 - height * 0.040 / 2,
     },
 });

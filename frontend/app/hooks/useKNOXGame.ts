@@ -180,33 +180,33 @@ export function useKNOXGame() {
             // vycistenie odpovede pred spravnym uhadnutim sekvencie
             setActiveUserTap(null);
 
-        if (sequence.length === 3) {
-            threeRef.current++;
-            setThreeStepSequencesCorrect(prev => prev + 1);
-        }
-        else if (sequence.length === 4) {
-            fourRef.current++;
-            setFourStepSequencesCorrect(prev => prev + 1);
-        }
-        else if (sequence.length === 5) {
-            fiveRef.current++;
-            setFiveStepSequencesCorrect(prev => prev + 1);
-        }
-        else if (sequence.length === 6) {
-            sixRef.current++;
-            setSixStepSequencesCorrect(prev => prev + 1);
-        }
-        else if (sequence.length === 7) {
-            sevenRef.current++;
-            setSevenStepSequencesCorrect(prev => prev + 1);
-        }
-        else if (sequence.length === 8) {
-            eightRef.current++;
-            setEightStepSequencesCorrect(prev => prev + 1);
-        }
+            if (sequence.length === 3) {
+                threeRef.current++;
+                setThreeStepSequencesCorrect(prev => prev + 1);
+            }
+            else if (sequence.length === 4) {
+                fourRef.current++;
+                setFourStepSequencesCorrect(prev => prev + 1);
+            }
+            else if (sequence.length === 5) {
+                fiveRef.current++;
+                setFiveStepSequencesCorrect(prev => prev + 1);
+            }
+            else if (sequence.length === 6) {
+                sixRef.current++;
+                setSixStepSequencesCorrect(prev => prev + 1);
+            }
+            else if (sequence.length === 7) {
+                sevenRef.current++;
+                setSevenStepSequencesCorrect(prev => prev + 1);
+            }
+            else if (sequence.length === 8) {
+                eightRef.current++;
+                setEightStepSequencesCorrect(prev => prev + 1);
+            }
 
-        totalCorrectRef.current++;
-        setTotalCorrect(prev => prev + 1);
+            totalCorrectRef.current++;
+            setTotalCorrect(prev => prev + 1);
 
             console.log("3-step Sequence rigth after: ", threeStepSequencesCorrect);
             console.log("total correct right after: ", totalCorrect);

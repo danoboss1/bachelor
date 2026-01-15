@@ -12,7 +12,7 @@ export class TolStatsController {
                 return res.status(400).json({ error: "statId is required" });
             }
 
-            const stat = await prisma.stats_knox.findUnique({
+            const stat = await prisma.stats_tol.findUnique({
                 where: { id: parseInt(statId) }
             });
 

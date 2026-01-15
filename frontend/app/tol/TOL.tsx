@@ -1,10 +1,13 @@
 import { DiscInHand, Hand, StackWithDiscs } from "@/components/tol/ToLComponents";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { useTOLGame } from "../hooks/useTOLGame";
 import { difficultyFive, difficultyFour, difficultySix } from './TOL_data';
 
 const { width, height } = Dimensions.get("window");
+
+const TOL_ROUTE_ENDSCREEN = "/tol/TOL_endscreen";
 
 type DiscData = {
     id: number;
@@ -22,6 +25,12 @@ const DISC_MAP: Record<string, DiscData> = {
     M: { id: 1, size: width * 0.28, color: "#004aad" }, // modrý
     Z: { id: 2, size: width * 0.28, color: "#00bf63" }, // zelený
     Č: { id: 3, size: width * 0.28, color: "#ff3131" }, // červený
+};
+
+const COEFFICIENTS = {
+    4: 0.3,
+    5: 0.6,
+    6: 1.0,
 };
 
 /* =========================
@@ -56,6 +65,18 @@ const areStacksEqual = (
 ========================= */
 
 export default function TOL_Screen() {
+    const router = useRouter();
+    
+    const [fourMovesSequencesCorrect, setFourMovesSequencesCorrect] = useState(0);
+    const [fiveMovesSequencesCorrect, setFiveMovesSequencesCorrect] = useState(0);
+    const [sixMovesSequencesCorrect, setSixMovesSequencesCorrect] = useState(0);
+    const [totalCorrect, setTotalCorrect] = useState(0);
+
+    const fourRef = useRef(0);
+    const fiveRef = useRef(0);
+    const sixRef = useRef(0);
+    const totalCorrectRef = useRef(0);
+    
     const {
         moveDisc,
         selectedDiscId,
@@ -142,14 +163,16 @@ export default function TOL_Screen() {
 
     const [discInHand, setDiscInHand] = useState<DiscData | null>(null);
 
-    React.useEffect(() => {
-        if (feedback) return;
+    // React.useEffect(() => {
+    //     if (feedback) return;
 
-        if (userMoves === targetMoves) {
-            setFeedback("Incorrect!");
-            setShowFeedback(true);
-        }
-    }, [userMoves, targetMoves, feedback])
+    //     if (userMoves === targetMoves) {
+    //         setFeedback("Incorrect!");
+    //         setShowFeedback(true);
+    //     }
+    // }, [userMoves, targetMoves, feedback])
+
+    const [finished, setFinished] = React.useState(false);
 
     const onStackPress = (stackIndex: number) => {
         if (showFeedback) return;
@@ -197,6 +220,22 @@ export default function TOL_Screen() {
             const isCorrect = areStacksEqual(newStacks, targetStacks);
 
             if (isCorrect) {
+                if (targetMoves === 4) {
+                    fourRef.current++;
+                    setFourMovesSequencesCorrect(prev => prev + 1);
+                }
+                if (targetMoves === 5) {
+                    fiveRef.current++;
+                    setFiveMovesSequencesCorrect(prev => prev + 1);
+                }
+                if (targetMoves === 6) {
+                    sixRef.current++;
+                    setSixMovesSequencesCorrect(prev => prev + 1);
+                }
+
+                totalCorrectRef.current++;
+                setTotalCorrect(prev => prev + 1);
+
                 setFeedback("Well done!");
                 setShowFeedback(true);
 
@@ -232,8 +271,47 @@ export default function TOL_Screen() {
             setStacks(convertStacks(difficultyFour[fourSequenceIndex].userStack))
             setTargetStacks(convertStacks(difficultyFour[fourSequenceIndex].targetStack))
 
+            setTargetMoves(difficultyFour[fourSequenceIndex].targetMoves);
+
             await waitForUser();
         }
+
+        for(let i = 0; i < 2; i++) {
+            setUserMoves(0);
+            setDiscInHand(null);
+            setFeedback("");
+            setShowFeedback(false);
+
+            fiveSequenceIndex = Math.floor(Math.random() * 21);
+
+            const selectedLevel = difficultyFive[fiveSequenceIndex];
+            setStacks(convertStacks(difficultyFive[fiveSequenceIndex].userStack))
+            setTargetStacks(convertStacks(difficultyFive[fiveSequenceIndex].targetStack))
+
+            setTargetMoves(difficultyFive[fiveSequenceIndex].targetMoves);
+
+            await waitForUser();
+        }
+
+        for(let i = 0; i < 2; i++) {
+            setUserMoves(0);
+            setDiscInHand(null);
+            setFeedback("");
+            setShowFeedback(false);
+
+            sixSequenceIndex = Math.floor(Math.random() * 21);
+
+            const selectedLevel = difficultySix[sixSequenceIndex];
+            setStacks(convertStacks(difficultySix[sixSequenceIndex].userStack))
+            setTargetStacks(convertStacks(difficultySix[sixSequenceIndex].targetStack))
+
+            setTargetMoves(difficultySix[sixSequenceIndex].targetMoves);
+
+            await waitForUser();
+        }
+
+        // neviem ci treba aj sem return;???
+        setFinished(true);
     }
 
     React.useEffect(() => {
@@ -246,6 +324,30 @@ export default function TOL_Screen() {
             userAnsweredResolve.current = resolve;
         });
     }
+
+    React.useEffect(() => {
+        if (finished) {
+
+            const totalScore = 
+                fourRef.current * COEFFICIENTS[4] +
+                fiveRef.current * COEFFICIENTS[5] +
+                sixRef.current * COEFFICIENTS[6];
+
+            router.push({
+                pathname: TOL_ROUTE_ENDSCREEN,
+                params: {
+                    fourMovesSequencesCorrect,
+                    fiveMovesSequencesCorrect,
+                    sixMovesSequencesCorrect,
+                    totalCorrect,
+                    totalScore,
+                }
+            });
+        };
+    }, [finished]);
+
+
+
 
 
     // const randomDifficulty =
@@ -272,9 +374,10 @@ export default function TOL_Screen() {
                         <StackWithDiscs
                             key={index}
                             stackHeight={[height * 0.27, height * 0.18, height * 0.09][index]}
-                            backgroundColor="#4CAF50"
+                            // backgroundColor="#4CAF50"
                             // backgroundColor="#f9f9f9"
                             // backgroundColor="#FFCC80"
+                            backgroundColor="#e8eef5"
                             discs={targetStack}
                         />
                     ))}
@@ -307,8 +410,9 @@ export default function TOL_Screen() {
                         <StackWithDiscs
                             key={index}
                             stackHeight={[height * 0.27, height * 0.18, height * 0.09][index]}
-                            backgroundColor="#FFCC80"
+                            // backgroundColor="#FFCC80"
                             // backgroundColor="#f9f9f9"
+                            backgroundColor="#e8eef5"
                             discs={stack}
                             onPress={() => onStackPress(index)}
                         />
@@ -348,7 +452,7 @@ const localStyles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        backgroundColor: "green",
+        // backgroundColor: "green",
     },
     targetAttemptsText: {
         fontSize: 20, 
@@ -366,20 +470,30 @@ const localStyles = StyleSheet.create({
     },
     targetPegs: {
         flex: 3,
-        backgroundColor: "green",
+        // backgroundColor: "#bcc0dd",
+        backgroundColor: "#d6c7b9",
+
+        // backgroundColor: "green",
+        // backgroundColor: "#5B5FE9",
         // backgroundColor: "#f9f9f9",
-        // backgroundColor: "orange",
+        // backgroundColor: "#d6c7b9",
+        // orange
         justifyContent: "flex-end",
     },
     userPegs: {
         flex: 3,
-        backgroundColor: "orange",
+        // backgroundColor: "#d6c7b9",
+        backgroundColor: "#bcc0dd",
+
+        // backgroundColor: "orange",
+        // backgroundColor: "#bcc0dd",
+        // backgroundColor: "#2b2f77",
         // backgroundColor: "#f9f9f9",
         justifyContent: "flex-end",
     },
     footer: {
         flex: 1,
-        backgroundColor: "orange",
+        // backgroundColor: "orange",
     },
     stacksRow: {
         flexDirection: "row",

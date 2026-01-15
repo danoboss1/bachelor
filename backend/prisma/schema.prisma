@@ -12,8 +12,10 @@ model users {
   username         String             @unique @db.VarChar(50)
   password         String
   leaderboard_knox leaderboard_knox[]
+  leaderboard_tol  leaderboard_tol[]
   leaderboard_wcst leaderboard_wcst[]
   stats_knox       stats_knox[]
+  stats_tol        stats_tol[]
   stats_wcst       stats_wcst[]
 }
 
@@ -65,7 +67,28 @@ model stats_knox {
   eightstepsequencescorrect Int?               @db.SmallInt
   totalcorrect              Int?               @db.SmallInt
   user_id                   Int?
-  totalscore                Int?               @db.SmallInt
+  totalscore                Float?
   leaderboard_knox          leaderboard_knox[]
   users                     users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_knox_user_id")
+}
+
+model leaderboard_tol {
+  id        Int        @id @default(autoincrement())
+  user_id   Int?
+  stats_id  Int?
+  stats_tol stats_tol? @relation(fields: [stats_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_tol_stats_id")
+  users     users?     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_leaderboard_tol_user_id")
+}
+
+model stats_tol {
+  id                        Int               @id @default(autoincrement())
+  time                      DateTime?         @db.Timestamp(6)
+  fourmovessequencescorrect Int?              @db.SmallInt
+  fivemovessequencescorrect Int?              @db.SmallInt
+  sixmovessequencescorrect  Int?              @db.SmallInt
+  totalcorrect              Int?              @db.SmallInt
+  user_id                   Int?              @db.SmallInt
+  totalscore                Float?
+  leaderboard_tol           leaderboard_tol[]
+  users                     users?            @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_stats_tol_user_id")
 }

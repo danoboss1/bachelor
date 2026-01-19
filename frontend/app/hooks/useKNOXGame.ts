@@ -52,7 +52,7 @@ export function useKNOXGame() {
 
     const [sequenceLengths] = React.useState([
         // testovacie sekvencie
-        3, 3, 3,
+        3, 4, 5, 6, 7, 8
         // 4,
         // 5,
 
@@ -92,8 +92,6 @@ export function useKNOXGame() {
     const userAnsweredResolve = React.useRef<() => void | null>(null);
 
     const [isLastSequence, setIsLastSequence] = React.useState(false);
-
-    // const [totalScore, setTotalScore] = React.useState(0);
 
     const [finished, setFinished] = React.useState(false);
     

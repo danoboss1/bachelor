@@ -1,4 +1,5 @@
 import { DiscInHand, Hand, StackWithDiscs } from "@/components/tol/ToLComponents";
+import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
@@ -8,6 +9,16 @@ import { difficultyFive, difficultyFour, difficultySix } from './TOL_data';
 const { width, height } = Dimensions.get("window");
 
 const TOL_ROUTE_ENDSCREEN = "/tol/TOL_endscreen";
+
+type TolStatsPayload = {
+    time: string,
+    fourMovesSequencesCorrect: number,
+    fiveMovesSequencesCorrect: number,
+    sixMovesSequencesCorrect: number,
+    totalCorrect: number,
+    totalScore: number,
+    user_id: number,
+}
 
 type DiscData = {
     id: number;
@@ -174,6 +185,24 @@ export default function TOL_Screen() {
 
     const [finished, setFinished] = React.useState(false);
 
+    async function saveTolStatstoBackend(score: number) {
+        const payload: TolStatsPayload = {
+            time: new Date().toISOString(),
+            fourMovesSequencesCorrect: fourMovesSequencesCorrect,
+            fiveMovesSequencesCorrect: fiveMovesSequencesCorrect,
+            sixMovesSequencesCorrect: sixMovesSequencesCorrect,
+            totalCorrect: totalCorrect,
+            totalScore: score,
+            user_id: 1,
+        }
+
+        try {
+            await axios.post("https://bachelor-pi.vercel.app/tolStats", payload);
+        } catch (err: any) {
+            console.error("Error saving stats:", err);
+        }
+    }
+
     const onStackPress = (stackIndex: number) => {
         if (showFeedback) return;
 
@@ -253,6 +282,10 @@ export default function TOL_Screen() {
         });
     };
 
+    function delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
+
     let fourSequenceIndex: number;
     let fiveSequenceIndex: number;
     let sixSequenceIndex: number;
@@ -274,6 +307,7 @@ export default function TOL_Screen() {
             setTargetMoves(difficultyFour[fourSequenceIndex].targetMoves);
 
             await waitForUser();
+            await delay(1500);
         }
 
         for(let i = 0; i < 2; i++) {
@@ -291,6 +325,7 @@ export default function TOL_Screen() {
             setTargetMoves(difficultyFive[fiveSequenceIndex].targetMoves);
 
             await waitForUser();
+            await delay(1500);
         }
 
         for(let i = 0; i < 2; i++) {
@@ -308,6 +343,7 @@ export default function TOL_Screen() {
             setTargetMoves(difficultySix[sixSequenceIndex].targetMoves);
 
             await waitForUser();
+            await delay(1500);
         }
 
         // neviem ci treba aj sem return;???
@@ -327,28 +363,24 @@ export default function TOL_Screen() {
 
     React.useEffect(() => {
         if (finished) {
-
             const totalScore = 
                 fourRef.current * COEFFICIENTS[4] +
                 fiveRef.current * COEFFICIENTS[5] +
                 sixRef.current * COEFFICIENTS[6];
-
-            router.push({
-                pathname: TOL_ROUTE_ENDSCREEN,
-                params: {
-                    fourMovesSequencesCorrect,
-                    fiveMovesSequencesCorrect,
-                    sixMovesSequencesCorrect,
-                    totalCorrect,
-                    totalScore,
-                }
-            });
+            saveTolStatstoBackend(totalScore).then(() => {
+                router.push({
+                    pathname: TOL_ROUTE_ENDSCREEN,
+                    params: {
+                        fourMovesSequencesCorrect,
+                        fiveMovesSequencesCorrect,
+                        sixMovesSequencesCorrect,
+                        totalCorrect,
+                        totalScore,
+                    }
+                });
+            })
         };
     }, [finished]);
-
-
-
-
 
     // const randomDifficulty =
     //     [difficultyFour, difficultyFive, difficultySix][

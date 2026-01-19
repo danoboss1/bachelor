@@ -4,30 +4,13 @@ import { styles } from "../assets/styles/mainScreens.styles";
 
 const { width, height } = Dimensions.get("window");
 
-type StatItem = {
-    label: string;
-    value: number;
-    max?: number;
-}
-
-type StatsComponentProps = {
-    title: string;
-    stats: StatItem[];
-    image?: ImageSourcePropType;
-}
 
 type StatMiniProps = {
     label: string;
     value: number;
     percentile: number;
     max?: number;
-    showPercentSign?: boolean; // nový voliteľný prop
-};
-
-type StatMiniSupplementaryProps = {
-    label: string;
-    value: number | string;
-    whole?: number;
+    showPercentSign?: boolean; 
 };
 
 export function StatMini({ label, value, percentile, max = 100, showPercentSign }: StatMiniProps) {
@@ -61,6 +44,12 @@ export function StatMini({ label, value, percentile, max = 100, showPercentSign 
     );
 }
 
+type StatMiniSupplementaryProps = {
+    label: string;
+    value: number | string;
+    whole?: number;
+};
+
 export function StatMiniSupplementary({ label, value, whole }: StatMiniSupplementaryProps) {
     return (
         <View style={stylesSupplementary.container}>
@@ -70,6 +59,20 @@ export function StatMiniSupplementary({ label, value, whole }: StatMiniSupplemen
             </Text>
         </View>
     );
+}
+
+type StatItem = {
+    label: string;
+    value: number;
+    percentile: number;
+    max?: number;
+    showPercentSign?: boolean;
+}
+
+type StatsComponentProps = {
+    title: string;
+    stats: StatItem[];
+    image?: ImageSourcePropType;
 }
 
 export function StatsComponent({ title, stats, image }: StatsComponentProps) {
@@ -84,21 +87,31 @@ export function StatsComponent({ title, stats, image }: StatsComponentProps) {
                     <Text style={localStyles.cardTitle}>{title}</Text>
 
                     {stats.map((item, index) => {
-                        const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
+                        // const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
 
                         return (
                             <View key={index} style={localStyles.statContainer}>
-                                <Text style={localStyles.statLabel}>{item.label}</Text>
-                                <View style={localStyles.statRow}>
-                                    <Text style={localStyles.statValue}>{item.value}</Text>
-                                    <View style={localStyles.progressBarBackground}>
-                                        <View style={[localStyles.progressBarFill, { width: `${percentage}%` }]} />
+                                <Text style={stylesMini.label}>{item.label}</Text>
+
+                                <Text style={stylesMini.valueCentered}>
+                                    {item.value}{item.showPercentSign ? "%" : ""}
+                                </Text>
+
+                                <View style={stylesMini.barRow}>
+                                    <View style={stylesMini.barBackground}>
+                                        {/* tuto mam v statMini, iny vypocet, potom to checknut, ktore je spravne */}
+                                        <View style={[stylesMini.barFill, { width: `${item.percentile}%` }]} />
                                     </View>
-                                    <Text style={localStyles.statPercentage}>{Math.round(percentage)}%</Text>
+
+                                    <Text style={stylesMini.barText} numberOfLines={1}>
+                                        {/* tuto mam v statMini, iny vypocet, potom to checknut, ktore je spravne */}
+                                        {Math.round(item.percentile)}% percentile
+                                    </Text>
                                 </View>
                             </View>
                         );
                     })}
+
                     <TouchableOpacity style={styles.button}>
                         <Text style={styles.buttonTextWhite}> More </Text>
                     </TouchableOpacity>
@@ -108,21 +121,31 @@ export function StatsComponent({ title, stats, image }: StatsComponentProps) {
                     <Text style={localStyles.cardTitle}>{title}</Text>
 
                     {stats.map((item, index) => {
-                        const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
+                        // const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
 
                         return (
                             <View key={index} style={localStyles.statContainer}>
-                                <Text style={localStyles.statLabel}>{item.label}</Text>
-                                <View style={localStyles.statRow}>
-                                    <Text style={localStyles.statValue}>{item.value}</Text>
-                                    <View style={localStyles.progressBarBackground}>
-                                        <View style={[localStyles.progressBarFill, { width: `${percentage}%` }]} />
+                                <Text style={stylesMini.label}>{item.label}</Text>
+
+                                <Text style={stylesMini.valueCentered}>
+                                    {item.value}{item.showPercentSign ? "%" : ""}
+                                </Text>
+
+                                <View style={stylesMini.barRow}>
+                                    <View style={stylesMini.barBackground}>
+                                        {/* tuto mam v statMini, iny vypocet, potom to checknut, ktore je spravne */}
+                                        <View style={[stylesMini.barFill, { width: `${item.percentile}%` }]} />
                                     </View>
-                                    <Text style={localStyles.statPercentage}>{Math.round(percentage)}%</Text>
+
+                                    <Text style={stylesMini.barText} numberOfLines={1}>
+                                        {/* tuto mam v statMini, iny vypocet, potom to checknut, ktore je spravne */}
+                                        {Math.round(item.percentile)}% percentile
+                                    </Text>
                                 </View>
                             </View>
                         );
                     })}
+
                     <TouchableOpacity style={styles.button}>
                         <Text style={styles.buttonTextWhite}> More </Text>
                     </TouchableOpacity>
@@ -132,10 +155,8 @@ export function StatsComponent({ title, stats, image }: StatsComponentProps) {
     );
 }
 
-
 const localStyles = StyleSheet.create({
     card: {
-        height: height * 0.55,
         width: width * 0.9,
         borderRadius: 16,
         marginBottom: 12,
@@ -151,45 +172,12 @@ const localStyles = StyleSheet.create({
     cardTitle: {
         fontSize: 20,
         fontWeight: "bold",
-        color: "white",
+        color: "black",
         marginVertical: 10,
         textAlign: "center",
     },
     statContainer: {
         marginBottom: 12,
-    },
-    statLabel: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "white",
-        marginBottom: 4,
-    },
-    statRow: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    statValue: {
-        width: 40, // fixná šírka pre hodnotu
-        color: "white",
-        fontWeight: "600",
-    },
-    progressBarBackground: {
-        flex: 1,
-        height: 14,
-        borderRadius: 6,
-        backgroundColor: "#444",
-        marginHorizontal: 8,
-        overflow: "hidden",
-    },
-    progressBarFill: {
-        height: "100%",
-        backgroundColor: "#4caf50",
-    },
-    statPercentage: {
-        width: 40,
-        color: "white",
-        fontWeight: "600",
-        textAlign: "right",
     },
     imageBackground: {
         // width: "100%",

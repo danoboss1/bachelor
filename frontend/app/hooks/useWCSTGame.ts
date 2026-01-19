@@ -184,7 +184,7 @@ export function useWCSTGame() {
         };
 
         try {
-            await axios.post("https://bachelor-pi.vercel.app/stats", payload);
+            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload);
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }

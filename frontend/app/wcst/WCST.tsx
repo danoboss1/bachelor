@@ -4,8 +4,6 @@ import React from "react";
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useWCSTGame } from "../hooks/useWCSTGame";
 
-export const options = { headerShown: false };
-
 export default function WCST_Screen() {
     const {
         timeLeft,

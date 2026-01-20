@@ -74,7 +74,7 @@ const localStyles = StyleSheet.create({
         width: width * 0.4,       
         alignSelf: "center", 
     },
-        title_info: {
+    title_info: {
         fontSize: 22,
         fontWeight: "bold",
         marginBottom: 10,

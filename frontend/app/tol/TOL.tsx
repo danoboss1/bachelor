@@ -1,10 +1,7 @@
 import { DiscInHand, Hand, StackWithDiscs } from "@/components/tol/ToLComponents";
-import axios from "axios";
-import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { useTOLGame } from "../hooks/useTOLGame";
-import { difficultyFive, difficultyFour, difficultySix } from './TOL_data';
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,7 +15,7 @@ type TolStatsPayload = {
     totalCorrect: number,
     totalScore: number,
     user_id: number,
-}
+};
 
 type DiscData = {
     id: number;
@@ -75,321 +72,20 @@ const areStacksEqual = (
    SCREEN
 ========================= */
 
-export default function TOL_Screen() {
-    const router = useRouter();
-    
-    const [fourMovesSequencesCorrect, setFourMovesSequencesCorrect] = useState(0);
-    const [fiveMovesSequencesCorrect, setFiveMovesSequencesCorrect] = useState(0);
-    const [sixMovesSequencesCorrect, setSixMovesSequencesCorrect] = useState(0);
-    const [totalCorrect, setTotalCorrect] = useState(0);
-
-    const fourRef = useRef(0);
-    const fiveRef = useRef(0);
-    const sixRef = useRef(0);
-    const totalCorrectRef = useRef(0);
-    
+export default function TOL_Screen() { 
     const {
-        moveDisc,
-        selectedDiscId,
-        handPosition,
         handRef,
-        registerDiscRef,
+        stacks,
+        targetStacks,
+        discInHand,
+        userMoves,
+        targetMoves,
+        feedback,
+        showFeedback,
+        finished,
+        onStackPress,
     } = useTOLGame();
 
-    const userAnsweredResolve = React.useRef<() => void | null>(null);
-
-    const [feedback, setFeedback] = React.useState<
-        | "" 
-        | "Well done!"
-        | "Incorrect!"
-        | "Well done. You have completed the test!"
-        | "Incorrect. You have completed the test!"
-    >("");
-
-    /* 🎲 RANDOM DIFFICULTY */
-    const randomDifficulty =
-        [difficultyFour, difficultyFive, difficultySix][
-            Math.floor(Math.random() * 3)
-        ];
-
-    const selectedLevel = randomDifficulty[0];
-
-    console.log("Selected level", selectedLevel);
-
-    /* 🎯 STATE */
-    const [stacks, setStacks] = useState<DiscData[][]>(() =>
-        convertStacks(selectedLevel.userStack)
-    );
-
-    const [targetStacks, setTargetStacks] = useState<DiscData[][]>(() =>
-        convertStacks(selectedLevel.targetStack)
-    );
-
-    // testovacie targetStacks
-    // const [targetStacks, setTargetStacks] = useState<DiscData[][]>([
-    //     [
-    //         { id: 3, size: width * 0.28, color: "#ff3131" }, 
-    //     ],
-    //     [
-    //         { id: 1, size: width * 0.28, color: "#004aad" },
-    //         { id: 2, size: width * 0.28, color: "#00bf63" },
-    //     ],
-    //     [
-    //     ],
-    // ]);
-
-    // stacky na testovanie
-    // const [stacks, setStacks] = useState<DiscData[][]>([
-    //     [
-    //         { id: 1, size: width * 0.28, color: "red" },
-    //         { id: 2, size: width * 0.28, color: "blue" },
-    //         { id: 3, size: width * 0.28, color: "green" },
-    //     ],
-    //     [
-    //         { id: 4, size: width * 0.28, color: "red" },
-    //         { id: 5, size: width * 0.28, color: "blue" },
-    //     ],
-    //     [
-    //         { id: 6, size: width * 0.28, color: "red" },    
-    //     ],
-    // ]);
-
-    // testovacie stacks
-    // const [stacks, setStacks] = useState<DiscData[][]>([
-    //     [
-    //     ],
-    //     [
-    //         { id: 3, size: width * 0.28, color: "#ff3131" },
-    //         { id: 2, size: width * 0.28, color: "#00bf63" }, 
-    //     ],
-    //     [
-    //         { id: 1, size: width * 0.28, color: "#004aad" },   
-    //     ],
-    // ]);
-
-    const [showFeedback, setShowFeedback] = useState(false);
-
-    const [userMoves, setUserMoves] = useState(0); 
-    const [targetMoves, setTargetMoves] = useState(selectedLevel.targetMoves);
-
-    const [discInHand, setDiscInHand] = useState<DiscData | null>(null);
-
-    // React.useEffect(() => {
-    //     if (feedback) return;
-
-    //     if (userMoves === targetMoves) {
-    //         setFeedback("Incorrect!");
-    //         setShowFeedback(true);
-    //     }
-    // }, [userMoves, targetMoves, feedback])
-
-    const [finished, setFinished] = React.useState(false);
-
-    async function saveTolStatstoBackend(score: number) {
-        const payload: TolStatsPayload = {
-            time: new Date().toISOString(),
-            fourMovesSequencesCorrect: fourMovesSequencesCorrect,
-            fiveMovesSequencesCorrect: fiveMovesSequencesCorrect,
-            sixMovesSequencesCorrect: sixMovesSequencesCorrect,
-            totalCorrect: totalCorrect,
-            totalScore: score,
-            user_id: 1,
-        }
-
-        try {
-            await axios.post("https://bachelor-pi.vercel.app/tolStats", payload);
-        } catch (err: any) {
-            console.error("Error saving stats:", err);
-        }
-    }
-
-    const onStackPress = (stackIndex: number) => {
-        if (showFeedback) return;
-
-        setStacks(prev => {
-            const newStacks = prev.map(s => [...s]);
-
-            // console.log("newStacks", newStacks);
-            // setTargetMoves(prev => prev + 1);
-            
-            if (!discInHand) {
-                if (newStacks[stackIndex].length === 0) return prev;
-                const pickedDisc = newStacks[stackIndex].pop()!;
-                setDiscInHand(pickedDisc);
-                return newStacks;
-            }
-            
-            const maxCapacity = STACK_CAPACITY[stackIndex];
-            
-            if (newStacks[stackIndex].length >= maxCapacity) {
-                return prev;
-            }
-            
-            // toto mozem pouzit na vizualne zvyraznenie plneho stacku
-            // const isFull = discs.length >= STACK_CAPACITY[index];
-            
-            // ked davam disk dole, pridat userMoves + 1
-            // setUserMoves(prev => prev + 1);
-
-            // newStacks[stackIndex].push(discInHand);
-            // setDiscInHand(null);
-            
-            const nextMove = userMoves + 1;
-
-            newStacks[stackIndex].push(discInHand);
-            setDiscInHand(null);
-            setUserMoves(nextMove);
-
-            // if(areStacksEqual(newStacks, targetStacks)) {
-            //     console.log("Correct");
-            //     setFeedback("Well done!");
-            //     setShowFeedback(true);
-            // }
-
-            const isCorrect = areStacksEqual(newStacks, targetStacks);
-
-            if (isCorrect) {
-                if (targetMoves === 4) {
-                    fourRef.current++;
-                    setFourMovesSequencesCorrect(prev => prev + 1);
-                }
-                if (targetMoves === 5) {
-                    fiveRef.current++;
-                    setFiveMovesSequencesCorrect(prev => prev + 1);
-                }
-                if (targetMoves === 6) {
-                    sixRef.current++;
-                    setSixMovesSequencesCorrect(prev => prev + 1);
-                }
-
-                totalCorrectRef.current++;
-                setTotalCorrect(prev => prev + 1);
-
-                setFeedback("Well done!");
-                setShowFeedback(true);
-
-                userAnsweredResolve.current?.();
-                // mam sem dat return;???
-            } else if (nextMove === targetMoves) {
-                setFeedback("Incorrect!");
-                setShowFeedback(true);
-
-                userAnsweredResolve.current?.();
-                // mam sem dat return;???
-            }
-
-            return newStacks;
-        });
-    };
-
-    function delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms))
-    }
-
-    let fourSequenceIndex: number;
-    let fiveSequenceIndex: number;
-    let sixSequenceIndex: number;
-
-    async function startGame() {
-
-        for(let i = 0; i < 2; i++) {
-            setUserMoves(0);
-            setDiscInHand(null);
-            setFeedback("");
-            setShowFeedback(false);
-
-            fourSequenceIndex = Math.floor(Math.random() * 21);
-
-            const selectedLevel = difficultyFour[fourSequenceIndex];
-            setStacks(convertStacks(difficultyFour[fourSequenceIndex].userStack))
-            setTargetStacks(convertStacks(difficultyFour[fourSequenceIndex].targetStack))
-
-            setTargetMoves(difficultyFour[fourSequenceIndex].targetMoves);
-
-            await waitForUser();
-            await delay(1500);
-        }
-
-        for(let i = 0; i < 2; i++) {
-            setUserMoves(0);
-            setDiscInHand(null);
-            setFeedback("");
-            setShowFeedback(false);
-
-            fiveSequenceIndex = Math.floor(Math.random() * 21);
-
-            const selectedLevel = difficultyFive[fiveSequenceIndex];
-            setStacks(convertStacks(difficultyFive[fiveSequenceIndex].userStack))
-            setTargetStacks(convertStacks(difficultyFive[fiveSequenceIndex].targetStack))
-
-            setTargetMoves(difficultyFive[fiveSequenceIndex].targetMoves);
-
-            await waitForUser();
-            await delay(1500);
-        }
-
-        for(let i = 0; i < 2; i++) {
-            setUserMoves(0);
-            setDiscInHand(null);
-            setFeedback("");
-            setShowFeedback(false);
-
-            sixSequenceIndex = Math.floor(Math.random() * 21);
-
-            const selectedLevel = difficultySix[sixSequenceIndex];
-            setStacks(convertStacks(difficultySix[sixSequenceIndex].userStack))
-            setTargetStacks(convertStacks(difficultySix[sixSequenceIndex].targetStack))
-
-            setTargetMoves(difficultySix[sixSequenceIndex].targetMoves);
-
-            await waitForUser();
-            await delay(1500);
-        }
-
-        // neviem ci treba aj sem return;???
-        setFinished(true);
-    }
-
-    React.useEffect(() => {
-        startGame();
-    }, []);
-
-
-    function waitForUser() {
-        return new Promise<void>(resolve => {
-            userAnsweredResolve.current = resolve;
-        });
-    }
-
-    React.useEffect(() => {
-        if (finished) {
-            const totalScore = 
-                fourRef.current * COEFFICIENTS[4] +
-                fiveRef.current * COEFFICIENTS[5] +
-                sixRef.current * COEFFICIENTS[6];
-            saveTolStatstoBackend(totalScore).then(() => {
-                router.push({
-                    pathname: TOL_ROUTE_ENDSCREEN,
-                    params: {
-                        fourMovesSequencesCorrect,
-                        fiveMovesSequencesCorrect,
-                        sixMovesSequencesCorrect,
-                        totalCorrect,
-                        totalScore,
-                    }
-                });
-            })
-        };
-    }, [finished]);
-
-    // const randomDifficulty =
-    //     [difficultyFour, difficultyFive, difficultySix][
-    //         Math.floor(Math.random() * 3)
-    //     ];
-
-
-    // const handRef = React.useRef<View>(null);
-  
     return (
         // #f9f9f9
         <View style={localStyles.container}>

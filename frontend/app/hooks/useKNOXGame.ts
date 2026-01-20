@@ -15,19 +15,20 @@ type KnoxStatsPayload = {
     totalCorrect: number,
     totalScore: number,
     user_id: number,
-}
+};
+
+const COEFFICIENTS: Record<number, number> = {
+    3: 0.1,
+    4: 0.15,
+    5: 0.2,
+    6: 0.3,
+    7: 0.5,
+    8: 1.2,
+};
 
 
 export function useKNOXGame() {
     const router = useRouter();
-
-    const threeRef = React.useRef(0);
-    const fourRef = React.useRef(0);
-    const fiveRef = React.useRef(0);
-    const sixRef = React.useRef(0);
-    const sevenRef = React.useRef(0);
-    const eightRef = React.useRef(0);
-    const totalCorrectRef = React.useRef(0);
 
     const [timeLeft, setTimeLeft] = React.useState(60);
     const [feedback, setFeedback] = React.useState<
@@ -50,6 +51,30 @@ export function useKNOXGame() {
     const [userSequence, setUserSequence] = React.useState<number[]>([]);
     const userSequenceRef = React.useRef<number[]>([]);
 
+    const [isAnimating, setIsAnimating] = React.useState(true);
+    const [userAnswered, setUserAnswered] = React.useState(false);
+    const [isLastSequence, setIsLastSequence] = React.useState(false);
+    const [finished, setFinished] = React.useState(false);
+
+    const threeRef = React.useRef(0);
+    const fourRef = React.useRef(0);
+    const fiveRef = React.useRef(0);
+    const sixRef = React.useRef(0);
+    const sevenRef = React.useRef(0);
+    const eightRef = React.useRef(0);
+    const totalCorrectRef = React.useRef(0);
+
+    const [threeStepSequencesCorrect, setThreeStepSequencesCorrect] = React.useState(0);
+    const [fourStepSequencesCorrect, setFourStepSequencesCorrect] = React.useState(0);
+    const [fiveStepSequencesCorrect, setFiveStepSequencesCorrect] = React.useState(0);
+    const [sixStepSequencesCorrect, setSixStepSequencesCorrect] = React.useState(0);
+    const [sevenStepSequencesCorrect, setSevenStepSequencesCorrect] = React.useState(0);
+    const [eightStepSequencesCorrect, setEightStepSequencesCorrect] = React.useState(0);
+    const [totalCorrect, setTotalCorrect] = React.useState(0);
+
+    const timeoutRef = React.useRef<number | null>(null);
+    const userAnsweredResolve = React.useRef<() => void | null>(null);
+
     const [sequenceLengths] = React.useState([
         // testovacie sekvencie
         3, 4, 5, 6, 7, 8
@@ -65,37 +90,46 @@ export function useKNOXGame() {
         // 8, 8,
     ]);
 
-    // tieto koeficienty budem neskor ratat cez nejaku metriku ako je Rasch model
-    const COEFFICIENTS = {
-        3: 0.1,
-        4: 0.15,
-        5: 0.2,
-        6: 0.3,
-        7: 0.5,
-        8: 1.2,
-    };
 
-    const [threeStepSequencesCorrect, setThreeStepSequencesCorrect] = React.useState(0);
-    const [fourStepSequencesCorrect, setFourStepSequencesCorrect] = React.useState(0);
-    const [fiveStepSequencesCorrect, setFiveStepSequencesCorrect] = React.useState(0);
-    const [sixStepSequencesCorrect, setSixStepSequencesCorrect] = React.useState(0);
-    const [sevenStepSequencesCorrect, setSevenStepSequencesCorrect] = React.useState(0);
-    const [eightStepSequencesCorrect, setEightStepSequencesCorrect] = React.useState(0);
+    function delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
 
-    const [totalCorrect, setTotalCorrect] = React.useState(0);
+    function formatTime(sec: number) {
+        const m = Math.floor(sec / 60).toString().padStart(2, "0");
+        const s = (sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    }
 
-    const timeoutRef = React.useRef<number | null>(null);
+    function generateSequence(length: number) {
+        const seq = Array.from({ length }, () =>
+            Math.floor(Math.random() * 4)
+        );
+        setSequence(seq);
+        setUserSequence([]);
+        return seq;
+    }
 
-    const [isAnimating, setIsAnimating] = React.useState(true);
-    const [userAnswered, setUserAnswered] = React.useState(false);
+    async function playSequence(seq: number []) {
+        setIsAnimating(true);
 
-    const userAnsweredResolve = React.useRef<() => void | null>(null);
+        for (const id of seq) {
+            setActiveSquare(id);
+            await delay(600);
+            setActiveSquare(null);
+            await delay(300);
+        }
 
-    const [isLastSequence, setIsLastSequence] = React.useState(false);
+        setIsAnimating(false);
+    }
 
-    const [finished, setFinished] = React.useState(false);
-    
-    async function saveKnoxStatstoBackend(score: number) {
+    function waitForUser() {
+        return new Promise<void>(resolve => {
+            userAnsweredResolve.current = resolve;
+        });
+    }
+
+    async function saveKnoxStatstoBackend(finalScore: number) {
         const payload: KnoxStatsPayload = {
             time: new Date().toISOString(),
             threeStepSequencesCorrect: threeStepSequencesCorrect,
@@ -105,7 +139,7 @@ export function useKNOXGame() {
             sevenStepSequencesCorrect: sevenStepSequencesCorrect,
             eightStepSequencesCorrect: eightStepSequencesCorrect,
             totalCorrect: totalCorrect,
-            totalScore: score,
+            totalScore: finalScore,
             user_id: 1,
         };
 
@@ -114,12 +148,6 @@ export function useKNOXGame() {
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }
-    }
-
-    function formatTime(sec: number) {
-        const m = Math.floor(sec / 60).toString().padStart(2, "0");
-        const s = (sec % 60).toString().padStart(2, "0");
-        return `${m}:${s}`;
     }
 
     React.useEffect(() => {
@@ -135,23 +163,17 @@ export function useKNOXGame() {
         return () => clearInterval(interval);
     }, []);
 
-    // rozsviet stvorec po stlaceni
+
     function lightUpSquare(id : number) {
         if (isAnimating) return;
 
-        
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
         }
 
-        // const nextIndex = userSequenceRef.current.length;
-        // const isLastTap = nextIndex === sequence.length - 1;
-        // const isCorrect = id === sequence[nextIndex];
-
         const indexNext = userSequenceRef.current.length;
 
         if (id !== sequence[indexNext]) {
-            // vycistenie odpovede pred zlych vyberom
             setActiveUserTap(null);
 
             if (isLastSequence) {
@@ -173,9 +195,7 @@ export function useKNOXGame() {
             return;
         }
 
-        // lebo este tam nie je pridany ten posledny, tak musim zvysit o jedna
         if (userSequenceRef.current.length + 1 === sequence.length) {
-            // vycistenie odpovede pred spravnym uhadnutim sekvencie
             setActiveUserTap(null);
 
             if (sequence.length === 3) {
@@ -206,9 +226,6 @@ export function useKNOXGame() {
             totalCorrectRef.current++;
             setTotalCorrect(prev => prev + 1);
 
-            console.log("3-step Sequence rigth after: ", threeStepSequencesCorrect);
-            console.log("total correct right after: ", totalCorrect);
-
             if (isLastSequence) {
                 setFeedback("Well done. You have completed the test");
             } else {
@@ -235,7 +252,8 @@ export function useKNOXGame() {
             setUserSequence(userSequenceRef.current);
         }
 
-        console.log("IMMEDIATE:", userSequenceRef.current);
+        // tento console log neskor vymazat
+        // console.log("IMMEDIATE:", userSequenceRef.current);
 
         timeoutRef.current = setTimeout(() => {
             setActiveUserTap(null);
@@ -243,36 +261,42 @@ export function useKNOXGame() {
         }, 600);
     }
 
-    function generateSequence(length: number) {
-        const seq = Array.from({ length }, () =>
-            Math.floor(Math.random() * 4)
-        );
-        setSequence(seq);
+    function resetGame() {
+        // refs
+        threeRef.current = 0;
+        fourRef.current = 0;
+        fiveRef.current = 0;
+        sixRef.current = 0;
+        sevenRef.current = 0;
+        eightRef.current = 0;
+        totalCorrectRef.current = 0;
+
+        // state
+        setThreeStepSequencesCorrect(0);
+        setFourStepSequencesCorrect(0);
+        setFiveStepSequencesCorrect(0);
+        setSixStepSequencesCorrect(0);
+        setSevenStepSequencesCorrect(0);
+        setEightStepSequencesCorrect(0);
+        setTotalCorrect(0);
+
+        setFinished(false);
+        setIsLastSequence(false);
+        setTimeLeft(60);
+        setFeedback("Tap here when you are ready");
+
+        setSequence([]);
         setUserSequence([]);
-        console.log("Seq: ", seq);
-        return seq;
-    }
+        userSequenceRef.current = [];
 
-    async function playSequence(seq: number []) {
-        setIsAnimating(true);
-
-        for (const id of seq) {
-            setActiveSquare(id);
-            await delay(600);
-            setActiveSquare(null);
-            await delay(300);
-        }
-
-        setIsAnimating(false);
-    }
-
-    function delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms))
+        setActiveSquare(null);
+        setActiveUserTap(null);
+        setIncorrectUserTap(null);
+        setCorrectLastUserTap(null);
     }
 
     async function startGame() {
-        // reset flagu na začiatku každej hry
-        setIsLastSequence(false);
+        resetGame();
 
         for(let i = 0; i < sequenceLengths.length; i++) {
             if (i + 1 === sequenceLengths.length) {
@@ -296,33 +320,9 @@ export function useKNOXGame() {
             await delay(1500);
         }
 
-        // const finalScore = 
-        //     threeStepSequencesCorrect * COEFFICIENTS[3] +
-        //     fourStepSequencesCorrect * COEFFICIENTS[4] +
-        //     fiveStepSequencesCorrect * COEFFICIENTS[5] +
-        //     sixStepSequencesCorrect * COEFFICIENTS[6] + 
-        //     sevenStepSequencesCorrect * COEFFICIENTS[7] +
-        //     eightStepSequencesCorrect * COEFFICIENTS[8];
-        
-        // setTotalScore(finalScore);
-
-
         setFinished(true);
     }
 
-    function waitForUser() {
-        return new Promise<void>(resolve => {
-            userAnsweredResolve.current = resolve;
-        });
-    }
-
-    // React.useEffect(() => {
-    //     if (finished) {
-    //         saveStatsToBackend().then(() => {
-    //             router.push(WCST_ROUTE_ENDSCREEN); // bez params
-    //         });
-    //     }
-    // }, [finished]);
     React.useEffect(() => {
         if (finished) {
             const finalScore =
@@ -332,10 +332,8 @@ export function useKNOXGame() {
                 sixRef.current * COEFFICIENTS[6] +
                 sevenRef.current * COEFFICIENTS[7] +
                 eightRef.current * COEFFICIENTS[8];
-            
-            // setTotalScore(finalScore);
+
             console.log("final score", finalScore);
-            // console.log("total score", totalScore);
 
             saveKnoxStatstoBackend(finalScore).then(() => {
                 router.push({
@@ -354,14 +352,6 @@ export function useKNOXGame() {
             })
         };
     }, [finished]);
-
-    React.useEffect(() => {
-        console.log("3-step Sequence updated:", threeStepSequencesCorrect);
-    }, [threeStepSequencesCorrect]);
-
-    React.useEffect(() => {
-        console.log("total correct updated:", totalCorrect);
-    }, [totalCorrect]);
 
     return {
         timeLeft,

@@ -1,9 +1,9 @@
+import { router } from "expo-router";
 import React from "react";
 import { Dimensions, ImageBackground, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../assets/styles/mainScreens.styles";
 
 const { width, height } = Dimensions.get("window");
-
 
 type StatMiniProps = {
     label: string;
@@ -73,9 +73,10 @@ type StatsComponentProps = {
     title: string;
     stats: StatItem[];
     image?: ImageSourcePropType;
+    path: "/tol/TOL_stats_detail";
 }
 
-export function StatsComponent({ title, stats, image }: StatsComponentProps) {
+export function StatsComponent({ title, stats, image, path }: StatsComponentProps) {
     return (
         <View style={localStyles.card}>
             {image ? (
@@ -112,7 +113,10 @@ export function StatsComponent({ title, stats, image }: StatsComponentProps) {
                         );
                     })}
 
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity 
+                        style={styles.button}
+                        onPress={() => router.push(path)}
+                    >
                         <Text style={styles.buttonTextWhite}> More </Text>
                     </TouchableOpacity>
                 </ImageBackground>
@@ -146,7 +150,10 @@ export function StatsComponent({ title, stats, image }: StatsComponentProps) {
                         );
                     })}
 
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity 
+                        style={styles.button}
+                        onPress={() => router.push(path)}
+                    >
                         <Text style={styles.buttonTextWhite}> More </Text>
                     </TouchableOpacity>
                 </>

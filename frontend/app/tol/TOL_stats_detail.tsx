@@ -1,18 +1,41 @@
 import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
-import { LineChart } from "react-native-gifted-charts";
+// import { LineChart } from "react-native-gifted-charts";
+import { Color } from "@/constants/TWPalette";
+import React, { useMemo, useState } from "react";
+import { BarChart } from "react-native-gifted-charts";
 
 const { width, height } = Dimensions.get("window")
 
-const lineData = [
+const CHART_HORIZONTAL_PADDING = width * 0.08;
+const NUMBER_OF_BARS = 7;
+const SPACING = 12;
+const INITIAL_SPACING = 6;
+const END_SPACING = 6;
+
+const BAR_WIDTH =
+    (width - CHART_HORIZONTAL_PADDING * 2 - INITIAL_SPACING - END_SPACING - SPACING * (NUMBER_OF_BARS - 1)) /
+    NUMBER_OF_BARS;
+
+const rawData = [
     {value: 50, dataPointText: '50', label: '15/1'},
     {value: 80, dataPointText: '80', label: '16/1'},
-    {value: 90, dataPointText: '90', label: '17/1'},
+    {value: 100, dataPointText: '100', label: '17/1'},
     {value: 70, dataPointText: '70', label: '18/1'},
     {value: 56, dataPointText: '56', label: '19/1'},
     {value: 78, dataPointText: '78', label: '20/1'},
-    {value: 74, dataPointText: '74', label: '21/1'},
+    {value: 74, dataPointText: '74', label: '21/1', frontColor: '#177AD5'},
 ];
+
+// const barData2 = [
+//     {value: 250, label: 'M'},
+//     {value: 500, label: 'T', frontColor: '#177AD5'},
+//     {value: 745, label: 'W', frontColor: '#177AD5'},
+//     {value: 320, label: 'T'},
+//     {value: 600, label: 'F', frontColor: '#177AD5'},
+//     {value: 256, label: 'S'},
+//     {value: 300, label: 'S'},
+// ];
 
 // const data = [ {value:50}, {value:80}, {value:90}, {value:70} ]
 
@@ -30,28 +53,83 @@ const FocusLabel = ({ item }: any) => {
 }
 
 export default function TOLStatsDetail() {
+    const [activeIndex, setActiveIndex] = useState(rawData.length - 1);
+
+    const barData = useMemo(
+        () =>
+            rawData.map((item, index) => ({
+                ...item,
+                frontColor:
+                    index === activeIndex
+                        ? Color.blue[800]
+                        : Color.blue[400],
+
+                topLabelComponent:
+                    index === activeIndex
+                        ? () => (
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: Color.blue[800],
+                                    marginBottom: 6,
+                                }}
+                            >
+                                {item.value}
+                            </Text>
+                            )
+                        : undefined,
+            })),
+        [activeIndex]    
+    );
+
     return (
         <View style={{
             flex: 1,
+            backgroundColor: Color.blue[100]
             // justifyContent: "center", // vertikálne centrovanie
             // alignItems: "center",     // horizontálne centrovanie
         }}>
 
             <View style={{flex:1, justifyContent:"center"}}>
                 <Text style={localStyles.graphTitle}>Total score</Text>
-                <LineChart 
-                    data={lineData} 
+                {/* <LineChart 
+                    data={barData} 
                     height={250}
-                    showVerticalLines
+                    showVerticalLines={false}
+                    dashWidth={0}   
+                    dashGap={0}
+                    // horizontalLinesColor="#E5E7EB"
+
                     spacing={44}
                     initialSpacing={44}
                     color="skyblue"
+                    thickness={6}
                     dataPointsHeight={6}
                     dataPointsWidth={6}
                     dataPointsColor="blue"
                     yAxisThickness={0}
                     xAxisThickness={0}
                     focusEnabled
+
+                    xAxisLabelTextStyle={{
+                        fontSize: 12,
+                        fontWeight: "600", 
+                        color: "black",
+                    }}
+
+                    yAxisTextStyle={{
+                        fontSize: 12,
+                        fontWeight: "600",
+                        color: "black"
+                    }}
+
+                    // value: {
+                    //     fontSize: 16,
+                    //     fontWeight: "600",
+                    //     color: "black",
+                    //     textAlign: "right", // hodnota bude zarovnaná doprava
+                    // },
 
                     focusedDataPointLabelComponent={(item: any) => (
                         <FocusLabel item={item} />
@@ -60,6 +138,49 @@ export default function TOLStatsDetail() {
                     onFocus={() => {
                         console.log("Focused point:");
                     }}
+                /> */}
+                <BarChart
+                    maxValue={100}     
+                    stepValue={20}
+                    yAxisExtraHeight={20}
+                    barBorderRadius={4}
+                    // frontColor="lightgray"
+                    // showGradient
+                    // gradientColor={Color.blue[400]}
+                    frontColor={Color.blue[400]}
+                    data={barData}
+                    xAxisThickness={0}
+                    yAxisThickness={0}
+                    disableScroll
+
+                    width={width - CHART_HORIZONTAL_PADDING * 2}
+                    barWidth={BAR_WIDTH}
+                    spacing={SPACING}
+                    initialSpacing={INITIAL_SPACING}
+                    endSpacing={END_SPACING}  
+
+                    xAxisLabelTextStyle={{
+                        color: Color.gray[400],
+                        fontSize: 12,
+                        fontWeight: "500",
+                    }}
+                    yAxisTextStyle={{
+                        color: Color.gray[400],
+                        fontSize: 12,
+                        fontWeight: "500",
+                    }}
+
+                    onPress={(_item: any, index: number) => {
+                        setActiveIndex(index);
+                    }}
+
+                    // renderTooltip={(item: any, index: number) => {
+                    //     if (index !== activeIndex) return null;
+
+                    //     return <FocusLabel item={item} />;
+                    // }}
+
+                    dashGap={10}
                 />
             </View>
 
@@ -94,9 +215,9 @@ const localStyles = StyleSheet.create({
         width: "100%",
     },
     graphTitle: {
-        fontSize: 14,
-        fontWeight: '500',
-        marginLeft: 16,
+        fontSize: 16,
+        fontWeight: '600',
+        marginLeft: width * 0.1,
         marginBottom: 8,
         color: "black",
         textAlign: "left",

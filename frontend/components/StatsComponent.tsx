@@ -73,7 +73,7 @@ type StatsComponentProps = {
     title: string;
     stats: StatItem[];
     image?: ImageSourcePropType;
-    path: "/tol/TOL_stats_detail";
+    path: "/tol/TOL_stats_detail" | "/wcst/WCST_stats_detail";
 }
 
 export function StatsComponent({ title, stats, image, path }: StatsComponentProps) {

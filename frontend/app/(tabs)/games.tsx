@@ -8,6 +8,7 @@ const gamesData = [
     {
         id: "1",
         title: "Wisconsin Card\nSorting Test",
+        subtitle: "responding to feedback\nflexibility",
         image: require('../../assets/images/wisconsinCardSortingTest.png'),
         path: "/wcst/WCST_info" as const,
     },
@@ -16,6 +17,7 @@ const gamesData = [
         // velkost toho obrazku ako funguje skontrolovat
         id: "2",
         title: "Tower of London",
+        subtitle: "decision-making\nplanning",
         image: require('../../assets/images/TowerOfLondon.png'),
         path: "/tol/TOL_info" as const,
     },
@@ -24,6 +26,7 @@ const gamesData = [
         // #DCEEFF
         id: "3",
         title: "Knox's Cube\nTest",
+        subtitle: "working memory\ninhibition",
         image: require('../../assets/images/knoxsCubeTest.png'),
         path: "/knox/KNOX_info" as const,
     },
@@ -48,6 +51,7 @@ export default function GamesScreen() {
                     renderItem={({ item }) => (
                         <GameCard
                         title={item.title}
+                        subtitle={item.subtitle}
                         image={item.image} 
                         path={item.path}
                         />

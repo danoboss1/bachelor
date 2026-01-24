@@ -9,11 +9,12 @@ const { width, height } = Dimensions.get("window");
 
 type GameCardProps = {
     title: string;
+    subtitle?: string;
     image?: ImageSourcePropType;
     path: "/wcst/WCST_info" | "/tol/TOL_info" | "/knox/KNOX_info";
 }
 
-export function GameCard({ image, title, path }: GameCardProps) {
+export function GameCard({ image, title, subtitle, path }: GameCardProps) {
   return (
     <View style={localStyles.card}>
       {image ? (
@@ -22,6 +23,8 @@ export function GameCard({ image, title, path }: GameCardProps) {
           style={localStyles.imageBackground}
           imageStyle={{ borderRadius: 16 }} // zaoblenie rohov
         > 
+          <Text style={localStyles.cardSubtitle}>{subtitle}</Text>
+
           <View style={localStyles.rowContainer}>
             <Text style={localStyles.cardTitle}>{title}</Text>
             {/* <Text style={localStyles.cardDescription}>{description}</Text> */}
@@ -87,6 +90,17 @@ const localStyles = StyleSheet.create({
     marginLeft: width * 0.1,
     fontFamily: "Gagalin",
     marginBottom: height * 0.04,
+  },
+  cardSubtitle: {
+      position: "absolute",
+      top: 4,
+      right: 16,
+      alignSelf: "flex-start",
+      fontWeight: "bold",
+      fontSize: 16,
+      color: "#000",
+      fontFamily: "Gagalin",
+      textAlign: "right",
   },
   cardDescription: {
     fontSize: 14,

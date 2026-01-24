@@ -4,6 +4,7 @@ import { ScrollView } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 
 const TOL_STATS_DETAIL_ROUTE = "/tol/TOL_stats_detail"; 
+const WCST_STATS_DETAIL_ROUTE = "/wcst/WCST_stats_detail";
 
 export default function StatsScreen() {
     return (
@@ -24,7 +25,7 @@ export default function StatsScreen() {
                             { label: "Percentage of non-perseverative errors", value: 50, percentile: 50, showPercentSign: true },
                         ]}
                         image={require('../../assets/images/backgroundWisconsinCardSortingTest.png')}
-                        path={TOL_STATS_DETAIL_ROUTE}
+                        path={WCST_STATS_DETAIL_ROUTE}
                     />
 
                     <StatsComponent

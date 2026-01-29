@@ -61,8 +61,8 @@ export default function TOLStatsDetail() {
                 ...item,
                 frontColor:
                     index === activeIndex
-                        ? Color.blue[800]
-                        : Color.blue[400],
+                        ? Color.brown[800]
+                        : Color.brown[400],
 
                 topLabelComponent:
                     index === activeIndex
@@ -71,7 +71,7 @@ export default function TOLStatsDetail() {
                                 style={{
                                     fontSize: 12,
                                     fontWeight: "600",
-                                    color: Color.blue[800],
+                                    color: Color.brown[800],
                                     marginBottom: 6,
                                 }}
                             >
@@ -86,7 +86,7 @@ export default function TOLStatsDetail() {
     return (
         <View style={{
             flex: 1,
-            backgroundColor: Color.blue[100]
+            backgroundColor: Color.brown[100]
             // justifyContent: "center", // vertikálne centrovanie
             // alignItems: "center",     // horizontálne centrovanie
         }}>
@@ -103,11 +103,11 @@ export default function TOLStatsDetail() {
 
                     spacing={44}
                     initialSpacing={44}
-                    color="skyblue"
+                    color="skybrown"
                     thickness={6}
                     dataPointsHeight={6}
                     dataPointsWidth={6}
-                    dataPointsColor="blue"
+                    dataPointsColor="brown"
                     yAxisThickness={0}
                     xAxisThickness={0}
                     focusEnabled
@@ -144,10 +144,10 @@ export default function TOLStatsDetail() {
                     stepValue={20}
                     yAxisExtraHeight={20}
                     barBorderRadius={4}
-                    // frontColor="lightgray"
+                    // frontColor="lightbrown"
                     // showGradient
-                    // gradientColor={Color.blue[400]}
-                    frontColor={Color.blue[400]}
+                    // gradientColor={Color.brown[400]}
+                    frontColor={Color.brown[400]}
                     data={barData}
                     xAxisThickness={0}
                     yAxisThickness={0}

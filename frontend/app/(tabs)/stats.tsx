@@ -3,8 +3,9 @@ import { Text, View } from '@/components/Themed';
 import { ScrollView } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 
-const TOL_STATS_DETAIL_ROUTE = "/tol/TOL_stats_detail"; 
 const WCST_STATS_DETAIL_ROUTE = "/wcst/WCST_stats_detail";
+const TOL_STATS_DETAIL_ROUTE = "/tol/TOL_stats_detail"; 
+const KNOX_STATS_DETAIL_ROUTE = "/knox/KNOX_stats_detail";
 
 export default function StatsScreen() {
     return (
@@ -43,7 +44,7 @@ export default function StatsScreen() {
                             { label: "Total score", value: 75, percentile: 75 },
                         ]}
                         image={require('../../assets/images/backgroundKnoxsCubeTest.png')}
-                        path={TOL_STATS_DETAIL_ROUTE}
+                        path={KNOX_STATS_DETAIL_ROUTE}
                     />
                 </ScrollView>
             </View>

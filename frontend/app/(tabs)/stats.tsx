@@ -20,10 +20,10 @@ export default function StatsScreen() {
                     <StatsComponent
                         title={"Wisconsin Card Sorting Test\nBest Attempt"}
                         stats={[
-                            { label: "Total number of trials administered", value: 75, percentile: 75 },
-                            { label: "Percentage of perseverative responses", value: 60, percentile: 60, showPercentSign: true },
-                            { label: "Percentage of perseverative errors", value: 90, percentile: 90, showPercentSign: true },
-                            { label: "Percentage of non-perseverative errors", value: 50, percentile: 50, showPercentSign: true },
+                            { label: "Total score\n(Number of trials administered)", value: 75, percentile: 75 },
+                            // { label: "Percentage of perseverative responses", value: 60, percentile: 60, showPercentSign: true },
+                            // { label: "Percentage of perseverative errors", value: 90, percentile: 90, showPercentSign: true },
+                            // { label: "Percentage of non-perseverative errors", value: 50, percentile: 50, showPercentSign: true },
                         ]}
                         image={require('../../assets/images/backgroundWisconsinCardSortingTest.png')}
                         path={WCST_STATS_DETAIL_ROUTE}
@@ -32,7 +32,7 @@ export default function StatsScreen() {
                     <StatsComponent
                         title={"Tower of London\nBest Attempt"}
                         stats={[
-                            { label: "Total score", value: 75, percentile: 75 },
+                            { label: "Total score", value: 3.2, percentile: 83 },
                         ]}
                         image={require('../../assets/images/backgroundTowerOfLondon.png')}
                         path={TOL_STATS_DETAIL_ROUTE}
@@ -41,7 +41,7 @@ export default function StatsScreen() {
                     <StatsComponent
                         title={"Knox's Cube Test\nBest Attempt"}
                         stats={[
-                            { label: "Total score", value: 75, percentile: 75 },
+                            { label: "Total score", value: 8.6, percentile: 52 },
                         ]}
                         image={require('../../assets/images/backgroundKnoxsCubeTest.png')}
                         path={KNOX_STATS_DETAIL_ROUTE}

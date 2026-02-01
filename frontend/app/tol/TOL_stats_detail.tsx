@@ -1,8 +1,7 @@
 import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
-import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
-// import { LineChart } from "react-native-gifted-charts";
 import { Color } from "@/constants/TWPalette";
 import React, { useMemo, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 const { width, height } = Dimensions.get("window")
@@ -93,52 +92,7 @@ export default function TOLStatsDetail() {
 
             <View style={{flex:1, justifyContent:"center"}}>
                 <Text style={localStyles.graphTitle}>Total score</Text>
-                {/* <LineChart 
-                    data={barData} 
-                    height={250}
-                    showVerticalLines={false}
-                    dashWidth={0}   
-                    dashGap={0}
-                    // horizontalLinesColor="#E5E7EB"
 
-                    spacing={44}
-                    initialSpacing={44}
-                    color="skybrown"
-                    thickness={6}
-                    dataPointsHeight={6}
-                    dataPointsWidth={6}
-                    dataPointsColor="brown"
-                    yAxisThickness={0}
-                    xAxisThickness={0}
-                    focusEnabled
-
-                    xAxisLabelTextStyle={{
-                        fontSize: 12,
-                        fontWeight: "600", 
-                        color: "black",
-                    }}
-
-                    yAxisTextStyle={{
-                        fontSize: 12,
-                        fontWeight: "600",
-                        color: "black"
-                    }}
-
-                    // value: {
-                    //     fontSize: 16,
-                    //     fontWeight: "600",
-                    //     color: "black",
-                    //     textAlign: "right", // hodnota bude zarovnaná doprava
-                    // },
-
-                    focusedDataPointLabelComponent={(item: any) => (
-                        <FocusLabel item={item} />
-                    )}
-
-                    onFocus={() => {
-                        console.log("Focused point:");
-                    }}
-                /> */}
                 <BarChart
                     maxValue={100}     
                     stepValue={20}

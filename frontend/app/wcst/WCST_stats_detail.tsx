@@ -1,7 +1,7 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-// import { LineChart } from "react-native-gifted-charts";
+import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
 import React, { useMemo, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 const { width, height } = Dimensions.get("window")
@@ -111,6 +111,28 @@ export default function TOLStatsDetail() {
                     dashGap={10}
                 />
             </View>
+
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}>
+                <StatMini
+                    label={"Total score\n(Number of trials administered)"}
+                    value={75}
+                    percentile={75}
+                    max={100}
+                />
+
+                <StatMiniSupplementary label={"Percentage of perseverative responses"} value={60} whole={60} />
+                <StatMiniSupplementary label={"Percentage of perseverative errors"} value={90} whole={90} />
+                <StatMiniSupplementary label={"Percentage of non-perseverative errors"} value={50} whole={50} />
+                <StatMiniSupplementary label="Number of categories completed" value={6} />
+                <StatMiniSupplementary label="Correct responses" value={60} />
+                <StatMiniSupplementary label="Errors" value={15} />
+                <StatMiniSupplementary label="Percentage of errors" value={`14%`} />
+                <StatMiniSupplementary label="Perseverative responses" value={5} />
+                <StatMiniSupplementary label="Perseverative errors" value={5} />
+                <StatMiniSupplementary label="Non-perseverative errors" value={10} />
+                <StatMiniSupplementary label="Trials to complete first category" value={13} />
+                <StatMiniSupplementary label="Failure to maintain set" value={3} />
+            </ScrollView>
         </View>
     )
 }

@@ -1,7 +1,7 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-// import { LineChart } from "react-native-gifted-charts";
+import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
 import React, { useMemo, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 const { width, height } = Dimensions.get("window")
@@ -111,6 +111,23 @@ export default function TOLStatsDetail() {
                     dashGap={10}
                 />
             </View>
+
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}>
+                <StatMini
+                    label="Total score"
+                    value={8.6}
+                    percentile={52}
+                    max={100}
+                />
+
+                <StatMiniSupplementary label="3-step sequences" value={2} whole={2} />
+                <StatMiniSupplementary label="4-step sequences" value={4} whole={4} />
+                <StatMiniSupplementary label="5-step sequences" value={3} whole={4} />
+                <StatMiniSupplementary label="6-step sequences" value={1} whole={3} />
+                <StatMiniSupplementary label="7-step sequences" value={0} whole={3} />
+                <StatMiniSupplementary label="8-step sequences" value={1} whole={2} />
+                <StatMiniSupplementary label="Total correct sequences" value={11} whole={18} />
+            </ScrollView>
         </View>
     )
 }

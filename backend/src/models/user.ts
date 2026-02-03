@@ -17,7 +17,7 @@ const userModel = {
         const user = await prisma.users.create({
             data: {
                 username,
-                password
+                password: hashedPassword,
             },
         });
 

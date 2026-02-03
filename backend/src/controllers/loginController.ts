@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import userModel from '../models/user.js'
+import jwt from 'jsonwebtoken';
 
 interface LoginBody {
     username: string;
@@ -58,15 +59,21 @@ export class LoginController {
                 return res.status(401).json({ message: 'Invalid password credentials' });
             }
 
-            // JWT
+            if (!process.env.JWT_SECRET) {
+                throw new Error("JWT secret is not defined");
+            }
 
+            const token = jwt.sign(
+                { id: user.id, username: user.username },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h"}
+            );
             const userData: UserResponse = {
                 id: user.id,
                 username: user.username,
             };
 
-            // tu este vratit aj JWT token
-            res.json({ user: userData });
+            res.json({ token, user: userData });
         } catch (err: any) {
             console.error('Login error:', err.message);
             res.status(500).json({ message: 'Server error' });

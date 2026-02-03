@@ -7,9 +7,12 @@ const prisma = new PrismaClient();
 
 interface User extends PrismaUser {}
 
+const SALT_ROUNDS = 10;
+
 const userModel = {
     createUser: async (username: string, password: string) => {
         // zahashovat heslo 
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
         const user = await prisma.users.create({
             data: {

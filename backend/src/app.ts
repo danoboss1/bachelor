@@ -11,6 +11,7 @@ import knoxStatRouter from './routes/knoxStatsRouter.js';
 import tolStatsRouter from './routes/tolStatsRouter.js';
 
 import registerRouter from './routes/registerRouter.js';
+import loginRouter from './routes/loginRouter.js';
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use('/leaderboard', leaderboardRoutes);
 app.use('/knoxStats', knoxStatRouter);
 app.use('/tolStats', tolStatsRouter);
 app.use('/register', registerRouter);
+app.use('/login', loginRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello world!');

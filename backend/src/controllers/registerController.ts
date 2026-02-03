@@ -43,7 +43,7 @@ export class RegisterController {
 
         // a tu errory, ale nemozem zatial lebo if je na JWT 
 
-        // dalej sa popytat na otazky a potom pokracujem v programovani 
+        // ten endpoint na register funguje a ako tak chapem kodu, potom pokracujem v programovani 
         // registracie a login-u
 
     };

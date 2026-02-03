@@ -1,7 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient} from "@prisma/client";
+// toto keby nefunguje skontrolovat
+import type {users as PrismaUser} from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+interface User extends PrismaUser {}
 
 const userModel = {
     createUser: async (username: string, password: string) => {
@@ -15,6 +19,14 @@ const userModel = {
         });
 
         return user.id;
+    },
+
+    findByUsername: async (username: string): Promise<User | null> => {
+        if (!username) throw new Error('Username is required');
+
+        return prisma.users.findFirst({
+            where: { username },
+        });
     },
 }
 

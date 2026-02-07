@@ -56,5 +56,6 @@ export const styles = StyleSheet.create({
     inputGroup: {
         marginHorizontal: "5%",
         marginTop: height * 0.02,
+        // backgroundColor: "white",
     }
 });

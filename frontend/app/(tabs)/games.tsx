@@ -9,7 +9,7 @@ const gamesData = [
         id: "1",
         title: "Wisconsin Card\nSorting Test",
         subtitle: "responding to feedback\nflexibility",
-        image: require('../../assets/images/wisconsinCardSortingTest.png'),
+        image: require('../../assets/images/wisconsinCardSortingTestBroskyna.png'),
         path: "/wcst/WCST_info" as const,
     },
     {   
@@ -18,7 +18,7 @@ const gamesData = [
         id: "2",
         title: "Tower of London",
         subtitle: "decision-making\nplanning",
-        image: require('../../assets/images/TowerOfLondon.png'),
+        image: require('../../assets/images/TowerOfLondonBroskyna.png'),
         path: "/tol/TOL_info" as const,
     },
     {
@@ -27,7 +27,7 @@ const gamesData = [
         id: "3",
         title: "Knox's Cube\nTest",
         subtitle: "working memory\ninhibition",
-        image: require('../../assets/images/knoxsCubeTest.png'),
+        image: require('../../assets/images/knoxsCubeTestBroskyna.png'),
         path: "/knox/KNOX_info" as const,
     },
 ];
@@ -58,6 +58,8 @@ export default function GamesScreen() {
                     )}
                 />
             </View>
+
+            {/* <Helper></Helper> */}
 
 
         </View>

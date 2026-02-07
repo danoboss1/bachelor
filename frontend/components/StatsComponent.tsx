@@ -166,15 +166,15 @@ const localStyles = StyleSheet.create({
     card: {
         width: width * 0.9,
         borderRadius: 16,
-        marginBottom: 12,
+        marginBottom: 16,
+        marginTop: 20,
         overflow: "hidden",
-        elevation: 5,
+        elevation: 4,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
         marginHorizontal: width * 0.05,
-        marginVertical: height * 0.03,
     },
     cardTitle: {
         fontSize: 20,

@@ -25,7 +25,7 @@ export default function StatsScreen() {
                             // { label: "Percentage of perseverative errors", value: 90, percentile: 90, showPercentSign: true },
                             // { label: "Percentage of non-perseverative errors", value: 50, percentile: 50, showPercentSign: true },
                         ]}
-                        image={require('../../assets/images/backgroundWisconsinCardSortingTest.png')}
+                        image={require('../../assets/images/backgroundBroskyna.png')}
                         path={WCST_STATS_DETAIL_ROUTE}
                     />
 
@@ -34,7 +34,7 @@ export default function StatsScreen() {
                         stats={[
                             { label: "Total score", value: 3.2, percentile: 83 },
                         ]}
-                        image={require('../../assets/images/backgroundTowerOfLondon.png')}
+                        image={require('../../assets/images/backgroundBroskyna.png')}
                         path={TOL_STATS_DETAIL_ROUTE}
                     />
 
@@ -43,7 +43,7 @@ export default function StatsScreen() {
                         stats={[
                             { label: "Total score", value: 8.6, percentile: 52 },
                         ]}
-                        image={require('../../assets/images/backgroundKnoxsCubeTest.png')}
+                        image={require('../../assets/images/backgroundBroskyna.png')}
                         path={KNOX_STATS_DETAIL_ROUTE}
                     />
                 </ScrollView>

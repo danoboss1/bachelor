@@ -7,7 +7,14 @@ export const styles = StyleSheet.create({
     },
     bgTop: {
         flex: 1,
-        backgroundColor: "#3D5CFF",
+        backgroundColor: "#8B593E",
+    },
+    bgTopNew: {
+        flex: 1,
+        // primary odtiene test
+        backgroundColor: "#4c5ec1",
+        // primary
+        // backgroundColor: "#4c5ec1",
     },
     bgBottom: {
         flex: 5,

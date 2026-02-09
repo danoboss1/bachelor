@@ -39,14 +39,9 @@ export default function TabOneScreen() {
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                // justifyContent: 'flex-end',  // zarovná obsah dole
-                // alignItems: 'flex-start',    // zarovná obsah doľava
-                // marginLeft: 16,              // odsadenie zľava
-                // marginBottom: 16,            // odsadenie zospodu
             }]}>
                 <Text style={[styles.title, {
                     alignSelf: 'flex-end',
-                    // marginTop: 'auto',
                     marginLeft: '5%',
                     marginBottom: 18,
                 }]}>Log In</Text>
@@ -60,12 +55,11 @@ export default function TabOneScreen() {
                         alignSelf: "flex-end",
                         marginBottom: 14,
                         marginRight: '5%',
-                        // alignSelf: 'center',
                     }}
                 />
             </View>
 
-            <View style={{ flex: 3, backgroundColor: "white" }}>
+            <View style={styles.body}>
                 <View style={[styles.inputGroup, { marginTop: height * 0.04 }]}>
                     <Text style={styles.label}>Username</Text>
                     <TextInput

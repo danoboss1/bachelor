@@ -23,15 +23,18 @@ export const styles = StyleSheet.create({
     header: {
         fontSize: 24,
         fontWeight: "bold",
-        textAlign: "left",
-        marginTop: height * 0.07,
+        marginTop: height * 0.06,
         marginLeft: width * 0.05,
+        // textAlign: "left",
+        // marginTop: height * 0.07,
+        // marginLeft: width * 0.05,
         color: "white",
     },
     subheader: {
         fontSize: 14,
-        textAlign: "left",
         marginLeft: width * 0.05,
+        // textAlign: "left",
+        // marginLeft: width * 0.05,
         color: "white",
     },
     userID: {

@@ -23,6 +23,11 @@ export const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: COLORS.secondary_background,
+        // backgroundColor: "#ffd6a5",
+    },
+    body: {
+        flex: 3,
+        backgroundColor: "white",
     },
     title: {
         fontSize: 35,

@@ -1,5 +1,4 @@
-import { Text, View } from '@/components/Themed';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { styles } from "../../assets/styles/mainScreens.styles";
 // import { Card, Red_Triangle_Card, Gr } from "@/components/Card";
 import { GameCard } from "@/components/GameComponent";
@@ -38,9 +37,27 @@ export default function GamesScreen() {
     return (
         <View style={styles.container}>
             {/* vrchna cast pred upravou */}
-            <View style={styles.bgTop}>
-                <Text style={styles.header}> Hi, John </Text>
-                <Text style={styles.subheader}> Let's start practising </Text>
+            <View style={[styles.bgTop, {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }]}>
+                <View>
+                    <Text style={styles.header}> Hi, John </Text>
+                    <Text style={styles.subheader}> Let's start practising </Text>
+                </View>
+
+                <Image
+                    source={require('../../assets/images/brainee.png')}
+                    style={{
+                        width: 60,
+                        height: 60,
+                        resizeMode: 'contain',
+                        alignSelf: "flex-end",
+                        marginBottom: 14,
+                        marginRight: '5%',
+                    }}
+                />
             </View>
             
             {/* spodna cast pred upravou */}

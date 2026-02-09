@@ -1,5 +1,4 @@
-import { Text } from '@/components/Themed';
-import { Dimensions, Image, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { styles } from "../../assets/styles/mainScreens.styles";
 const { width, height } = Dimensions.get("window");
@@ -8,11 +7,28 @@ export default function ProfileScreen() {
     return (
         <View style={styles.container}>
 
-            <View style={styles.bgTop}>
+            <View style={[styles.bgTop, {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }]}>
                 <Text style={styles.header}> Profile </Text>
+
+                <Image
+                    source={require('../../assets/images/brainee.png')}
+                    style={{
+                        width: 60,
+                        height: 60,
+                        resizeMode: "contain",
+                        alignSelf: "flex-end",
+                        marginBottom: 14,
+                        marginRight: "5%",
+                    }}
+                />
             </View>
 
             <View style={styles.bgBottom}>
+                {/* <CogIcon></CogIcon> */}
 
                 <View style={styles.imageContainer}>
                     <Image

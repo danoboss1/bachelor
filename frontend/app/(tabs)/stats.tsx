@@ -1,6 +1,5 @@
 import { StatsComponent } from '@/components/StatsComponent';
-import { Text, View } from '@/components/Themed';
-import { ScrollView } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 
 const WCST_STATS_DETAIL_ROUTE = "/wcst/WCST_stats_detail";
@@ -11,8 +10,24 @@ export default function StatsScreen() {
     return (
         <View style={styles.container}>
             {/* vrchna cast pred upravou */}
-            <View style={styles.bgTop}>
+            <View style={[styles.bgTop, {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }]}>
                 <Text style={styles.header}> My Stats </Text>
+
+                <Image
+                    source={require('../../assets/images/brainee.png')}
+                    style={{
+                        width: 60,
+                        height: 60,
+                        resizeMode: "contain",
+                        alignSelf: "flex-end",
+                        marginBottom: 14,
+                        marginRight: "5%",
+                    }}
+                />
             </View>
 
             <View style={styles.bgBottom}>

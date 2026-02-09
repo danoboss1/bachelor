@@ -1,8 +1,8 @@
-import { Text, View } from '@/components/Themed';
+import { Text } from '@/components/Themed';
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Dimensions, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from "../../assets/styles/auth.styles";
 
 const { height } = Dimensions.get("window");
@@ -35,6 +35,9 @@ export default function TabOneScreen() {
         <View style={styles.container}>
             <View style={[styles.header, {
                 flex: 1,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
                 // justifyContent: 'flex-end',  // zarovná obsah dole
                 // alignItems: 'flex-start',    // zarovná obsah doľava
                 // marginLeft: 16,              // odsadenie zľava
@@ -46,9 +49,21 @@ export default function TabOneScreen() {
                     marginLeft: '5%',
                     marginBottom: '5%',
                 }]}>Sign Up</Text>
+
+                <Image
+                    source={require('../../assets/images/brainee.png')}
+                    style={{
+                        width: 60,
+                        height: 60,
+                        resizeMode: "contain",
+                        alignSelf: "flex-end",
+                        marginBottom: 14,
+                        marginRight: "5%",
+                    }}
+                />
             </View>
 
-            <View style={{ flex: 3 }}>
+            <View style={styles.body}>
                 <View style={[styles.inputGroup, { marginTop: height * 0.04 }]}>
                     <Text style={styles.label}>Username</Text>
                     <TextInput

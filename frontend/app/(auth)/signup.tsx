@@ -17,11 +17,18 @@ export default function TabOneScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
     const [errorMessage, setErrorMessage] = useState("");
+
     const [loading, setLoading] = useState(false);
 
     async function registerUser() {
+        setUsernameError("");
+        setPasswordError("");
         setErrorMessage("");
+        
         setLoading(true);
 
         const registration: RegisterPayload = {

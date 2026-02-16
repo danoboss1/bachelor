@@ -13,9 +13,17 @@ interface UserResponse {
     username: string;
 }
 
+interface ValidationErrors {
+    username?: string;
+    password?: string;
+}
+
 export class RegisterController {
     static register = async (req: Request, res: Response) => {
         try{
+            // toto preco tu hore hned
+            const errors: ValidationErrors = {};
+
             let { username, password } = req.body as RegisterBody;
     
             if (typeof req.body === 'string') {
@@ -24,47 +32,51 @@ export class RegisterController {
                     username = parsedBody.username;
                     password = parsedBody.password;
                 } catch (parseError) {
-                    return res.status(400).json({ message: 'Invalid JSON format' });
+
+                    return res.status(400).json({
+                        errors: {
+                            username: "Invalid request format",
+                            password: "Invalid request format"
+                        }
+                    });
                 }
             }
+
+            // s tymto trimom sa opytat ci je to dobre
+            // preco az pod tu JSON kontrolu
+
+            username = username?.trim();
+            password = password?.trim();
     
             if (!username) {
-                return res.status(400).json({ message: "Username is required" });
+                errors.username = "Username is required"
+            } else if (username.length < 3 || username.length > 30) {
+                errors.username = "Username length must be between 3 and 30 characters";
             }
     
             if (!password) {
-                return res.status(400).json({ message: "Password is required" });
+                errors.password = "Password is required";
+            } else if (typeof password !== "string") {
+                errors.password = "Password must be a string";
+            } else {
+                if (password.length < 8) {
+                    errors.password = "Password must be at least 8 characters long";
+                } else if (password.length > 72) {
+                    errors.password = "Password is too long";
+                } else {
+                    const hasLowercase = /[a-z]/.test(password);
+                    const hasUppercase = /[A-Z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+
+                    if (!hasLowercase || !hasUppercase || !hasNumber) {
+                        errors.password = "Password must contain lowercase, uppercase letter and number";
+                    }
+                }
             }
 
-            if (username.length < 3 || username.length > 30) {
-                return res.status(400).json({ message: "Username length must be between 3 and 30 characters" });
-            }
-
-            if (typeof password !== "string") {
-                return res.status(400).json({ message: "Password must be a string"});
-            }
-
-            password = password.trim();
-
-            if (password.length < 8) {
+            if (Object.keys(errors).length > 0) {
                 return res.status(400).json({
-                    message: "Password must be at least 8 characters long"
-                });
-            }
-
-            if (password.length > 72) {
-                return res.status(400).json({
-                    message: "Password is too long"
-                });
-            }
-
-            const hasLowercase = /[a-z]/.test(password);
-            const hasUppercase = /[A-Z]/.test(password);
-            const hasNumber = /[0-9]/.test(password);
-
-            if (!hasLowercase || !hasUppercase || !hasNumber) {
-                return res.status(400).json({
-                    message: "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+                    errors
                 });
             }
     
@@ -94,7 +106,13 @@ export class RegisterController {
         } catch (err: any) {
             console.error('Registration error:', err.message);
 
-            res.status(500).json({ message: 'Server error' });
+            return res.status(500).json({
+                errors: {
+                    username: "Server error",
+                    password: "Server error"
+                }
+            });
+
         }
     };
 }

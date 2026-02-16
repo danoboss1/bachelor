@@ -1,8 +1,7 @@
-import { Text } from '@/components/Themed';
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Dimensions, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from "../../assets/styles/auth.styles";
 
 const { height } = Dimensions.get("window");
@@ -18,7 +17,13 @@ export default function TabOneScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+
     async function registerUser() {
+        setErrorMessage("");
+        setLoading(true);
+
         const registration: RegisterPayload = {
             username,
             password,
@@ -26,8 +31,26 @@ export default function TabOneScreen() {
 
         try {
             await axios.post("https://bachelor-pi.vercel.app/register", registration);
+
+            router.push("/(auth)/login");
         } catch (err: any) {
+
+            if (err.response && err.response.data && err.response.data.message) {
+                setErrorMessage(err.response.data.message);
+            }
+            else if (err.request) {
+                setErrorMessage("Cannot connect to server");
+            }
+            else {
+                setErrorMessage("Registration failed");
+            }
+
             console.error("Registration error", err);
+
+        } finally {
+
+            setLoading(false);
+
         }
     }
 
@@ -71,6 +94,8 @@ export default function TabOneScreen() {
                         placeholder="Enter your username"
                         value={username}
                         onChangeText={setUsername}
+                        autoCapitalize="none"
+                        autoCorrect={false}
                     />
                 </View>
 
@@ -82,15 +107,25 @@ export default function TabOneScreen() {
                         secureTextEntry={true}
                         value={password}
                         onChangeText={setPassword}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        textContentType="password"
                     />
                 </View>
 
                 <TouchableOpacity
                     style={styles.button}
                     onPress={registerUser}
+                    disabled={loading}
                 >
                     <Text style={styles.buttonText}>Sign up</Text>
                 </TouchableOpacity>
+
+                {errorMessage ? (
+                    <Text style={localStyles.errorText}>
+                        {errorMessage}
+                    </Text>
+                ) : null}
 
                 <Text style={styles.bottomMessage}>
                     Already have an account?{" "}
@@ -112,6 +147,13 @@ const localStyles = StyleSheet.create({
         color: "#1E90FF",
         fontWeight: "600",
         textDecorationLine: "underline",
+    },
+    errorText: {
+        color: "red",
+        marginTop: 12,
+        textAlign: "center",
+        fontSize: 14,
+        fontWeight: "500",
     }
 })
 // const styles = StyleSheet.create({

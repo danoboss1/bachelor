@@ -35,6 +35,38 @@ export class RegisterController {
             if (!password) {
                 return res.status(400).json({ message: "Password is required" });
             }
+
+            if (username.length < 3 || username.length > 30) {
+                return res.status(400).json({ message: "Username length must be between 3 and 30 characters" });
+            }
+
+            if (typeof password !== "string") {
+                return res.status(400).json({ message: "Password must be a string"});
+            }
+
+            password = password.trim();
+
+            if (password.length < 8) {
+                return res.status(400).json({
+                    message: "Password must be at least 8 characters long"
+                });
+            }
+
+            if (password.length > 72) {
+                return res.status(400).json({
+                    message: "Password is too long"
+                });
+            }
+
+            const hasLowercase = /[a-z]/.test(password);
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+
+            if (!hasLowercase || !hasUppercase || !hasNumber) {
+                return res.status(400).json({
+                    message: "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+                });
+            }
     
             const existingUser = await userModel.findByUsername(username);
     

@@ -2,6 +2,7 @@ import { GamesIcon, ProfileIcon, StatsIcon } from '@/components/mainMenu/MainMen
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { PlatformPressable } from '@react-navigation/elements';
 import { Link, Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
@@ -28,6 +29,24 @@ export default function TabLayout() {
                 // toto je zakomentovany kod na hlavicku pri view-ckach
                 // headerShown: useClientOnlyValue(false, true),
                 headerShown: false,
+                // tabBarButton: (props) => (
+                //     <PlatformPressable
+                //         {...props}
+                //         android_ripple={{ color: 'transparent' }}  // Disables the ripple effect for Android
+                //     />
+                // ),
+
+                tabBarButton: (props) => (
+                    <PlatformPressable
+                        {...props}
+                        pressColor="transparent" //For android
+                        pressOpacity={0.3} //For ios
+                    />
+                    ),
+                // tabBarShowLabel: false,
+                // tabBarStyle: {
+                //     height: 70,
+                // },
             }}>
             <Tabs.Screen
                 name="index"

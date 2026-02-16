@@ -44,7 +44,7 @@ export default function TOLInfoScreen() {
 
             <TouchableOpacity
                 style={localStyles.button}
-                onPress={() => router.push(TOL_ROUTE)}
+                onPress={() => router.replace(TOL_ROUTE)}
             >
                 <Text style={styles.buttonTextWhite}> Start Test </Text>
             </TouchableOpacity>

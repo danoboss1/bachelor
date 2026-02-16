@@ -1,7 +1,7 @@
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { Alert, BackHandler, Dimensions, View } from "react-native";
 import { difficultyFive, difficultyFour, difficultySix } from "../tol/TOL_data";
 
 const { width, height } = Dimensions.get("window");
@@ -78,6 +78,44 @@ export function useTOLGame() {
 
     const handRef = React.useRef<View>(null);
 
+    // toto je nova funkcia, vysvetlit
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                // ⚠️ Clash Royale štýl: zobrazí sa modal
+                Alert.alert(
+                    "Ukončiť hru?",
+                    "Naozaj chceš ukončiť túto hru?",
+                    [
+                    {
+                        text: "Zrušiť", // hráč pokračuje v hre
+                        style: "cancel",
+                    },
+                    {
+                        text: "Ukončiť",
+                        style: "destructive",
+                        onPress: () => {
+                        // tu môžeš buď router.replace("/main") alebo router.back()
+                            router.replace("/"); // ide späť do hlavného menu
+                        },
+                    },
+                    ],
+                    { cancelable: true }
+                );
+
+                // return true → zabránime default back správanie
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                "hardwareBackPress",
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [router])
+    );
+    
     const fourRef = useRef(0);
     const fiveRef = useRef(0);
     const sixRef = useRef(0);

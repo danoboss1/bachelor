@@ -42,13 +42,21 @@ export default function TabOneScreen() {
             router.push("/(auth)/login");
         } catch (err: any) {
 
-            if (err.response && err.response.data && err.response.data.message) {
-                setErrorMessage(err.response.data.message);
-            }
-            else if (err.request) {
+            // toto vysvetlit
+            if (err.response?.data?.errors) {
+                const errors = err.response.data.errors;
+
+                if (errors.username) {
+                    setUsernameError(errors.username);
+                }
+
+                if (errors.password) {
+                    setPasswordError(errors.password);
+                }
+
+            } else if (err.request) {
                 setErrorMessage("Cannot connect to server");
-            }
-            else {
+            } else {
                 setErrorMessage("Registration failed");
             }
 
@@ -100,10 +108,22 @@ export default function TabOneScreen() {
                         style={styles.input}
                         placeholder="Enter your username"
                         value={username}
-                        onChangeText={setUsername}
+
+                        // toto tiez vysvetlit
+                        onChangeText={(text) => {
+                            setUsername(text);
+                            setUsernameError("");
+                        }}
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
+
+                    {usernameError ? (
+                        <Text style={localStyles.errorText}>
+                            {usernameError}
+                        </Text>
+                    ) : null}
+
                 </View>
 
                 <View style={styles.inputGroup}>
@@ -113,11 +133,22 @@ export default function TabOneScreen() {
                         placeholder="Enter your password"
                         secureTextEntry={true}
                         value={password}
-                        onChangeText={setPassword}
+
+                        // toto vysvetlit tiez
+                        onChangeText={(text) => {
+                            setPassword(text);
+                            setPasswordError("");
+                        }}
                         autoCapitalize="none"
                         autoCorrect={false}
                         textContentType="password"
                     />
+
+                    {passwordError ? (
+                        <Text style={localStyles.errorText}>
+                            {passwordError}
+                        </Text>
+                    ) : null}
                 </View>
 
                 <TouchableOpacity

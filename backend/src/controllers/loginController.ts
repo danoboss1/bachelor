@@ -27,7 +27,6 @@ export class LoginController {
                 try {
                     body = JSON.parse(req.body) as LoginBody;
                 } catch (parseError) {
-                    console.log('Invalid JSON format');
                     return res.status(400).json({ message: 'Invalid JSON format'});
                 }
             } else {
@@ -36,27 +35,14 @@ export class LoginController {
 
             const { username, password } = body;
 
-            if (!username) {
-                console.log('Username is required');
-                return res.status(400).json({ message: 'Username is required'});
-            }
-
-            if (!password) {
-                console.log('Password is required');
-                return res.status(400).json({ message: 'Password is required'});
+            if (!username || !password) {
+                return res.status(401).json({ message: 'Username or password is incorrect' });
             }
 
             const user: User | null = await userModel.findByUsername(username);
 
-            if (!user) {
-                console.log('Invalid username credentials');
-                return res.status(401).json({ message: 'Invalid username credentials' });
-            }
-
-            const isMatch = bcrypt.compareSync(password, user.password);
-            if (!isMatch) {
-                console.log('Invalid password credentials');
-                return res.status(401).json({ message: 'Invalid password credentials' });
+            if (!user || !bcrypt.compareSync(password, user.password)) {
+                return res.status(401).json({ message: 'Username or password is incorrect'});
             }
 
             if (!process.env.JWT_SECRET) {
@@ -75,7 +61,6 @@ export class LoginController {
 
             res.json({ token, user: userData });
         } catch (err: any) {
-            console.error('Login error:', err.message);
             res.status(500).json({ message: 'Server error' });
         }
     };

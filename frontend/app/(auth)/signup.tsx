@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from "../../assets/styles/auth.styles";
 
 const { height } = Dimensions.get("window");
@@ -42,7 +42,6 @@ export default function TabOneScreen() {
             router.push("/(auth)/login");
         } catch (err: any) {
 
-            // toto vysvetlit
             if (err.response?.data?.errors) {
                 const errors = err.response.data.errors;
 
@@ -53,14 +52,15 @@ export default function TabOneScreen() {
                 if (errors.password) {
                     setPasswordError(errors.password);
                 }
-
+            
+            // toto by som si mal vyskusat nejako na-mockovat
             } else if (err.request) {
                 setErrorMessage("Cannot connect to server");
             } else {
                 setErrorMessage("Registration failed");
             }
 
-            console.error("Registration error", err);
+            // console.error("Registration error", err);
 
         } finally {
 
@@ -102,14 +102,13 @@ export default function TabOneScreen() {
             </View>
 
             <View style={styles.body}>
-                <View style={[styles.inputGroup, { marginTop: height * 0.04 }]}>
-                    <Text style={styles.label}>Username</Text>
+
+                <View style={[styles.inputGroup, { marginTop: 48 }]}>
+                    <Text style={localStyles.floatingLabel}>Username</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Enter your username"
+                        // placeholder="Enter your username"
                         value={username}
-
-                        // toto tiez vysvetlit
                         onChangeText={(text) => {
                             setUsername(text);
                             setUsernameError("");
@@ -126,15 +125,13 @@ export default function TabOneScreen() {
 
                 </View>
 
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Password</Text>
+                <View style={[styles.inputGroup, { marginTop: 32 }]}>
+                    <Text style={localStyles.floatingLabel}>Password</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Enter your password"
+                        // placeholder="Enter your password"
                         secureTextEntry={true}
                         value={password}
-
-                        // toto vysvetlit tiez
                         onChangeText={(text) => {
                             setPassword(text);
                             setPasswordError("");
@@ -152,11 +149,21 @@ export default function TabOneScreen() {
                 </View>
 
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[
+                        styles.button,
+                        loading && { opacity: 0.6 }
+                    ]}
                     onPress={registerUser}
                     disabled={loading}
-                >
-                    <Text style={styles.buttonText}>Sign up</Text>
+                >   
+                {/* tiez */}
+                    { loading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>
+                            Sign up
+                        </Text>
+                    )}
                 </TouchableOpacity>
 
                 {errorMessage ? (
@@ -188,18 +195,22 @@ const localStyles = StyleSheet.create({
     },
     errorText: {
         color: "red",
-        marginTop: 12,
-        textAlign: "center",
-        fontSize: 14,
+        marginHorizontal: "5%",
+        marginTop: 4,
+        textAlign: "left",
+        fontSize: 12,
         fontWeight: "500",
+    },
+    floatingLabel: {
+        position: "absolute",
+        top: -8,
+        left: 12,
+        backgroundColor: "#fff",
+        paddingHorizontal: 4,
+        fontSize: 12,
+        color: "#666",
+        zIndex: 10,
     }
 })
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
 
 

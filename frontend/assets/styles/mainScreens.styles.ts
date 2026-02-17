@@ -8,6 +8,9 @@ export const styles = StyleSheet.create({
     bgTop: {
         flex: 1,
         backgroundColor: "#8B593E",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     bgTopNew: {
         flex: 1,

@@ -18,7 +18,18 @@ export default function TabOneScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [loginError, setLoginError] = useState("");
+
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const [loading, setLoading] = useState(false);
+
     async function loginUser() {
+        setLoginError("");
+        setErrorMessage("");
+
+        setLoading(false);
+
         const login: LoginPayload = {
             username,
             password,
@@ -26,9 +37,20 @@ export default function TabOneScreen() {
 
         try {
             await await axios.post("https://bachelor-pi.vercel.app/login", login);
+
             router.replace("/games");
         } catch (err: any) {
-            console.error("Login error", err);
+
+            if (err.response?.data?.message) {
+                setLoginError(err.response.data.message)
+            } else if (err.request) {
+                setErrorMessage("Cannot connect to server");
+            } else {
+                setErrorMessage("Login failed");
+            }
+
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -79,6 +101,12 @@ export default function TabOneScreen() {
                         value={password}
                         onChangeText={setPassword}
                     />
+
+                    {loginError ? (
+                        <Text style={localStyles.errorText}>
+                            {loginError}
+                        </Text>
+                    ) : null}
                 </View>
 
                 <TouchableOpacity 
@@ -97,19 +125,8 @@ export default function TabOneScreen() {
                         Sign up
                     </Text>
                 </Text>
-                {/* <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                    <Text style={styles.bottomMessage}>
-                        Don't have an account?{" "}
-                    </Text>
 
-                    <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-                        <Text style={localStyles.linkText}>
-                            Sign up
-                        </Text>
-                    </TouchableOpacity>
-                </View> */}
             </View>
-
         </View>
     );
 }
@@ -119,14 +136,13 @@ const localStyles = StyleSheet.create({
         color:  "#1E90FF", 
         fontWeight: "600",
         textDecorationLine: "underline",
+    },
+    errorText: {
+        color: "red",
+        marginHorizontal: "5%",
+        marginTop: 4,
+        textAlign: "left",
+        fontSize: 12,
+        fontWeight: "500",
     }
 })
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
-
-

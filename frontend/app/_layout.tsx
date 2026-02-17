@@ -57,6 +57,7 @@ function RootLayoutNav() {
                 <Stack.Screen name="wcst" options={{ headerShown: false }} />
                 <Stack.Screen name="tol" options={{ headerShown: false }} />
                 <Stack.Screen name="knox" options={{ headerShown: false }} />
+                <Stack.Screen name="editProfile" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
             </Stack>
         </ThemeProvider>

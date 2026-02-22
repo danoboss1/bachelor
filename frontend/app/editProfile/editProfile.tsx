@@ -1,7 +1,9 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, TextInput, View } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
+
+const { width, height } = Dimensions.get("window");
 
 export default function editProfileScreen() {
     const router = useRouter();
@@ -49,6 +51,16 @@ export default function editProfileScreen() {
                 </View>
             </View>
 
+            <View style={localStyles.buttonContainer}>
+                <TouchableOpacity style={localStyles.button}>
+                    <Text> Cancel </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={localStyles.button}>
+                    <Text> Save </Text>
+                </TouchableOpacity>
+            </View>
+
         </View>
     )
 }
@@ -67,4 +79,23 @@ const localStyles = StyleSheet.create({
         fontSize: 16,
         backgroundColor: "#fff",
     },
+    button: {
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 10,
+        width: width * 0.4,
+        // backgroundColor: "#F5F5F5",
+        backgroundColor: "black",
+        minHeight: 48,
+        paddingVertical: 12,
+        paddingHorizontal: width * 0.025,
+        marginBottom: 100,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "white",
+        // backgroundColor: "#F5F5F5",
+    }
 })

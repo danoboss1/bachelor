@@ -1,4 +1,4 @@
-import { StatMini, StatMiniSupplementary } from '@/components/StatsComponent';
+import { StatMiniSupplementary } from '@/components/StatsComponent';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -12,8 +12,8 @@ const { width, height } = Dimensions.get("window");
 const RETURN_HOME = "/(tabs)/games";
 const PLAY_AGAIN = "/wcst/WCST_info";
 
-
 export default function WCST_ENDSCREEN() {
+
     const params = useLocalSearchParams<{
         trialsAdministered?: string;
         totalCorrect?: string;
@@ -44,173 +44,459 @@ export default function WCST_ENDSCREEN() {
     const nonPerseverativeErrorPercent = Number(params.nonPerseverativeErrorPercent) || 0;
     const errorPercent = Number(params.errorPercent) || 0;
 
-    const [percentiles, setPercentiles] = useState<{
-        trials: number | null;
-        perseverativeResponses: number | null;
-        perseverativeErrors: number | null;
-        nonPerseverativeErrors: number | null;
-    }>({
-        trials: null,
-        perseverativeResponses: null,
-        perseverativeErrors: null,
-        nonPerseverativeErrors: null,
+    const [percentiles, setPercentiles] = useState({
+        trials: 0,
+        perseverativeResponses: 0,
+        perseverativeErrors: 0,
+        nonPerseverativeErrors: 0,
     });
 
+    /*
+    CATEGORY LOGIC
+    */
+
+    function getCategoryIndex(categoriesCompleted: number, trials: number) {
+
+        if (categoriesCompleted <= 2) return 0;
+        if (categoriesCompleted <= 4) return 1;
+        if (categoriesCompleted === 5) return 2;
+
+        if (categoriesCompleted === 6 && trials > 85)
+            return 3;
+
+        if (categoriesCompleted === 6 && trials <= 85)
+            return 4;
+
+        return 0;
+    }
+
+    function getCategoryInterpretation(index: number) {
+
+        switch (index) {
+
+            case 0:
+                return "Severe impairment of cognitive flexibility";
+
+            case 1:
+                return "Reduced cognitive flexibility";
+
+            case 2:
+                return "Average cognitive flexibility";
+
+            case 3:
+                return "Above average cognitive flexibility";
+
+            case 4:
+                return "Superior cognitive flexibility";
+
+            default:
+                return "";
+        }
+    }
+
+    const categoryIndex = getCategoryIndex(categoriesCompleted, trials);
+
+    /*
+    FETCH PERCENTILES
+    */
+
+
+    // POTIALTO TO CHAPEM
     useEffect(() => {
+
         async function fetchPercentile(metric: string, value: number) {
+
             try {
+
                 const response = await fetch(
                     `https://bachelor-pi.vercel.app/stats/percentile?metric=${metric}&value=${value}`
                 );
+
                 const data = await response.json();
-                return data.percentile;
-            } catch (error) {
-                console.error(`Failed to fetch percentile for ${metric}:`, error);
-                return null;
+
+                return data.percentile ?? 0;
+
+            } catch {
+
+                return 0;
             }
         }
 
-        async function fetchAllPercentiles() {
-            const [
-                trialsPercentile,
-                perseverativeResponsesPercentile,
-                perseverativeErrorsPercentile,
-                nonPerseverativeErrorsPercentile
-            ] = await Promise.all([
-                fetchPercentile("trials_administered", trials),
-                fetchPercentile("perseverative_responses", perseverativeResponses),
-                fetchPercentile("perseverative_errors", perseverativeErrors),
-                fetchPercentile("non_perseverative_errors", nonPerseverativeErrors),
-            ]);
+        async function fetchAll() {
+
+            const trialsP =
+                await fetchPercentile("trials_administered", trials);
+
+            const prP =
+                await fetchPercentile("perseverative_responses", perseverativeResponses);
+
+            const peP =
+                await fetchPercentile("perseverative_errors", perseverativeErrors);
+
+            const npeP =
+                await fetchPercentile("non_perseverative_errors", nonPerseverativeErrors);
 
             setPercentiles({
-                trials: trialsPercentile ?? 0,
-                perseverativeResponses: perseverativeResponsesPercentile ?? 0,
-                perseverativeErrors: perseverativeErrorsPercentile ?? 0,
-                nonPerseverativeErrors: nonPerseverativeErrorsPercentile ?? 0,
+                trials: trialsP,
+                perseverativeResponses: prP,
+                perseverativeErrors: peP,
+                nonPerseverativeErrors: npeP,
             });
         }
 
-        fetchAllPercentiles();
-    }, [trials, perseverativeResponses, perseverativeErrors, nonPerseverativeErrors]);
+        fetchAll();
+
+    }, []);
 
     return (
+
         <LinearGradient
-            colors={[COLORS.gradient_orange, COLORS.gradient_yellow]} 
+            colors={[
+                COLORS.gradient_orange,
+                COLORS.gradient_yellow
+            ]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={styles.container}
         >
+
             <View style={localStyles.container}>
 
-                <Text style={localStyles.title}>Test Completed</Text>
+                <Text style={localStyles.title}>
+                    Test Completed
+                </Text>
 
-                {/* Hlavné štatistiky */}
-                <ScrollView contentContainerStyle={localStyles.statsScroll}>
-                    <StatMini 
-                        label="Total number of trials administered" 
+                {/* INTERPRETATION BAR */}
+
+                <View style={[localStyles.scaleContainer, { flex: 1}]}>
+
+                    <View style={localStyles.scaleBar}>
+                        <View style={[localStyles.segment, localStyles.red]}>
+                            <Text style={localStyles.segmentText}>
+                                VERY POOR{"\n"}0-2 categories
+                            </Text>
+                        </View>
+
+                        <View style={[localStyles.segment, localStyles.orange]}>
+                            <Text style={localStyles.segmentText}>
+                                POOR{"\n"}3-4 categories
+                            </Text>
+                        </View>
+
+                        <View style={[localStyles.segment, localStyles.yellow]}>
+                            <Text style={[localStyles.segmentText, { color: "black" }]}>
+                                NORMAL{"\n"}5 categories
+                            </Text>
+                        </View>
+
+                        <View style={[localStyles.segment, localStyles.lightGreen]}>
+                            <Text style={localStyles.segmentText}>
+                                GOOD{"\n"}6 categories
+                            </Text>
+                        </View>
+
+                        <View style={[localStyles.segment, localStyles.darkGreen]}>
+                            <Text style={localStyles.segmentText}>
+                                EXCELLENT{"\n"}≤85 cards
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* ARROW */}
+
+                    <View style={localStyles.arrowContainer}>
+
+                        <View
+                            style={[
+                                localStyles.arrowWrapper,
+                                {
+                                    left: `${categoryIndex * 18 + 5 + 9}%`
+                                }
+                            ]}
+                        >
+
+                            <Text style={localStyles.arrow}>
+                                ▲
+                            </Text>
+
+                            {/* <Text style={localStyles.arrowLabel}>
+                                Categories completed: {categoriesCompleted}{"\n"}
+                                Trials administered: {trials}
+                            </Text> */}
+
+                        </View>
+
+                    </View>
+
+                    {/* RESULT TEXT */}
+
+                    <View style={localStyles.resultContainer}>
+
+                        {/* <Text style={localStyles.resultText}>
+                            Categories completed: {categoriesCompleted}
+                        </Text>
+
+                        <Text style={localStyles.resultText}>
+                            Trials administered: {trials}
+                        </Text> */}
+
+                        <Text style={localStyles.resultInterpretation}>
+                            {getCategoryInterpretation(categoryIndex)}
+                        </Text>
+
+                    </View>
+
+                </View>
+
+                {/* MAIN STATS */}
+
+                <ScrollView
+                    style={{ width: "100%", flex: 3 }}
+                    contentContainerStyle={{ alignItems: "stretch" }}
+                >
+
+                    {/* <StatMini
+                        label="Total number of trials administered"
                         value={trials}
-                        percentile={percentiles.trials ?? 0} 
-                        max={100} 
-                    />
-                    <StatMini 
-                        label="Percentage of perseverative responses" 
-                        value={perseverativePercent}
-                        percentile={percentiles.perseverativeResponses ?? 0} 
-                        max={100} 
-                        showPercentSign={true}
-                    />
-                    <StatMini 
-                        label="Percentage of perseverative errors" 
-                        value={perseverativeErrorPercent}
-                        percentile={percentiles.perseverativeErrors ?? 0} 
-                        max={100} 
-                        showPercentSign={true}
-                    />
-                    <StatMini 
-                        label="Percentage of non-perseverative errors" 
-                        value={nonPerseverativeErrorPercent}
-                        percentile={percentiles.nonPerseverativeErrors ?? 0} 
-                        max={100} 
-                        showPercentSign={true}
-                    />
+                        percentile={percentiles.trials}
+                    /> */}
 
                     <View style={localStyles.separator} />
 
-                    {/* Vedľajšie štatistiky */}
-                    <StatMiniSupplementary label="Number of categories completed" value={categoriesCompleted} />
-                    <StatMiniSupplementary label="Correct responses" value={totalCorrect} />
-                    <StatMiniSupplementary label="Errors" value={totalError} />
-                    <StatMiniSupplementary label="Percentage of errors" value={`${errorPercent}%`} />
-                    <StatMiniSupplementary label="Perseverative responses" value={perseverativeResponses} />
-                    <StatMiniSupplementary label="Perseverative errors" value={perseverativeErrors} />
-                    <StatMiniSupplementary label="Non-perseverative errors" value={nonPerseverativeErrors} />
-                    <StatMiniSupplementary label="Trials to complete first category" value={trialsToFirstCategory} />
-                    <StatMiniSupplementary label="Failure to maintain set" value={failureToMaintainSet} />
+                    <StatMiniSupplementary
+                        label="Categories completed"
+                        value={categoriesCompleted}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Trials administered"
+                        value={trials}
+                    />
+                    <StatMiniSupplementary 
+                        label="Percentage of perseverative responses"
+                        value={`${perseverativePercent}%`}
+                    />
+
+                    <StatMiniSupplementary 
+                        label="Percentage of perseverative errors"
+                        value={`${perseverativeErrorPercent}%`}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Percentage of non-perseverative errors"
+                        value={`${nonPerseverativeErrorPercent}%`}
+                    />
+
+
+                    <StatMiniSupplementary
+                        label="Correct responses"
+                        value={totalCorrect}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Errors"
+                        value={totalError}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Error percentage"
+                        value={`${errorPercent}%`}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Perseverative responses"
+                        value={perseverativeResponses}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Perseverative errors"
+                        value={perseverativeErrors}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Non-perseverative errors"
+                        value={nonPerseverativeErrors}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Trials to first category"
+                        value={trialsToFirstCategory}
+                    />
+
+                    <StatMiniSupplementary
+                        label="Failure to maintain set"
+                        value={failureToMaintainSet}
+                    />
+
                 </ScrollView>
 
-                {/* Tlačidlá stále viditeľné */}
+                {/* BUTTONS */}
+
                 <View style={localStyles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={[localStyles.button, { backgroundColor: COLORS.green_button }]}
-                        onPress={() => router.replace(RETURN_HOME)}
+
+                    <TouchableOpacity
+                        style={[
+                            localStyles.button,
+                            { backgroundColor: COLORS.green_button }
+                        ]}
+                        onPress={() =>
+                            router.replace(RETURN_HOME)
+                        }
                     >
-                        <Text style={styles.buttonTextWhite}>Return Home</Text>
+                        <Text style={styles.buttonTextWhite}>
+                            Return Home
+                        </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        style={[localStyles.button, { backgroundColor: COLORS.blue_button }]}
-                        onPress={() => router.replace(PLAY_AGAIN)}
+                    <TouchableOpacity
+                        style={[
+                            localStyles.button,
+                            { backgroundColor: COLORS.blue_button }
+                        ]}
+                        onPress={() =>
+                            router.replace(PLAY_AGAIN)
+                        }
                     >
-                        <Text style={styles.buttonTextWhite}>Play Again</Text>
+                        <Text style={styles.buttonTextWhite}>
+                            Play Again
+                        </Text>
                     </TouchableOpacity>
+
                 </View>
+
             </View>
+
         </LinearGradient>
+
     );
 }
 
 const localStyles = StyleSheet.create({
+
     container: {
         flex: 1,
-        paddingTop: height * 0.026,
         alignItems: "center",
         justifyContent: "space-between",
+        paddingTop: height * 0.03
     },
+
     title: {
         fontSize: Theme.typography.h1,
         fontWeight: "bold",
-        color: "#000",
-        marginBottom: height * 0.03,
+        marginTop: 20,
+    },
+
+    scaleContainer: {
+        width: width * 0.9,
+        marginTop: 30,
+        marginBottom: 20,
+        justifyContent: "center",
+    },
+
+    scaleBar: {
+        flexDirection: "row",
+        height: 60,
+        borderRadius: 16,
+        overflow: "hidden"
+    },
+
+    segment: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 4,
+    },
+
+    segmentText: {
+        color: "white",
+        fontSize: 10,
+        fontWeight: "bold",
         textAlign: "center",
-        marginTop: height * 0.04,
+        lineHeight: 12,
     },
+
+    red: {
+        backgroundColor: "#e53935"
+    },
+
+    orange: {
+        backgroundColor: "#fb8c00"
+    },
+
+    yellow: {
+        backgroundColor: "#fdd835"
+    },
+
+    lightGreen: {
+        backgroundColor: "#7cb342"
+    },
+
+    darkGreen: {
+        backgroundColor: "#2e7d32"
+    },
+
+    arrowContainer: {
+        height: 50,
+        justifyContent: "center"
+    },
+
+    arrowWrapper: {
+        position: "absolute",
+        alignItems: "center",
+        transform: [{ translateX: -40 }]
+    },
+
+    arrow: {
+        fontSize: 28,
+        fontWeight: "bold"
+    },
+
+    arrowLabel: {
+        fontSize: 12
+    },
+
+    resultContainer: {
+        alignItems: "center",
+        marginTop: 8
+    },
+
+    resultText: {
+        fontSize: 16,
+        fontWeight: "600"
+    },
+
+    resultInterpretation: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginTop: 4,
+        textAlign: "center"
+    },
+
     statsScroll: {
-        width: "100%",
+        width: "100%"
     },
+
+    separator: {
+        height: 1,
+        backgroundColor: "#ccc",
+        marginVertical: 15
+    },
+
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: height * 0.05,
-        textAlign: "center",
+        marginBottom: 40
     },
+
     button: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: "center",     
-        justifyContent: "center",
-        paddingVertical: height * 0.02,
-        borderRadius: Theme.button.radius,
-        marginHorizontal: width * 0.015,
-    },
-    separator: {
-        marginVertical: height * 0.025,
-        height: StyleSheet.hairlineWidth,
-        backgroundColor: "#ccc",
-        marginHorizontal: width * 0.05,
-        width: width * 0.9,
-    },
+        padding: 15,
+        marginHorizontal: 5,
+        borderRadius: 10,
+        alignItems: "center"
+    }
+
 });
+
 
 // nativne skalovanie textu bez width, height. Vyskusat potom neskor
 // fontSize: RFValue(22), // text bude škálovaný podľa veľkosti obrazovky

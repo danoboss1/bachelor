@@ -4,6 +4,7 @@ import React from "react";
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useWCSTGame } from "../hooks/useWCSTGame";
 
+// preco je toto skoro vzdy tvar ako prve pravidlo 
 export default function WCST_Screen() {
     const {
         timeLeft,

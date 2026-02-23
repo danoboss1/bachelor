@@ -56,41 +56,23 @@ export default function WCST_ENDSCREEN() {
     */
 
     function getCategoryIndex(categoriesCompleted: number, trials: number) {
-
         if (categoriesCompleted <= 2) return 0;
         if (categoriesCompleted <= 4) return 1;
         if (categoriesCompleted === 5) return 2;
-
-        if (categoriesCompleted === 6 && trials > 85)
-            return 3;
-
-        if (categoriesCompleted === 6 && trials <= 85)
-            return 4;
+        if (categoriesCompleted === 6 && trials > 85) return 3;
+        if (categoriesCompleted === 6 && trials <= 85) return 4;
 
         return 0;
     }
 
     function getCategoryInterpretation(index: number) {
-
         switch (index) {
-
-            case 0:
-                return "Severe impairment of cognitive flexibility";
-
-            case 1:
-                return "Reduced cognitive flexibility";
-
-            case 2:
-                return "Average cognitive flexibility";
-
-            case 3:
-                return "Above average cognitive flexibility";
-
-            case 4:
-                return "Superior cognitive flexibility";
-
-            default:
-                return "";
+            case 0: return "Severe impairment of cognitive flexibility";
+            case 1: return "Reduced cognitive flexibility";
+            case 2: return "Average cognitive flexibility";
+            case 3: return "Above average cognitive flexibility";
+            case 4: return "Superior cognitive flexibility";
+            default: return "";
         }
     }
 
@@ -103,38 +85,24 @@ export default function WCST_ENDSCREEN() {
 
     // POTIALTO TO CHAPEM
     useEffect(() => {
-
         async function fetchPercentile(metric: string, value: number) {
-
             try {
-
                 const response = await fetch(
                     `https://bachelor-pi.vercel.app/stats/percentile?metric=${metric}&value=${value}`
                 );
 
                 const data = await response.json();
-
                 return data.percentile ?? 0;
-
             } catch {
-
                 return 0;
             }
         }
 
         async function fetchAll() {
-
-            const trialsP =
-                await fetchPercentile("trials_administered", trials);
-
-            const prP =
-                await fetchPercentile("perseverative_responses", perseverativeResponses);
-
-            const peP =
-                await fetchPercentile("perseverative_errors", perseverativeErrors);
-
-            const npeP =
-                await fetchPercentile("non_perseverative_errors", nonPerseverativeErrors);
+            const trialsP = await fetchPercentile("trials_administered", trials);
+            const prP = await fetchPercentile("perseverative_responses", perseverativeResponses);
+            const peP = await fetchPercentile("perseverative_errors", perseverativeErrors);
+            const npeP = await fetchPercentile("non_perseverative_errors", nonPerseverativeErrors);
 
             setPercentiles({
                 trials: trialsP,
@@ -145,133 +113,85 @@ export default function WCST_ENDSCREEN() {
         }
 
         fetchAll();
-
     }, []);
+
+    const labels = [
+        "VERY POOR\n0-2 categories",
+        "POOR\n3-4 categories",
+        "NORMAL\n5 categories",
+        "GOOD\n6 categories",
+        "EXCELLENT\n≤85 cards"
+    ];
+
+    const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
+    const inactiveColor = "#666";
 
     return (
 
-        <LinearGradient
-            colors={[
-                COLORS.gradient_orange,
-                COLORS.gradient_yellow
-            ]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.container}
-        >
+        <View style={localStyles.container}>
 
-            <View style={localStyles.container}>
-
+            <View style={localStyles.titleContainer}>
                 <Text style={localStyles.title}>
                     Test Completed
                 </Text>
+            </View>
 
-                {/* INTERPRETATION BAR */}
-
-                <View style={[localStyles.scaleContainer, { flex: 1}]}>
-
-                    <View style={localStyles.scaleBar}>
-                        <View style={[localStyles.segment, localStyles.red]}>
-                            <Text style={localStyles.segmentText}>
-                                VERY POOR{"\n"}0-2 categories
-                            </Text>
-                        </View>
-
-                        <View style={[localStyles.segment, localStyles.orange]}>
-                            <Text style={localStyles.segmentText}>
-                                POOR{"\n"}3-4 categories
-                            </Text>
-                        </View>
-
-                        <View style={[localStyles.segment, localStyles.yellow]}>
-                            <Text style={[localStyles.segmentText, { color: "black" }]}>
-                                NORMAL{"\n"}5 categories
-                            </Text>
-                        </View>
-
-                        <View style={[localStyles.segment, localStyles.lightGreen]}>
-                            <Text style={localStyles.segmentText}>
-                                GOOD{"\n"}6 categories
-                            </Text>
-                        </View>
-
-                        <View style={[localStyles.segment, localStyles.darkGreen]}>
-                            <Text style={localStyles.segmentText}>
-                                EXCELLENT{"\n"}≤85 cards
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* ARROW */}
-
-                    <View style={localStyles.arrowContainer}>
-
+            {/* INTERPRETATION BAR */}
+            <View style={localStyles.scaleContainer}>
+                <View style={localStyles.scaleBar}>
+                    {labels.map((label, index) => (
                         <View
+                            key={index}
                             style={[
-                                localStyles.arrowWrapper,
+                                localStyles.segment,
                                 {
-                                    left: `${categoryIndex * 18 + 5 + 9}%`
+                                    backgroundColor: index === categoryIndex
+                                        ? segmentColors[index] // iba aktuálna kategória svieti
+                                        : inactiveColor,       // ostatné tmavosivé
+                                    borderRightWidth: index < labels.length - 1 ? 1 : 0,
+                                    borderRightColor: "#999" // tenká čiarka medzi segmentmi
                                 }
                             ]}
                         >
-
-                            <Text style={localStyles.arrow}>
-                                ▲
+                            <Text style={[
+                                localStyles.segmentText,
+                                { color: categoryIndex === 2 && index === 2 ? "#333" : "white" }
+                                // { color: index === 2 ? "black" : "white" } // žltý segment čitateľný
+                            ]}>
+                                {label}
                             </Text>
-
-                            {/* <Text style={localStyles.arrowLabel}>
-                                Categories completed: {categoriesCompleted}{"\n"}
-                                Trials administered: {trials}
-                            </Text> */}
-
                         </View>
+                    ))}
+                </View>
 
-                    </View>
+                {/* RESULT TEXT */}
 
-                    {/* RESULT TEXT */}
+                <View style={localStyles.resultContainer}>
 
-                    <View style={localStyles.resultContainer}>
+                    <Text style={localStyles.resultText}>
+                        Categories completed: {categoriesCompleted}
+                    </Text>
 
-                        {/* <Text style={localStyles.resultText}>
-                            Categories completed: {categoriesCompleted}
-                        </Text>
+                    <Text style={localStyles.resultText}>
+                        Cards used: {trials}
+                    </Text>
 
-                        <Text style={localStyles.resultText}>
-                            Trials administered: {trials}
-                        </Text> */}
-
-                        <Text style={localStyles.resultInterpretation}>
-                            {getCategoryInterpretation(categoryIndex)}
-                        </Text>
-
-                    </View>
+                    <Text style={[localStyles.resultInterpretation, { color: "black" }]}>
+                        {getCategoryInterpretation(categoryIndex)}
+                    </Text>
 
                 </View>
 
-                {/* MAIN STATS */}
+            </View>
 
+            {/* MAIN STATS */}
+            <View style={{ flex: 3, width: "100%" }}>
                 <ScrollView
                     style={{ width: "100%", flex: 3 }}
                     contentContainerStyle={{ alignItems: "stretch" }}
                 >
-
-                    {/* <StatMini
-                        label="Total number of trials administered"
-                        value={trials}
-                        percentile={percentiles.trials}
-                    /> */}
-
                     <View style={localStyles.separator} />
 
-                    <StatMiniSupplementary
-                        label="Categories completed"
-                        value={categoriesCompleted}
-                    />
-
-                    <StatMiniSupplementary
-                        label="Trials administered"
-                        value={trials}
-                    />
                     <StatMiniSupplementary 
                         label="Percentage of perseverative responses"
                         value={`${perseverativePercent}%`}
@@ -286,7 +206,6 @@ export default function WCST_ENDSCREEN() {
                         label="Percentage of non-perseverative errors"
                         value={`${nonPerseverativeErrorPercent}%`}
                     />
-
 
                     <StatMiniSupplementary
                         label="Correct responses"
@@ -327,86 +246,82 @@ export default function WCST_ENDSCREEN() {
                         label="Failure to maintain set"
                         value={failureToMaintainSet}
                     />
-
                 </ScrollView>
-
-                {/* BUTTONS */}
-
-                <View style={localStyles.buttonContainer}>
-
-                    <TouchableOpacity
-                        style={[
-                            localStyles.button,
-                            { backgroundColor: COLORS.green_button }
-                        ]}
-                        onPress={() =>
-                            router.replace(RETURN_HOME)
-                        }
-                    >
-                        <Text style={styles.buttonTextWhite}>
-                            Return Home
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            localStyles.button,
-                            { backgroundColor: COLORS.blue_button }
-                        ]}
-                        onPress={() =>
-                            router.replace(PLAY_AGAIN)
-                        }
-                    >
-                        <Text style={styles.buttonTextWhite}>
-                            Play Again
-                        </Text>
-                    </TouchableOpacity>
-
-                </View>
-
             </View>
 
-        </LinearGradient>
+            {/* BUTTONS */}
+            <View style={localStyles.buttonContainer}>
 
+                <TouchableOpacity
+                    style={[
+                        localStyles.button,
+                        { 
+                            backgroundColor: COLORS.primary,
+                        }
+                    ]}
+                    onPress={() =>
+                        router.replace(RETURN_HOME)
+                    }
+                >
+                    <Text style={styles.buttonTextWhite}>
+                        Return Home
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[
+                        localStyles.button,
+                        { 
+                            backgroundColor: COLORS.primary,
+                        }
+                    ]}
+                    onPress={() =>
+                        router.replace(PLAY_AGAIN)
+                    }
+                >
+                    <Text style={styles.buttonTextWhite}>
+                        Play Again
+                    </Text>
+                </TouchableOpacity>
+
+            </View>
+        </View>
     );
 }
 
 const localStyles = StyleSheet.create({
-
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "space-between",
-        paddingTop: height * 0.03
+        paddingTop: height * 0.03,
+        backgroundColor: COLORS.primary_broskynova
     },
-
     title: {
         fontSize: Theme.typography.h1,
         fontWeight: "bold",
         marginTop: 20,
     },
-
+    titleContainer: {
+        alignItems: "center",  // centrovanie nadpisu horizontálne
+        marginBottom: 16,    
+    },
     scaleContainer: {
         width: width * 0.9,
-        marginTop: 30,
-        marginBottom: 20,
+        flex: 2,
         justifyContent: "center",
     },
-
     scaleBar: {
         flexDirection: "row",
         height: 60,
         borderRadius: 16,
         overflow: "hidden"
     },
-
     segment: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 4,
     },
-
     segmentText: {
         color: "white",
         fontSize: 10,
@@ -414,87 +329,61 @@ const localStyles = StyleSheet.create({
         textAlign: "center",
         lineHeight: 12,
     },
-
     red: {
         backgroundColor: "#e53935"
     },
-
     orange: {
         backgroundColor: "#fb8c00"
     },
-
     yellow: {
         backgroundColor: "#fdd835"
     },
-
     lightGreen: {
         backgroundColor: "#7cb342"
     },
-
     darkGreen: {
         backgroundColor: "#2e7d32"
     },
-
-    arrowContainer: {
-        height: 50,
-        justifyContent: "center"
-    },
-
-    arrowWrapper: {
-        position: "absolute",
-        alignItems: "center",
-        transform: [{ translateX: -40 }]
-    },
-
-    arrow: {
-        fontSize: 28,
-        fontWeight: "bold"
-    },
-
-    arrowLabel: {
-        fontSize: 12
-    },
-
     resultContainer: {
         alignItems: "center",
-        marginTop: 8
+        marginTop: 32,
     },
-
     resultText: {
         fontSize: 16,
-        fontWeight: "600"
     },
-
     resultInterpretation: {
         fontSize: 18,
         fontWeight: "bold",
-        marginTop: 4,
-        textAlign: "center"
+        marginTop: 16,
+        textAlign: "center",
     },
-
     statsScroll: {
         width: "100%"
     },
-
     separator: {
         height: 1,
         backgroundColor: "#ccc",
-        marginVertical: 15
+        marginBottom: 16,
+        marginTop: 4,
     },
-
     buttonContainer: {
         flexDirection: "row",
-        marginBottom: 40
+        marginBottom: 40,
+        justifyContent: "center",  // toto je dôležité
+        gap: 12, 
     },
-
     button: {
-        flex: 1,
-        padding: 15,
-        marginHorizontal: 5,
+        // flex: 1,
+        width: width * 0.4,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#FF1E1E",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
         borderRadius: 10,
-        alignItems: "center"
-    }
-
+        minHeight: 48,
+        minWidth: 60,
+    },
 });
 
 

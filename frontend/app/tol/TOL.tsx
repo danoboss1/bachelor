@@ -1,7 +1,7 @@
 import { DiscInHand, Hand, StackWithDiscs } from "@/components/tol/ToLComponents";
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { useTOLGame } from "../hooks/useTOLGame";
+import { useTOLGame } from "../hooks/useTOLGAME";
 
 const { width, height } = Dimensions.get("window");
 

@@ -20,6 +20,7 @@ export default {
 
 export const COLORS = {
   primary: "#8B593E",
+  primary_broskynova: "#ffd6a5",
   secondary_background: "#DCDCDC",
   background: "#FFF8F3",
   text: "#4A3428",

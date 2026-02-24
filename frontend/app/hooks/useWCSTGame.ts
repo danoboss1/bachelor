@@ -1,7 +1,7 @@
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
-import { Animated, View } from "react-native";
+import { Animated, View, Alert, BackHandler } from "react-native";
 
 const colors = ["red", "green", "orange", "blue"] as const;
 const shapes = ["triangle", "star", "plus", "circle"] as const;
@@ -124,6 +124,64 @@ export function useWCSTGame() {
             }, 1000);
         }
     };
+
+    const exitTest = React.useCallback(() => {
+        Alert.alert(
+            "Exit Test",
+            "Are you sure you want to exit?\nYour progress will not be saved.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Exit",
+                    style: "destructive",
+                    onPress: () => {
+                        router.replace("/");
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    }, [router]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                // ⚠️ Clash Royale štýl: zobrazí sa modal
+                Alert.alert(
+                    "Exit Test",
+                    "Are you sure you want to exit?\nYour progress will not be saved.",
+                    [
+                    {
+                        text: "Cancel",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Exit",
+                        style: "destructive",
+                        onPress: () => {
+                        // tu môžeš buď router.replace("/main") alebo router.back()
+                            router.replace("/"); // ide späť do hlavného menu
+                        },
+                    },
+                    ],
+                    { cancelable: true }
+                );
+
+                // return true → zabránime default back správanie
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                "hardwareBackPress",
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [router])
+    );
 
     React.useEffect(() => {
         const interval = setInterval(() => {
@@ -334,5 +392,7 @@ export function useWCSTGame() {
 
         feedback,
         currentCard,
+
+        exitTest,
     };
 }

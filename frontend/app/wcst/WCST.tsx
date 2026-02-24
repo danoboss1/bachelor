@@ -1,8 +1,10 @@
 import { AllCard, Blue_Circles_Card, Green_Stars_Card, Red_Triangle_Card, Yellow_Pluses_Card } from "@/components/cards/AllCard";
 import { LinearGradient } from 'expo-linear-gradient';
 import React from "react";
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useWCSTGame } from "../hooks/useWCSTGame";
+
+const { width, height } = Dimensions.get("window");
 
 // preco je toto skoro vzdy tvar ako prve pravidlo 
 export default function WCST_Screen() {
@@ -22,17 +24,41 @@ export default function WCST_Screen() {
         isLocked,
         isAnimating,
         feedback,
+        exitTest,
     } = useWCSTGame();
 
     return (
-        <LinearGradient
-            colors={["#FF8C00", "#FFD700"]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.container}
-        >
-            <View style={styles.timer}>
+        // <LinearGradient
+        //     colors={["#FF8C00", "#FFD700"]}
+        //     start={{ x: 0, y: 0.5 }}
+        //     end={{ x: 1, y: 0.5 }}
+        //     style={styles.container}
+        // >
+        <View style={[styles.container, {backgroundColor: "#ffd6a5"}]}>
+            {/* <View style={styles.timer}>
                 <Text style={styles.timerText}>Timer: {formatTime(timeLeft)}</Text>
+
+                <TouchableOpacity
+                    style={styles.button}
+                >
+                    <Text style={styles.exitButton}> Exit Test </Text>
+                </TouchableOpacity>
+            </View> */}
+
+            <View style={styles.timer}>
+                <Text style={styles.timerText}>
+                    Timer: {formatTime(timeLeft)}
+                </Text>
+
+                <TouchableOpacity
+                    style={styles.exitButtonContainer}
+                    activeOpacity={0.7}
+                    onPress={exitTest}
+                >
+                    <Text style={styles.exitButtonText}>
+                        Exit Test
+                    </Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.row}>
@@ -108,7 +134,7 @@ export default function WCST_Screen() {
                     />
                 </Animated.View>
             )}
-        </LinearGradient>
+        </View>
     );
 }
 
@@ -131,14 +157,32 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     timer: {
+        flexDirection: "row",
         flex: 1,
         width: "100%",
-        justifyContent: "center",
+        justifyContent: "space-between",
         alignItems: "center",
+        paddingHorizontal: width * 0.05,
+        marginTop: 8,
     },
     timerText: {
         fontSize: 24, 
-        color: "black" 
+        color: "#222",
+        // color: "black",
+        // marginLeft: "5%",
+    },
+    exitButtonContainer: {
+        paddingVertical: height * 0.012,
+        paddingHorizontal: width * 0.04,
+        borderRadius: 8,
+        // backgroundColor: "#444", // neutral dark gray
+        // backgroundColor: "#0E8A39",
+        backgroundColor: "#8B593E",
+    },
+    exitButtonText: {
+        fontSize: 16,
+        color: "#fff",
+        fontWeight: "500",
     },
     feedbackCorrectText: { 
         fontSize: 28, 

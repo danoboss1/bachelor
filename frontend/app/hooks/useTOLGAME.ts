@@ -84,15 +84,15 @@ export function useTOLGame() {
             const onBackPress = () => {
                 // ⚠️ Clash Royale štýl: zobrazí sa modal
                 Alert.alert(
-                    "Ukončiť hru?",
-                    "Naozaj chceš ukončiť túto hru?",
+                    "Exit Test",
+                    "Are you sure you want to exit?\nYour progress will not be saved.",
                     [
                     {
-                        text: "Zrušiť", // hráč pokračuje v hre
+                        text: "Cancel",
                         style: "cancel",
                     },
                     {
-                        text: "Ukončiť",
+                        text: "Exit",
                         style: "destructive",
                         onPress: () => {
                         // tu môžeš buď router.replace("/main") alebo router.back()

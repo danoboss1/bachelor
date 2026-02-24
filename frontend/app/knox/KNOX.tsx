@@ -3,6 +3,12 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useKNOXGame } from "../hooks/useKNOXGame";
 
+// mozno ked stlacim velakrat za sebou rychlo
+// jedno tlacitko, tak by to malo
+// vzdy na chvilku zhasnut
+// aby bolo vidno pre uzivatela, ze
+// to stlacil viackrat 
+
 export default function KNOX_Screen() {
     const {
         timeLeft,

@@ -5,7 +5,7 @@ import { styles } from "../../assets/styles/mainScreens.styles";
 
 const TOL_ROUTE = "/tol/TOL";
 
-const { width, height} = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 
 export default function TOLInfoScreen() {
@@ -14,7 +14,7 @@ export default function TOLInfoScreen() {
             <Text style={localStyles.title_info}>🧱 Tower of London (ToL)</Text>
 
             <Text style={localStyles.section}>
-                Move the discs to match the target configuration
+                Arrange the discs to match the target configuration.
             </Text>
 
             <Text style={localStyles.subtitle}>Peg capacities:</Text>
@@ -24,20 +24,20 @@ export default function TOLInfoScreen() {
 
             <Text style={localStyles.subtitle}>🎯 Goal</Text>
             <Text style={localStyles.section}>
-                Plan the correct order of moves to reach the target using the minimum number of moves.
+                Plan ahead the moves to reach the target using the minimum number of moves.
             </Text>
 
             <Text style={localStyles.subtitle}>🔄 Game Info</Text>
             <Text style={localStyles.item}>• 24 problems (4–6 move sequences)</Text>
-            <Text style={localStyles.item}>• 3 or 4 colored discs depending on difficulty</Text>
+            <Text style={localStyles.item}>• 3 colored discs</Text>
             <Text style={localStyles.item}>• Total time limit: 20 minutes</Text>
             <Text style={localStyles.item}>• Time limit per problem: 1 minute</Text>
             <Text style={localStyles.item}>• Test ends after 3 consecutive time-outs</Text>
 
             <Text style={localStyles.subtitle}>🎮 Controls</Text>
             <Text style={localStyles.section}>
-                Tap a disc to pick it up if it is on top of a peg.{"\n"}
-                Tap a peg to place the disc. Invalid moves are not allowed.
+                Tap a top disc to pick it up, then tap a peg to place it. 
+                Move one disc at a time, and invalid moves are blocked.
             </Text>
 
             <View style={localStyles.separator} />
@@ -56,23 +56,9 @@ const localStyles = StyleSheet.create({
     container: {
         flexGrow: 1,
         padding: width * 0.052,
+        paddingBottom: height * 0.05,
         backgroundColor: "#fff",
         justifyContent: "center",
-    },
-    separator: {
-        marginVertical: height * 0.027,
-        height: StyleSheet.hairlineWidth,
-        backgroundColor: "#ccc",
-    },
-    button: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#0E8A39",
-        paddingVertical: height * 0.02,
-        borderRadius: width * 0.025,
-        width: width * 0.4,       
-        alignSelf: "center", 
     },
     title_info: {
         fontSize: 22,
@@ -94,4 +80,32 @@ const localStyles = StyleSheet.create({
         marginLeft: 10,
         marginTop: 4,
     },
-})
+    separator: {
+        marginVertical: 24,
+        height: StyleSheet.hairlineWidth,
+        backgroundColor: "#ccc",
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#0E8A39",
+        width: width * 0.4,       
+        alignSelf: "center", 
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        minHeight: 48,
+        minWidth: 60,
+
+        elevation: 3, // Android shadow
+
+        shadowColor: "#000", // iOS shadow
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+    },
+});

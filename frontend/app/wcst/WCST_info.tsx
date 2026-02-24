@@ -23,7 +23,7 @@ export default function GameInfo() {
 
             <Text style={localStyles.subtitle}>🎯 Goal</Text>
             <Text style={localStyles.section}>
-                Figure out the current rule and sort correctly.{"\n"}
+                Figure out the current rule using feedback and sort correctly.{"\n"}
                 The rule will change without warning — stay flexible!
             </Text>
 
@@ -33,7 +33,7 @@ export default function GameInfo() {
 
             <Text style={localStyles.subtitle}>🎮 Controls</Text>
             <Text style={localStyles.section}>
-                Tap one of the 4 cards to choose where to place the current card.
+                Tap one of the 4 cards at the top of the screen to place the current card.
             </Text>
 
             <View style={localStyles.separator} />
@@ -52,6 +52,7 @@ const localStyles = StyleSheet.create({
     container: {
         flexGrow: 1,
         padding: width * 0.052,
+        paddingBottom: height * 0.05,
         backgroundColor: "#fff",
         justifyContent: "center",
     },
@@ -76,7 +77,7 @@ const localStyles = StyleSheet.create({
         marginTop: 4,
     },
     separator: {
-        marginVertical: height * 0.027,
+        marginVertical: 24,
         height: StyleSheet.hairlineWidth,
         backgroundColor: "#ccc",
     },
@@ -85,9 +86,22 @@ const localStyles = StyleSheet.create({
         alignItems: "center",     
         justifyContent: "center",
         backgroundColor: "#0E8A39",
-        paddingVertical: height * 0.02,
-        borderRadius: width * 0.025,
         width: width * 0.4,       
         alignSelf: "center", 
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        minHeight: 48,
+        minWidth: 60,
+
+        elevation: 3, // Android shadow
+
+        shadowColor: "#000", // iOS shadow
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
     },
 });

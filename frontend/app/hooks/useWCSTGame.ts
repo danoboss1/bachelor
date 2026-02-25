@@ -1,11 +1,15 @@
 import axios from "axios";
 import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
-import { Animated, View, Alert, BackHandler } from "react-native";
+import { Animated, View, Alert, BackHandler, AppState, AppStateStatus } from "react-native";
+
+const WCST_ROUTE_ENDSCREEN = "/wcst/WCST_endscreen";
+
 
 const colors = ["red", "green", "orange", "blue"] as const;
 const shapes = ["triangle", "star", "plus", "circle"] as const;
 const counts = [1, 2, 3, 4] as const;
+
 export type Color = typeof colors[number];
 export type Shape = typeof shapes[number];
 export type Count = typeof counts[number];
@@ -60,7 +64,6 @@ export const PILES = {
 export type Rule = "color" | "shape" | "count";
 const RULES: Rule[] = ["color", "shape", "count"];
 
-const WCST_ROUTE_ENDSCREEN = "/wcst/WCST_endscreen";
 
 export function useWCSTGame() {
     const router = useRouter();
@@ -106,10 +109,13 @@ export function useWCSTGame() {
     const [failureToMaintainSet, setFailureToMaintainSet] = React.useState(0);
     const [trialsToFirstCategory, setTrialsToFirstCategory] = React.useState<number | null>(null);
 
-    const [feedback, setFeedback] = React.useState<"" | "correct" | "wrong" | "category">("");
+    const [feedback, setFeedback] = React.useState<"" | "correct" | "wrong" | "finished">("");
     const feedbackTimeoutRef = React.useRef<number | null>(null);
 
-    const showFeedback = (type: "" | "correct" | "wrong" | "category") => {
+    const [testFinishedMessage, setTestFinishedMessage] = React.useState(false);
+    const [finished, setFinished] = React.useState(false);
+
+    const showFeedback = (type: "" | "correct" | "wrong" | "finished") => {
         if (feedbackTimeoutRef.current) {
             clearTimeout(feedbackTimeoutRef.current);
             feedbackTimeoutRef.current = null;
@@ -138,7 +144,7 @@ export function useWCSTGame() {
                     text: "Exit",
                     style: "destructive",
                     onPress: () => {
-                        router.replace("/");
+                        router.replace("/(tabs)/games");
                     },
                 },
             ],
@@ -149,7 +155,6 @@ export function useWCSTGame() {
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                // ⚠️ Clash Royale štýl: zobrazí sa modal
                 Alert.alert(
                     "Exit Test",
                     "Are you sure you want to exit?\nYour progress will not be saved.",
@@ -162,15 +167,13 @@ export function useWCSTGame() {
                         text: "Exit",
                         style: "destructive",
                         onPress: () => {
-                        // tu môžeš buď router.replace("/main") alebo router.back()
-                            router.replace("/"); // ide späť do hlavného menu
+                            router.replace("/(tabs)/games");
                         },
                     },
                     ],
                     { cancelable: true }
                 );
 
-                // return true → zabránime default back správanie
                 return true;
             };
 
@@ -204,14 +207,19 @@ export function useWCSTGame() {
         return `${m}:${s}`;
     }
 
-    const [finished, setFinished] = React.useState(false);
-
+    // toto zmenit neskor na 6
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
         if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
             setIsLocked(true);
-            setFinished(true);
-            if (newCategoriesCompleted >= 1) setFeedback("category");
-            else setFeedback("wrong");
+
+            // zobraz finished message
+            setTestFinishedMessage(true);
+
+            // delay pred endscreen
+            setTimeout(() => {
+                setFinished(true);
+            }, 1000);
+            // setFinished(true);
             return true;
         }
         return false;
@@ -371,6 +379,21 @@ export function useWCSTGame() {
         }
     }, [finished]);
 
+    React.useEffect(() => {
+        const handleAppStateChange = (nextAppState: AppStateStatus) => {
+            if (nextAppState === "background" || nextAppState === "inactive") {
+                setIsLocked(true);
+            } else if (nextAppState === "active") {
+                setIsLocked(false);
+            }
+        };
+
+        const subscription = AppState.addEventListener("change", handleAppStateChange);
+        return () => {
+            subscription.remove()
+        };
+    }, []);
+
     const currentCard = cardPack[0];
 
     return {
@@ -391,6 +414,7 @@ export function useWCSTGame() {
         isAnimating,
 
         feedback,
+        testFinishedMessage,
         currentCard,
 
         exitTest,

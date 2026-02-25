@@ -24,6 +24,7 @@ export default function WCST_Screen() {
         isLocked,
         isAnimating,
         feedback,
+        testFinishedMessage,
         exitTest,
     } = useWCSTGame();
 
@@ -108,8 +109,11 @@ export default function WCST_Screen() {
                 {feedback === "wrong" && (
                     <Text style={styles.feedbackWrongText}>Wrong!</Text>
                 )}
-                {feedback === "category" && (
-                    <Text style={styles.feedbackCategoryText}>Category Completed!</Text>
+                {/* {feedback === "finished" && (
+                    <Text style={styles.feedbackCategoryText}>Test Finished!</Text>
+                )} */}
+                {testFinishedMessage && (
+                    <Text style={styles.feedbackCategoryText}>Test Finished</Text>
                 )}
             </View>
 

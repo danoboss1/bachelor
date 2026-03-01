@@ -69,14 +69,14 @@ export class StatsController {
             res.status(500).json({ error: "Server error"});
         }
     };
-    
+
     static saveStat = async (req: Request, res: Response) => {
         try {
-            const { 
-                time, 
-                categories_completed, 
-                trials_administered, 
-                total_correct, 
+            const {
+                time,
+                categories_completed,
+                trials_administered,
+                total_correct,
                 total_error,
                 perseverative_responses,
                 perseverative_errors,
@@ -86,8 +86,8 @@ export class StatsController {
                 perseverativepercent,
                 perseverativeerrorpercent,
                 nonperseverativeerrorpercent,
-                errorpercent, 
-                user_id 
+                errorpercent,
+                user_id
             } = req.body;
 
             if (time == null) return res.status(400).json({ error: "time is required" });
@@ -242,7 +242,9 @@ export class StatsController {
             >();
 
             for (const s of stats) {
-                const dayKey = toDateKey(new Date(s.time));
+                if (!s.time) continue; // alebo: throw new Error("DB contains stats with null time");
+
+                const dayKey = toDateKey(s.time);
                 const score = computeScore(s);
 
                 const current = bestByDay.get(dayKey);

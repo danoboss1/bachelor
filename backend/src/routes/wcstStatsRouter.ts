@@ -9,7 +9,10 @@ const router = express.Router();
 // });
 
 router.get('/percentile', StatsController.getPercentile);
+router.get('/month', StatsController.getMonthlyBestPerDay);
+
 router.get('/:statId', StatsController.getStat);
 router.post('/', StatsController.saveStat);
+
 
 export default router;

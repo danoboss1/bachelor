@@ -3,6 +3,49 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+/**
+ * Helper: produce YYYY-MM-DD key in local server time.
+ * (Good enough for monthly aggregations. If you want strict UTC day keys,
+ * we can switch to UTC getters.)
+ */
+// Pozriet v akom casovom pasme ukladam data do databazy a mozno zmenit!
+function toDateKey(d: Date): string {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+/** Helper: days in a given month (month is 1..12) */
+function daysInMonth(year: number, month1to12: number): number {
+    return new Date(year, month1to12, 0).getDate();
+}
+
+/**
+ * Define what “best score” means for WCST chart.
+ * Default: categories_completed (0..6).
+ *
+ * If you later want something else (e.g. 100 - errorpercent),
+ * change only this function.
+ */
+function computeScore(stat: any): number {
+    return Number(stat.categories_completed ?? 0);
+}
+
+/**
+ * Optional: Your category bar index logic (0..4) from the frontend.
+ * Useful to include in responses for UI.
+ */
+// Mozem to nechat tu na backende, ale potom to musim odstranit z frontendu
+function getCategoryIndex(categoriesCompleted: number, trials: number): number {
+    if (categoriesCompleted <= 2) return 0;
+    if (categoriesCompleted <= 4) return 1;
+    if (categoriesCompleted === 5) return 2;
+    if (categoriesCompleted === 6 && trials > 85) return 3;
+    if (categoriesCompleted === 6 && trials <= 85) return 4;
+    return 0;
+}
+
 export class StatsController {
     static getStat = async (req: Request, res: Response) => {
         try {
@@ -153,4 +196,117 @@ export class StatsController {
             return res.status(500).json({ error: "Server error" });
         }
     };
+
+    /**
+   * GET /stats/wcst/history/month?year=2026&month=3
+   *
+   * IMPORTANT: user_id is HARD-CODED to 1 (as requested).
+   *
+   * Returns:
+   * - one entry per day in the month (even if no DB records -> value 0)
+   * - "value" = best score for that day (currently categories_completed)
+   * - "bestStat" = the full DB row used as the best for that day (or null)
+   * - includes computed categoryIndex for UI convenience
+   */
+
+    static getMonthlyBestPerDay = async (req: Request, res: Response) => {
+        try {
+            const userId = 1;
+
+            const year = Number(req.query.year);
+            const month = Number(req.query.month);
+
+            if (!year || !month || month < 1 || month > 12) {
+                return res.status(400).json({ error: "Year and month are required (month 1-12)" });
+            }
+
+            const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
+            const end = new Date(year, month, 1, 0, 0, 0, 0);
+
+            const stats = await prisma.stats_wcst.findMany({
+                where: {
+                    user_id: userId,
+                    time: { gte: start, lt: end },
+                },
+                orderBy: { time: "asc" },
+            });
+
+            // pick best per day
+            const bestByDay = new Map<
+                string,
+                { bestScore: number; bestStat: any }
+            >();
+
+            for (const s of stats) {
+                const dayKey = toDateKey(new Date(s.time));
+                const score = computeScore(s);
+
+                const current = bestByDay.get(dayKey);
+                if (!current) {
+                    bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+                    continue;
+                }
+
+                const currentScore = Number(current.bestScore);
+
+                if (score > currentScore) {
+                    bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+                    continue;
+                }
+
+                // Tento tie-breaker upravit
+                // malo by to brat nizsi pocet trials_administered
+                // a cas potom alebo mozno je aj jendo
+                // tie-breaker: newest time wins
+                if (score === currentScore) {
+                    const tNew = new Date(s.time).getTime();
+                    const tOld = new Date(current.bestStat.time).getTime();
+                    if (tNew > tOld) {
+                        bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+                    }
+                }
+            }
+
+            // tu som zatial skoncil s kodom
+            const dim = daysInMonth(year, month);
+
+            const days = Array.from({ length: dim }, (_, i) =>{
+                const date = new Date(year, month - 1, i + 1, 0, 0, 0, 0);
+                const key = toDateKey(date);
+
+                const found = bestByDay.get(key);
+
+                if (!found) {
+                    return {
+                        date: key,            // "2026-03-01"
+                        label: String(i + 1), // "1"
+                        value: 0,
+                        bestStat: null,
+                        categoryIndex: null,
+                    };
+                }
+
+                const cc = Number(found.bestStat.categories_completed ?? 0);
+                const trials = Number(found.bestStat.trials_administered ?? 0);
+
+                return {
+                    date: key,
+                    label: String(i + 1),
+                    value: Number(found.bestScore),
+                    bestStat: found.bestStat,
+                    categoryIndex: getCategoryIndex(cc, trials),
+                };
+            });
+
+            return res.json({
+                userId,
+                range: { year, month },
+                scoreDefinition: "categories_completed (0..6)",
+                days,
+            });
+        } catch (error) {
+            console.error("Error fetching WCST monthly best per day:", error);
+            return res.status(500).json({ error: "Server error" });
+        }
+    }
 }

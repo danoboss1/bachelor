@@ -46,6 +46,10 @@ function getCategoryIndex(categoriesCompleted: number, trials: number): number {
     return 0;
 }
 
+function safeTimeMs(t: Date | null): number {
+    return t ? t.getTime() : 0;
+}
+
 export class StatsController {
     static getStat = async (req: Request, res: Response) => {
         try {
@@ -259,8 +263,8 @@ export class StatsController {
                 // a cas potom alebo mozno je aj jendo
                 // tie-breaker: newest time wins
                 if (score === currentScore) {
-                    const tNew = new Date(s.time).getTime();
-                    const tOld = new Date(current.bestStat.time).getTime();
+                    const tNew = safeTimeMs(s.time);
+                    const tOld = safeTimeMs(current.bestStat.time);
                     if (tNew > tOld) {
                         bestByDay.set(dayKey, { bestScore: score, bestStat: s });
                     }

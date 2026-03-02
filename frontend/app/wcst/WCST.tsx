@@ -46,7 +46,7 @@ export default function WCST_Screen() {
                 </TouchableOpacity>
             </View> */}
 
-            <View style={styles.timer}>
+            <View style={styles.header}>
                 <Text style={styles.timerText}>
                     Timer: {formatTime(timeLeft)}
                 </Text>
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
     },
-    timer: {
+    header: {
         flexDirection: "row",
         flex: 1,
         width: "100%",
@@ -172,15 +172,11 @@ const styles = StyleSheet.create({
     timerText: {
         fontSize: 24, 
         color: "#222",
-        // color: "black",
-        // marginLeft: "5%",
     },
     exitButtonContainer: {
         paddingVertical: height * 0.012,
         paddingHorizontal: width * 0.04,
         borderRadius: 8,
-        // backgroundColor: "#444", // neutral dark gray
-        // backgroundColor: "#0E8A39",
         backgroundColor: "#8B593E",
     },
     exitButtonText: {

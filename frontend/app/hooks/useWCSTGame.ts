@@ -39,6 +39,9 @@ type StatsPayload = {
     user_id: number;
 };
 
+const TEST_DURATION_SEC = 1200;
+const TEST_DURATION_MS = TEST_DURATION_SEC * 1000;
+
 function generateCardPack(): Card[] {
     const copies = 2;
     const cards: Card[] = [];
@@ -67,11 +70,16 @@ const RULES: Rule[] = ["color", "shape", "count"];
 
 export function useWCSTGame() {
     const router = useRouter();
+    
+    const startTimeRef = React.useRef<number>(Date.now());
+    const endTimeRef = React.useRef<number>(
+        startTimeRef.current + TEST_DURATION_MS
+    );
+
+    const [timeLeft, setTimeLeft] = React.useState(TEST_DURATION_SEC);
 
     const [isLocked, setIsLocked] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
-
-    const [timeLeft, setTimeLeft] = React.useState(1200);
 
     const [cardPack, setCardPack] = React.useState(() => generateCardPack());
     const [movingCard, setMovingCard] = React.useState<Card | null>(null);
@@ -114,7 +122,7 @@ export function useWCSTGame() {
 
     const [testFinishedMessage, setTestFinishedMessage] = React.useState(false);
     const [finished, setFinished] = React.useState(false);
-
+    
     const showFeedback = (type: "" | "correct" | "wrong" | "finished") => {
         if (feedbackTimeoutRef.current) {
             clearTimeout(feedbackTimeoutRef.current);
@@ -131,6 +139,208 @@ export function useWCSTGame() {
         }
     };
 
+    React.useEffect(() => {
+        const updateTimer = () => {
+            const now = Date.now();
+            const remainingMs = endTimeRef.current - now;
+            
+            if (remainingMs <= 0) {
+                setTimeLeft(0);
+                setIsLocked(true);
+                setTestFinishedMessage(true);
+                
+                setTimeout(() => {
+                    setFinished(true);
+                }, 1000);
+                
+                return;
+            }
+            setTimeLeft(Math.ceil(remainingMs / 1000));
+        };
+        
+        updateTimer();
+        const interval = setInterval(updateTimer, 250);
+        return () => clearInterval(interval);
+    }, []);
+    
+    function formatTime(sec: number) {
+        const m = Math.floor(sec / 60).toString().padStart(2, "0");
+        const s = (sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    }
+    
+    // toto zmenit neskor na 6
+    const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
+        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
+            setIsLocked(true);
+            
+            // zobraz finished message
+            setTestFinishedMessage(true);
+
+            // delay pred endscreen
+            setTimeout(() => {
+                setFinished(true);
+            }, 1000);
+            // setFinished(true);
+            return true;
+        }
+        return false;
+    }, []);
+    
+    function pickNewRule(excludeRule: Rule): Rule {
+        const options = RULES.filter(r => r !== excludeRule);
+        return options[Math.floor(Math.random() * options.length)];
+    }
+    
+    async function saveStatsToBackend() {
+        const payload: StatsPayload = {
+            time: new Date().toISOString(),
+            categories_completed: categoriesCompleted,
+            trials_administered: trialsAdministered,
+            total_correct: totalCorrect,
+            total_error: totalError,
+            perseverative_responses: perseverativeResponses,
+            perseverative_errors: perseverativeErrors,
+            non_perseverative_errors: nonPerseverativeErrors,
+            failure_to_maintain_set: failureToMaintainSet,
+            trials_to_first_category: trialsToFirstCategory,
+            perseverativepercent: trialsAdministered > 0 ? Number(((perseverativeResponses / trialsAdministered) * 100).toFixed(2)) : 0,
+            perseverativeerrorpercent: trialsAdministered > 0 ? Number(((perseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
+            nonperseverativeerrorpercent: trialsAdministered > 0 ? Number(((nonPerseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
+            errorpercent: trialsAdministered > 0 ? Number(((totalError / trialsAdministered) * 100).toFixed(2)) : 0,
+            user_id: 1
+        };
+        
+        try {
+            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload);
+        } catch (err: any) {
+            console.error("Error saving stats:", err);
+        }
+    }
+    
+    const moveCardTo = (targetRef: React.RefObject<View | null>, pileKey: keyof typeof PILES) => {
+        if (cardPack.length === 0 || isAnimating || isLocked) return;
+        
+        if (feedbackTimeoutRef.current) {
+            clearTimeout(feedbackTimeoutRef.current);
+            feedbackTimeoutRef.current = null;
+            setFeedback("");
+        }
+
+        setIsAnimating(true);
+        const card = cardPack[0];
+        setMovingCard(card);
+        setCardPack(prev => prev.slice(1));
+        
+        packRef.current?.measure((fx, fy, w, h, px, py) => {
+            animPos.setValue({ x: px, y: py });
+            
+            targetRef.current?.measure((fx2, fy2, w2, h2, tx, ty) => {
+                Animated.timing(animPos, {
+                    toValue: { x: tx, y: ty },
+                    duration: 400,
+                    useNativeDriver: false,
+                }).start(() => {
+                    const pileProps = PILES[pileKey];
+                    const currentRule = ruleRef.current;
+                    
+                    let isCorrect = false;
+                    if (currentRule === "color") isCorrect = card.color === pileProps.color;
+                    else if (currentRule === "shape") isCorrect = card.shape === pileProps.shape;
+                    else if (currentRule === "count") isCorrect = card.count === pileProps.count;
+                    
+                    const prevRule = previousRuleRef.current;
+                    if (prevRule && prevRule !== currentRule) {
+                        if (
+                            (prevRule === "color" && card.color === PILES[pileKey].color) ||
+                            (prevRule === "shape" && card.shape === PILES[pileKey].shape) ||
+                            (prevRule === "count" && card.count === PILES[pileKey].count)
+                        ) {
+                            setPerseverativeResponses(prev => prev + 1);
+                        }
+                    }
+                    
+                    setTrialsAdministered(prev => {
+                        const next = prev + 1;
+                        endTestIfNeeded(completedRef.current, next);
+                        return next;
+                    });
+
+                    if (consecutiveRef.current >= 2 && !isCorrect) {
+                        setFailureToMaintainSet(prev => prev + 1);
+                    }
+
+                    if (isCorrect) {
+                        setTotalCorrect(prev => prev + 1);
+                        const newConsec = consecutiveRef.current + 1;
+                        setConsecutiveCorrect(newConsec);
+                        showFeedback("correct");
+                        
+                        if (newConsec >= 10) {
+                            const newCompleted = completedRef.current + 1;
+                            setCategoriesCompleted(newCompleted);
+                            setConsecutiveCorrect(0);
+                            // showFeedback("category");
+                            
+                            previousRuleRef.current = currentRule;
+                            
+                            const newRule = pickNewRule(currentRule);
+                            setRule(newRule);
+                            
+                            if (newCompleted === 1) setTrialsToFirstCategory(trialsAdministered + 1);
+                            
+                            endTestIfNeeded(newCompleted, trialsAdministered + 1);
+                        }
+                    } else {
+                        settotalError(prev => prev + 1);
+                        setConsecutiveCorrect(0);
+                        showFeedback("wrong");
+                        
+                        let isPerseverativeError = false;
+                        if (prevRule && prevRule !== currentRule) {
+                            if (
+                                (prevRule === "color" && card.color === pileProps.color) ||
+                                (prevRule === "shape" && card.shape === pileProps.shape) ||
+                                (prevRule === "count" && card.count === pileProps.count)
+                            ) isPerseverativeError = true;
+                        }
+                        
+                        if (isPerseverativeError) setPerseverativeErrors(prev => prev + 1);
+                        else setNonPerseverativeErrors(prev => prev + 1);
+                    }
+
+                    setMovingCard(null);
+                    setIsAnimating(false);
+                });
+            });
+        });
+    };
+
+    React.useEffect(() => {
+        if (finished) {
+            saveStatsToBackend().then(() => {
+                router.push({
+                    pathname: WCST_ROUTE_ENDSCREEN,
+                    params: {
+                        trialsAdministered,
+                        totalCorrect,
+                        totalError,
+                        perseverativeResponses,
+                        perseverativeErrors,
+                        nonPerseverativeErrors,
+                        categoriesCompleted,
+                        failureToMaintainSet,
+                        trialsToFirstCategory,
+                        perseverativePercent: trialsAdministered > 0 ? Number(((perseverativeResponses / trialsAdministered) * 100).toFixed(2)) : 0,
+                        perseverativeErrorPercent: trialsAdministered > 0 ? Number(((perseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
+                        nonPerseverativeErrorPercent: trialsAdministered > 0 ? Number(((nonPerseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
+                        errorPercent: trialsAdministered > 0 ? Number(((totalError / trialsAdministered) * 100).toFixed(2)) : 0,
+                    }
+                });
+            });
+        }
+    }, [finished]);
+    
     const exitTest = React.useCallback(() => {
         Alert.alert(
             "Exit Test",
@@ -185,199 +395,6 @@ export function useWCSTGame() {
             return () => subscription.remove();
         }, [router])
     );
-
-    React.useEffect(() => {
-        const interval = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    setFeedback("wrong");
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    function formatTime(sec: number) {
-        const m = Math.floor(sec / 60).toString().padStart(2, "0");
-        const s = (sec % 60).toString().padStart(2, "0");
-        return `${m}:${s}`;
-    }
-
-    // toto zmenit neskor na 6
-    const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
-        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
-            setIsLocked(true);
-
-            // zobraz finished message
-            setTestFinishedMessage(true);
-
-            // delay pred endscreen
-            setTimeout(() => {
-                setFinished(true);
-            }, 1000);
-            // setFinished(true);
-            return true;
-        }
-        return false;
-    }, []);
-
-    function pickNewRule(excludeRule: Rule): Rule {
-        const options = RULES.filter(r => r !== excludeRule);
-        return options[Math.floor(Math.random() * options.length)];
-    }
-
-    async function saveStatsToBackend() {
-        const payload: StatsPayload = {
-            time: new Date().toISOString(),
-            categories_completed: categoriesCompleted,
-            trials_administered: trialsAdministered,
-            total_correct: totalCorrect,
-            total_error: totalError,
-            perseverative_responses: perseverativeResponses,
-            perseverative_errors: perseverativeErrors,
-            non_perseverative_errors: nonPerseverativeErrors,
-            failure_to_maintain_set: failureToMaintainSet,
-            trials_to_first_category: trialsToFirstCategory,
-            perseverativepercent: trialsAdministered > 0 ? Number(((perseverativeResponses / trialsAdministered) * 100).toFixed(2)) : 0,
-            perseverativeerrorpercent: trialsAdministered > 0 ? Number(((perseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
-            nonperseverativeerrorpercent: trialsAdministered > 0 ? Number(((nonPerseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
-            errorpercent: trialsAdministered > 0 ? Number(((totalError / trialsAdministered) * 100).toFixed(2)) : 0,
-            user_id: 1
-        };
-
-        try {
-            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload);
-        } catch (err: any) {
-            console.error("Error saving stats:", err);
-        }
-    }
-
-    const moveCardTo = (targetRef: React.RefObject<View | null>, pileKey: keyof typeof PILES) => {
-        if (cardPack.length === 0 || isAnimating || isLocked) return;
-
-        if (feedbackTimeoutRef.current) {
-            clearTimeout(feedbackTimeoutRef.current);
-            feedbackTimeoutRef.current = null;
-            setFeedback("");
-        }
-
-        setIsAnimating(true);
-        const card = cardPack[0];
-        setMovingCard(card);
-        setCardPack(prev => prev.slice(1));
-
-        packRef.current?.measure((fx, fy, w, h, px, py) => {
-            animPos.setValue({ x: px, y: py });
-
-            targetRef.current?.measure((fx2, fy2, w2, h2, tx, ty) => {
-                Animated.timing(animPos, {
-                    toValue: { x: tx, y: ty },
-                    duration: 400,
-                    useNativeDriver: false,
-                }).start(() => {
-                    const pileProps = PILES[pileKey];
-                    const currentRule = ruleRef.current;
-
-                    let isCorrect = false;
-                    if (currentRule === "color") isCorrect = card.color === pileProps.color;
-                    else if (currentRule === "shape") isCorrect = card.shape === pileProps.shape;
-                    else if (currentRule === "count") isCorrect = card.count === pileProps.count;
-
-                    const prevRule = previousRuleRef.current;
-                    if (prevRule && prevRule !== currentRule) {
-                        if (
-                            (prevRule === "color" && card.color === PILES[pileKey].color) ||
-                            (prevRule === "shape" && card.shape === PILES[pileKey].shape) ||
-                            (prevRule === "count" && card.count === PILES[pileKey].count)
-                        ) {
-                            setPerseverativeResponses(prev => prev + 1);
-                        }
-                    }
-
-                    setTrialsAdministered(prev => {
-                        const next = prev + 1;
-                        endTestIfNeeded(completedRef.current, next);
-                        return next;
-                    });
-
-                    if (consecutiveRef.current >= 2 && !isCorrect) {
-                        setFailureToMaintainSet(prev => prev + 1);
-                    }
-
-                    if (isCorrect) {
-                        setTotalCorrect(prev => prev + 1);
-                        const newConsec = consecutiveRef.current + 1;
-                        setConsecutiveCorrect(newConsec);
-                        showFeedback("correct");
-
-                        if (newConsec >= 10) {
-                            const newCompleted = completedRef.current + 1;
-                            setCategoriesCompleted(newCompleted);
-                            setConsecutiveCorrect(0);
-                            // showFeedback("category");
-
-                            previousRuleRef.current = currentRule;
-
-                            const newRule = pickNewRule(currentRule);
-                            setRule(newRule);
-
-                            if (newCompleted === 1) setTrialsToFirstCategory(trialsAdministered + 1);
-
-                            endTestIfNeeded(newCompleted, trialsAdministered + 1);
-                        }
-                    } else {
-                        settotalError(prev => prev + 1);
-                        setConsecutiveCorrect(0);
-                        showFeedback("wrong");
-
-                        let isPerseverativeError = false;
-                        if (prevRule && prevRule !== currentRule) {
-                            if (
-                                (prevRule === "color" && card.color === pileProps.color) ||
-                                (prevRule === "shape" && card.shape === pileProps.shape) ||
-                                (prevRule === "count" && card.count === pileProps.count)
-                            ) isPerseverativeError = true;
-                        }
-
-                        if (isPerseverativeError) setPerseverativeErrors(prev => prev + 1);
-                        else setNonPerseverativeErrors(prev => prev + 1);
-                    }
-
-                    setMovingCard(null);
-                    setIsAnimating(false);
-                });
-            });
-        });
-    };
-
-    React.useEffect(() => {
-        if (finished) {
-            saveStatsToBackend().then(() => {
-                router.push({
-                    pathname: WCST_ROUTE_ENDSCREEN,
-                    params: {
-                        trialsAdministered,
-                        totalCorrect,
-                        totalError,
-                        perseverativeResponses,
-                        perseverativeErrors,
-                        nonPerseverativeErrors,
-                        categoriesCompleted,
-                        failureToMaintainSet,
-                        trialsToFirstCategory,
-                        perseverativePercent: trialsAdministered > 0 ? Number(((perseverativeResponses / trialsAdministered) * 100).toFixed(2)) : 0,
-                        perseverativeErrorPercent: trialsAdministered > 0 ? Number(((perseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
-                        nonPerseverativeErrorPercent: trialsAdministered > 0 ? Number(((nonPerseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
-                        errorPercent: trialsAdministered > 0 ? Number(((totalError / trialsAdministered) * 100).toFixed(2)) : 0,
-                    }
-                });
-            });
-        }
-    }, [finished]);
 
     React.useEffect(() => {
         const handleAppStateChange = (nextAppState: AppStateStatus) => {

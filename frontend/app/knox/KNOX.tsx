@@ -1,7 +1,10 @@
 import { Square } from "@/components/knox/KnoxComponents";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { useKNOXGame } from "../hooks/useKNOXGame";
+import { styles } from "@/assets/styles/auth.styles";
+
+const { width, height } = Dimensions.get("window");
 
 // mozno ked stlacim velakrat za sebou rychlo
 // jedno tlacitko, tak by to malo
@@ -20,13 +23,22 @@ export default function KNOX_Screen() {
         correctLastUserTap,
         lightUpSquare,
         startGame,
+        exitTest,
     } = useKNOXGame();
 
     return (
         <View style={localStyles.container}> 
 
-            <View style={localStyles.timer}>
-                {/* <Text style={styles.timerText}>Timer: {formatTime(timeLeft)}</Text> */}
+            <View style={localStyles.header}>
+                <TouchableOpacity
+                    style={localStyles.exitButtonContainer}
+                    activeOpacity={0.7}
+                    onPress={exitTest}
+                >
+                    <Text style={localStyles.exitButtonText}>
+                        Exit Test
+                    </Text>
+                </TouchableOpacity>
             </View>
 
             <View style={localStyles.infoBox}>
@@ -60,6 +72,13 @@ export default function KNOX_Screen() {
                     <View>
                         <Text style={localStyles.feedbackIncorrectText}>Incorrect!</Text>
                         <Text style={localStyles.feedbackTestFinishedText}>You have{"\n"}completed the test!</Text>
+                    </View>
+                )}
+                {feedback === "Test ended early based on performance" && (
+                    <View>
+                        <Text style={localStyles.feedbackTestFinishedText}>
+                            Test ended early based on performance!
+                        </Text>
                     </View>
                 )}
             </View>
@@ -114,11 +133,25 @@ const localStyles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#dceeff",
     },
-    timer: {
-        flex: 1,
+    header: {
+        flexDirection: "row",
+        // flex: 1,
         width: "100%",
-        justifyContent: "center",
+        justifyContent: "flex-end",
         alignItems: "center",
+        paddingHorizontal: width * 0.05,
+        paddingTop: height * 0.03, 
+    },
+    exitButtonContainer: {
+        paddingVertical: height * 0.012,
+        paddingHorizontal: width * 0.04,
+        borderRadius: 8,
+        backgroundColor: "#7aaeff",
+    },
+    exitButtonText: {
+        fontSize: 16,
+        color: "#fff",
+        fontWeight: "500",
     },
     infoBox: {
         flex: 2,

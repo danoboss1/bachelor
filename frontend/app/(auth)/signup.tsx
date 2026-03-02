@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from "../../assets/styles/auth.styles";
+import { saveToken } from './tokenStorage';
 
 const { height } = Dimensions.get("window");
 
@@ -37,9 +38,21 @@ export default function TabOneScreen() {
         };
 
         try {
-            await axios.post("https://bachelor-pi.vercel.app/register", registration);
+            const res = await axios.post(
+                "https://bachelor-pi.vercel.app/register", 
+                registration
+            );
 
-            router.push("/(auth)/login");
+            const token = res.data?.token;
+
+            if (!token) {
+                setErrorMessage("No token returned from server")
+                return;
+            }
+            
+            await saveToken(token);
+
+            router.replace("/(tabs)/games");
         } catch (err: any) {
 
             if (err.response?.data?.errors) {

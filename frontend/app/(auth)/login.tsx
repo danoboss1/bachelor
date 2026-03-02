@@ -2,8 +2,9 @@ import { Text } from '@/components/Themed';
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Dimensions, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { styles } from "../../assets/styles/auth.styles";
+import { saveToken } from './tokenStorage';
 
 const { height } = Dimensions.get("window");
 
@@ -28,7 +29,7 @@ export default function TabOneScreen() {
         setLoginError("");
         setErrorMessage("");
 
-        setLoading(false);
+        setLoading(true);
 
         const login: LoginPayload = {
             username,
@@ -36,9 +37,21 @@ export default function TabOneScreen() {
         };
 
         try {
-            await await axios.post("https://bachelor-pi.vercel.app/login", login);
+            const res = await axios.post(
+                "https://bachelor-pi.vercel.app/login", 
+                login
+            );
 
-            router.replace("/games");
+            const token = res.data?.token;
+
+            if (!token) {
+                setErrorMessage("No token returned from server");
+                return;
+            }
+
+            await saveToken(token);
+
+            router.replace("/(tabs)/games");
         } catch (err: any) {
 
             if (err.response?.data?.message) {
@@ -110,10 +123,17 @@ export default function TabOneScreen() {
                 </View>
 
                 <TouchableOpacity 
-                    style={styles.button}
+                    style={[styles.button, loading && { opacity: 0.6 }]}
                     onPress={loginUser}
+                    disabled={loading}
                 >
-                    <Text style={styles.buttonText}>Log in</Text>
+                    {loading ? (
+                        <ActivityIndicator color="#fff" /> 
+                    ) : (
+                        <Text style={styles.buttonText}>
+                            Log in
+                        </Text>
+                    )}
                 </TouchableOpacity>
 
                 <Text style={styles.bottomMessage}>

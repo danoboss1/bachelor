@@ -1,5 +1,6 @@
 import express from 'express';
 import { StatsController } from '../controllers/wcstStatsController.js';
+import authMiddleware from "../controllers/authMiddleware.js";
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const router = express.Router();
 // });
 
 router.get('/percentile', StatsController.getPercentile);
-router.get('/month', StatsController.getMonthlyBestPerDay);
+router.get('/month', authMiddleware, StatsController.getMonthlyBestPerDay);
 
 router.get('/:statId', StatsController.getStat);
 router.post('/', StatsController.saveStat);

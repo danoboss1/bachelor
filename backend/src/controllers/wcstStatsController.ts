@@ -215,7 +215,12 @@ export class StatsController {
 
     static getMonthlyBestPerDay = async (req: Request, res: Response) => {
         try {
-            const userId = 1;
+            // const userId = 1;
+            const userId = req.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
 
             const year = Number(req.query.year);
             const month = Number(req.query.month);

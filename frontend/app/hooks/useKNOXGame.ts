@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
+import { Alert, BackHandler } from "react-native";
 
 const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
 
@@ -40,6 +41,7 @@ export function useKNOXGame() {
         | "Incorrect"
         | "Well done. You have completed the test"
         | "Incorrect. You have completed the test"
+        | "Test ended early based on performance"
     >("Tap here when you are ready");
 
     const [activeSquare, setActiveSquare] = React.useState<number | null>(null);
@@ -51,7 +53,8 @@ export function useKNOXGame() {
     const [userSequence, setUserSequence] = React.useState<number[]>([]);
     const userSequenceRef = React.useRef<number[]>([]);
 
-    const [isAnimating, setIsAnimating] = React.useState(true);
+    // toto som prestavil
+    const [isAnimating, setIsAnimating] = React.useState(false);
     const [userAnswered, setUserAnswered] = React.useState(false);
     const [isLastSequence, setIsLastSequence] = React.useState(false);
     const [finished, setFinished] = React.useState(false);
@@ -77,7 +80,8 @@ export function useKNOXGame() {
 
     const [sequenceLengths] = React.useState([
         // testovacie sekvencie
-        3, 4, 5, 6, 7, 8
+        3, 4
+        // 3, 4, 5, 6, 7, 8
         // 4,
         // 5,
 
@@ -164,8 +168,20 @@ export function useKNOXGame() {
     }, []);
 
 
-    function lightUpSquare(id : number) {
+    async function lightUpSquare(id : number) {
         if (isAnimating) return;
+
+        const currentlyActive =
+            activeUserTap ?? incorrectUserTap ?? correctLastUserTap;
+
+        // 🔥 iba ak klikol znovu na TEN ISTÝ štvorec
+        if (currentlyActive === id) {
+            setActiveUserTap(null);
+            setIncorrectUserTap(null);
+            setCorrectLastUserTap(null);
+
+            await delay(60);
+        }
 
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
@@ -189,7 +205,7 @@ export function useKNOXGame() {
             setTimeout(() => {
                 setIncorrectUserTap(null);
                 timeoutRef.current = null;
-            }, 1000);
+            }, 1500);
 
             userAnsweredResolve.current?.();
             return;
@@ -239,7 +255,7 @@ export function useKNOXGame() {
             setTimeout(() => {
                 setCorrectLastUserTap(null);
                 timeoutRef.current = null;
-            }, 1000);
+            }, 1500);
 
             userAnsweredResolve.current?.();
             return;
@@ -295,30 +311,84 @@ export function useKNOXGame() {
         setCorrectLastUserTap(null);
     }
 
+    function getCorrectRefByLength(len: number) {
+        switch (len) {
+            case 3: return threeRef;
+            case 4: return fourRef;
+            case 5: return fiveRef;
+            case 6: return sixRef;
+            case 7: return sevenRef;
+            case 8: return eightRef;
+            default: throw new Error(`Unsupported length: ${len}`);
+        }
+    }
+
     async function startGame() {
         resetGame();
 
-        for(let i = 0; i < sequenceLengths.length; i++) {
-            if (i + 1 === sequenceLengths.length) {
-                setIsLastSequence(true);
+        const lengths = sequenceLengths;
+
+        const uniqueLengthsInOrder: number[] = [];
+        for (const l of lengths) {
+            if (!uniqueLengthsInOrder.includes(l)) {
+                uniqueLengthsInOrder.push(l);
+            }
+        }
+
+        let zeroStreak = 0;
+        let earlyStop = false;
+
+        for (let u = 0; u < uniqueLengthsInOrder.length; u++) {
+            const len = uniqueLengthsInOrder[u];
+
+            setIsLastSequence(u + 1 === uniqueLengthsInOrder.length);
+
+            const correctRef = getCorrectRefByLength(len);
+            const before = correctRef.current;
+            
+            const indices = lengths
+                .map((v, idx) => (v === len ? idx : -1))
+                .filter(idx => idx !== -1);
+
+            for (let j = 0; j < indices.length; j++) {
+                setUserAnswered(false);
+                setUserSequence([]);
+                userSequenceRef.current = [];
+
+                setFeedback("Watch carefully and remember the sequence");
+                await delay(300);
+
+                const seq = generateSequence(len);
+                await playSequence(seq);
+
+                setFeedback("Repeat the sequence by tapping the cubes");
+                await waitForUser();
+                await delay(1500);
             }
 
-            setUserAnswered(false);
-            setUserSequence([]);
-            userSequenceRef.current = [];
+            // nie je naozaj to before zbytocne ???
+            const gained = correctRef.current - before;
 
-            setFeedback("Watch carefully and remember the sequence");
+            if (gained === 0) {
+                zeroStreak += 1;
+            } else {
+                zeroStreak = 0;
+            }
 
-            await delay(300);
-
-            const seq = generateSequence(sequenceLengths[i]);
-            await playSequence(seq);
-
-            setFeedback("Repeat the sequence by tapping the cubes");
-
-            await waitForUser();
-            await delay(1500);
+            if (zeroStreak >= 2) {
+                earlyStop = true;
+                break;
+            }
         }
+
+        // tu zmenit text
+        if (earlyStop) {
+            setIsLastSequence(true);
+            setFeedback("Test ended early based on performance");
+            // prípadne vlastná hláška
+        }
+
+        await delay(1500);
 
         setFinished(true);
     }
@@ -353,6 +423,61 @@ export function useKNOXGame() {
         };
     }, [finished]);
 
+    const exitTest = React.useCallback(() => {
+        Alert.alert(
+            "Exit Test",
+            "Are you sure you want to exit?\nYour progress will not be saved.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Exit",
+                    style: "destructive",
+                    onPress: () => {
+                        router.replace("/(tabs)/games");
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    }, [router]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                Alert.alert(
+                    "Exit Test",
+                    "Are you sure you want to exit?\nYour progress will not be saved.",
+                    [
+                    {
+                        text: "Cancel",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Exit",
+                        style: "destructive",
+                        onPress: () => {
+                            router.replace("/(tabs)/games");
+                        },
+                    },
+                    ],
+                    { cancelable: true }
+                );
+
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                "hardwareBackPress",
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [router])
+    );
+
     return {
         timeLeft,
         formatTime,
@@ -366,5 +491,7 @@ export function useKNOXGame() {
         lightUpSquare,
 
         startGame,
+
+        exitTest,
     };
 }

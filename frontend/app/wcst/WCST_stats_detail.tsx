@@ -3,7 +3,9 @@ import { Color } from "@/constants/TWPalette";
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import { Icon } from "../../components/ui/Icon"
+import { Icon } from "../../components/ui/Icon";
+import { useRouter } from "expo-router";
+import { getToken, removeToken } from "../(auth)/tokenStorage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -102,6 +104,8 @@ const generateMonthlyData = (year: number, month: number): TimeSeriesData[] => {
 };
 
 export default function WCSTStatsDetail() {
+    const router = useRouter();
+
     const now = new Date();
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -113,6 +117,10 @@ export default function WCSTStatsDetail() {
     const [data, setData] = useState<MonthlyResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedDay, setSelectedDay] = useState<MonthlyDay | null>(null);
+
+    const trendUrl = "https://bachelor-pi.vercel.app/wcstStats/trend";
+
+    const [trendMessage, setTrendMessage] = useState<string | null>(null);
 
     const url = useMemo(() => {
         return `https://bachelor-pi.vercel.app/wcstStats/month?year=${currentYear}&month=${currentMonth + 1}`
@@ -148,7 +156,26 @@ export default function WCSTStatsDetail() {
             setSelectedDay(null);
 
             try {
-                const res = await fetch(url);
+                const token = await getToken();
+                
+                // tuto mozno session expired napisat uzivatelovi
+                if (!token) {
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    await removeToken();
+                    router.replace("/(auth)/login");
+                    return;
+                }
+                
                 // toto je naco ten druhy riadok
                 const json = await res.json();
 
@@ -172,6 +199,31 @@ export default function WCSTStatsDetail() {
             cancelled = true;
         };
     }, [url]);
+
+    useEffect(() => {
+        let cancelled = false;
+        
+        async function loadTrend() {
+            try {
+                const token = await getToken();
+                if (!token) return;
+
+                const res = await fetch(trendUrl, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+
+                if (!res.ok) return;
+
+                const json = await res.json();
+                if (!cancelled) setTrendMessage(json.message ?? null);
+            } catch {}
+        }
+
+        loadTrend();
+        return () => { cancelled = true; };
+    }, []);
 
     const maxScore = 6;
 
@@ -457,6 +509,12 @@ CATEGORY LOGIC
                             {getCategoryInterpretation(categoryIndex)}
                         </Text>
 
+                          {/* ✅ SEM */}
+                        {trendMessage ? (
+                            <Text style={localStyles.trendText}>
+                            {trendMessage}
+                            </Text>
+                        ) : null}
                     </View>
 
                 </View>
@@ -613,6 +671,13 @@ const localStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
         marginTop: 16,
+        textAlign: "center",
+    },
+    trendText: {
+        marginTop: 12,
+        paddingHorizontal: 12,
+        color: "black",
+        fontWeight: "600",
         textAlign: "center",
     },
 });

@@ -32,6 +32,19 @@ function computeScore(stat: any): number {
     return Number(stat.categories_completed ?? 0);
 }
 
+/** priemer */
+function mean(nums: number[]): number {
+    if (!nums.length) return 0;
+    return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
+// tuto ked vrati 0 tak urobit nieco ine
+/** percent difference (napr +7 znamená +7%) */
+function percentDiff(current: number, baseline: number): number {
+    if (baseline === 0) return 0;
+    return ((current - baseline) / baseline) * 100;
+}
+
 /**
  * Optional: Your category bar index logic (0..4) from the frontend.
  * Useful to include in responses for UI.
@@ -46,8 +59,55 @@ function getCategoryIndex(categoriesCompleted: number, trials: number): number {
     return 0;
 }
 
+// toto robi co, skor ako to robi
 function safeTimeMs(t: Date | null): number {
     return t ? t.getTime() : 0;
+}
+
+/**
+ * Vytiahne "best stat per day" pre usera (len dni, kde existuje výsledok),
+ * zoradené podľa dňa ASC.
+ */
+async function getBestPerDay(userId: number) {
+    const stats = await prisma.stats_wcst.findMany({
+        where: { user_id: userId },
+        orderBy: { time: "asc" },
+    });
+
+    const bestByDay = new Map<string, { bestScore: number; bestStat: any }>();
+
+    for (const s of stats) {
+        if (!s.time) continue;
+
+        const dayKey = toDateKey(s.time);
+        const score = computeScore(s);
+
+        const current = bestByDay.get(dayKey);
+        if (!current) {
+            bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+            continue;
+        }
+
+        if (score > current.bestScore) {
+            bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+            continue;
+        }
+
+        // tuto tu druhu metriku dat mensi pocet trials_administered
+        if (score === current.bestScore) {
+            const tNew = safeTimeMs(s.time);
+            const tOld = safeTimeMs(current.bestStat.time);
+            if (tNew > tOld) {
+                bestByDay.set(dayKey, { bestScore: score, bestStat: s });
+            }
+        }
+    }
+
+    const days = Array.from(bestByDay.entries())
+        .map(([date, obj]) => ({ date, score: Number(obj.bestScore), bestStat: obj.bestStat }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    return days;
 }
 
 export class StatsController {
@@ -319,5 +379,98 @@ export class StatsController {
             console.error("Error fetching WCST monthly best per day:", error);
             return res.status(500).json({ error: "Server error" });
         }
-    }
+    };
+
+    /**
+   * GET /wcstStats/trend
+   *
+   * Pravidlá:
+   * - zober posledných 10 dní, kde bol výsledok (best per day)
+   * - musí existovať aj "pred nimi" aspoň 10 ďalších dní s výsledkom
+   * - baseline = priemer zo všetkých dní pred poslednými 10 (t.j. historický priemer)
+   * - improving:
+   *   - priemer posledných 10 je aspoň o +7% lepší než baseline
+   *   - a aspoň 7/10 dní je aspoň o +3% lepších než baseline
+   * - declining analogicky -7% a 7/10 horších o -3%
+   * - inak stable
+   */
+
+    static getTrendMessage = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+            const allDays = await getBestPerDay(userId);
+
+            if (allDays.length < 20) {
+                return res.json({
+                    userId,
+                    hasEnoughData: false,
+                    message: null,
+                    reason: "Need at least 20 result-days (10 recent + 10 older).",
+                });
+            }
+
+            const recent10 = allDays.slice(-10);
+            const baselineDays = allDays.slice(0, -10);
+
+            if (baselineDays.length < 10) {
+                return res.json({
+                    userId,
+                    hasEnoughData: false,
+                    message: null,
+                    reason: "Need at least 10 result-days before the last 10."
+                });
+            }
+
+            const baselineAvg = mean(baselineDays.map((d) => d.score));
+            const recentAvg = mean(recent10.map((d) => d.score));
+
+            // toto este treba vyriesit lebo moze nastat
+            // if (baselineAvg === 0) {
+
+            // }
+
+            const avgDeltaPct = percentDiff(recentAvg, baselineAvg);
+
+            const perDayDeltaPct = recent10.map((d) => ({
+                date: d.date,
+                score: d.score,
+                deltaPct: percentDiff(d.score, baselineAvg),
+            }));
+
+            const better3Percent = perDayDeltaPct.filter((x) => x.deltaPct >= 3).length;
+            const worse3Percent = perDayDeltaPct.filter((x) => x.deltaPct <= -3).length;
+
+            const improving = avgDeltaPct >= 7 && better3Percent >= 7;
+            const declining = avgDeltaPct <= -7 && worse3Percent >= 7;
+
+            let trend: "improving" | "declining" | "stable" = "stable";
+            let message =
+                "Flexibility and responding to feedback abilities are stable.";
+
+            if (improving) {
+                trend = "improving";
+                message = "Flexibility and responding to feedback are improving.";
+            } else if (declining) {
+                trend = "declining";
+                message = "Flexibility and responding to feedback abilities show a sustained decline. If this continues, consider consulting a healthcare professional.";
+            }
+
+            return res.json({
+                userId,
+                hasEnoughData: true,
+                trend,
+                message,
+                baselineAvg,
+                recentAvg,
+                avgDeltaPct: Number(avgDeltaPct.toFixed(2)),
+                counts: { better3Percent, worse3Percent },
+                recent10: perDayDeltaPct,
+            });
+        } catch (error) {
+            console.error("Error computing WCST trend:", error);
+            return res.status(500).json({ error: "Server error" });
+        }
+    };
 }

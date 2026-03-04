@@ -89,10 +89,9 @@ export default function TOL_Screen() {
     return (
         // #f9f9f9
         <View style={localStyles.container}>
-
             <View style={localStyles.timer}>
-                <Text style={localStyles.targetAttemptsText}>Target Moves: {targetMoves}</Text>
-                <Text style={localStyles.userAttemptsText}>Used Moves: {userMoves}</Text>
+                <Text style={localStyles.targetAttemptsText}>Move limit: {targetMoves}</Text>
+                <Text style={localStyles.userAttemptsText}>Moves used: {userMoves}</Text>
             </View>
 
             {/* TARGET */}
@@ -101,7 +100,7 @@ export default function TOL_Screen() {
                     {targetStacks.map((targetStack, index) => (
                         <StackWithDiscs
                             key={index}
-                            stackHeight={[height * 0.27, height * 0.18, height * 0.09][index]}
+                            stackHeight={[height * 0.24, height * 0.16, height * 0.08][index]}
                             // backgroundColor="#4CAF50"
                             // backgroundColor="#f9f9f9"
                             // backgroundColor="#FFCC80"
@@ -110,6 +109,8 @@ export default function TOL_Screen() {
                         />
                     ))}
                 </View>
+
+                <Text style={localStyles.sectionLabel}>TARGET</Text>
             </View>
             
             <View ref={handRef} style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
@@ -133,11 +134,13 @@ export default function TOL_Screen() {
 
             {/* USER */}
             <View style={localStyles.userPegs}>
+                {/* <Text style={localStyles.sectionLabel}>YOUR BOARD</Text> */}
+                
                 <View style={localStyles.stacksRow}>
                     {stacks.map((stack, index) => (
                         <StackWithDiscs
                             key={index}
-                            stackHeight={[height * 0.27, height * 0.18, height * 0.09][index]}
+                            stackHeight={[height * 0.24, height * 0.16, height * 0.08][index]}
                             // backgroundColor="#FFCC80"
                             // backgroundColor="#f9f9f9"
                             backgroundColor="#e8eef5"
@@ -146,6 +149,9 @@ export default function TOL_Screen() {
                         />
                     ))}
                 </View>
+
+                <Text style={localStyles.sectionLabel}>YOUR BOARD</Text>
+                {/* <Text style={localStyles.hintText}>Tap a peg to move a disc</Text> */}
             </View>
 
             {/* DISK V RUKE */}
@@ -157,7 +163,7 @@ export default function TOL_Screen() {
             )}
 
             <View style={localStyles.footer}>
-
+                <Text style={localStyles.hintText}>Tap a peg to move a disc</Text>
             </View>
         </View>
     );
@@ -227,7 +233,7 @@ const localStyles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "flex-end",
         justifyContent: "space-around",
-        paddingBottom: height * 0.03,
+        paddingBottom: height * 0.01,
     },
     peg: {
         width: width * 0.035,
@@ -248,7 +254,22 @@ const localStyles = StyleSheet.create({
         color: "#ff3131",
         fontWeight: "bold",
         textAlign: "center",
-    }
+    },
+    sectionLabel: {
+        textAlign: "center",
+        fontSize: 16,
+        fontWeight: "700",
+        letterSpacing: 1.5,
+        marginBottom: 8,
+        color: "#333",
+    },
+    hintText: {
+        textAlign: "center",
+        fontSize: 13,
+        color: "#555",
+        marginTop: 4,
+        opacity: 0.8,
+    },
 });
 
 // {showFeedback && (

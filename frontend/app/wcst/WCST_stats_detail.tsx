@@ -57,20 +57,6 @@ type MonthlyResponse = {
     days: MonthlyDay[];
 };
 
-function pad2(n: number) {
-    return String(n).padStart(2, "0");
-}
-
-const rawData = [
-    { value: 50, dataPointText: "50", label: "15/1" },
-    { value: 80, dataPointText: "80", label: "16/1" },
-    { value: 100, dataPointText: "100", label: "17/1" },
-    { value: 70, dataPointText: "70", label: "18/1" },
-    { value: 56, dataPointText: "56", label: "19/1" },
-    { value: 78, dataPointText: "78", label: "20/1" },
-    { value: 74, dataPointText: "74", label: "21/1", frontColor: "#177AD5" },
-];
-
 const getMonthName = (month: number) => {
     const months = [
         "Jan",
@@ -110,7 +96,6 @@ export default function WCSTStatsDetail() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-    const [activeIndex, setActiveIndex] = useState(rawData.length - 1);
     // activeIndex je mozno selectedBarIndex, ze to je to iste
     const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
 
@@ -269,53 +254,6 @@ export default function WCSTStatsDetail() {
         }));
     }, [days, selectedBarIndex]);
 
-    // const chartData = useMemo(() => {
-    //     return monthlyData.map((item, index) => ({
-    //         ...item,
-    //         frontColor:
-    //             selectedBarIndex === index ? Color.orange[800] : Color.orange[400],
-    //         topLabelComponent:
-    //             selectedBarIndex === index
-    //                 ? () => (
-    //                     <Text
-    //                         style={{
-    //                             fontSize: 12,
-    //                             fontWeight: "600",
-    //                             color: Color.orange[800],
-    //                             marginBottom: 6,
-    //                         }}
-    //                     >
-    //                         {item.value}
-    //                     </Text>
-    //                 )
-    //                 : undefined,
-    //     }));
-    // }, [monthlyData, selectedBarIndex, activeIndex]);
-
-    // const barData = useMemo(
-    //     () =>
-    //         rawData.map((item, index) => ({
-    //             ...item,
-    //             frontColor: index === activeIndex ? Color.orange[800] : Color.orange[400],
-    //             topLabelComponent:
-    //                 index === activeIndex
-    //                     ? () => (
-    //                         <Text
-    //                             style={{
-    //                                 fontSize: 12,
-    //                                 fontWeight: "600",
-    //                                 color: Color.orange[800],
-    //                                 marginBottom: 6,
-    //                             }}
-    //                         >
-    //                             {item.value}
-    //                         </Text>
-    //                     )
-    //                     : undefined,
-    //         })),
-    //     [activeIndex]
-    // );
-
     const labels = [
         "VERY POOR\n0-2 categories",
         "POOR\n3-4 categories",
@@ -358,6 +296,7 @@ CATEGORY LOGIC
     // const categoryIndex = getCategoryIndex(categoriesCompleted, trials);
 
     const best = selectedDay?.bestStat ?? null;
+    const hasBest = !!best;
 
     const categoriesCompleted = Number(best?.categories_completed ?? 0);
     const trials = Number(best?.trials_administered ?? 0);
@@ -367,106 +306,128 @@ CATEGORY LOGIC
     (best ? getCategoryIndex(categoriesCompleted, trials) : 0);
 
     return (
-        <View
-            style={{
-                flex: 1,
-                backgroundColor: Color.orange[100],
-            }}
-        >
+        <View style={localStyles.screen}>
             <View style={{ flex: 1, justifyContent: "center" }}>
-                <Text style={localStyles.graphTitle}>Total score</Text>
+                <View style={localStyles.header}>
+                    <View>
+                        <Text style={localStyles.title}>WCST Statistics</Text>
+                        <Text style={localStyles.subtitle}>
+                            Track your monthly performance
+                        </Text>
+                    </View>
 
-                {/* Month Navigation */}
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 16,
-                        paddingHorizontal: 16,
-                    }}
-                >
+                    {/* Tento pressable pozriet ci je dobra adresa */}
                     <Pressable
-                        onPress={() => navigateMonth(-1)}
-                        style={{
-                            padding: 8,
-                            borderRadius: 8,
-                        }}
-                        hitSlop={20}
+                        onPress={() => router.back()}
+                        style={localStyles.backBtn}
+                        hitSlop={16}
                     >
-                        <Icon
-                            symbol={"chevron.backward"}
-                            size="sm"
-                            color={Color.gray[500]}
-                        />
-                    </Pressable>
-
-                    <Text
-                        style={{
-                            fontSize: 18,
-                            fontWeight: "600",
-                            color: Color.gray[900],
-                        }}
-                    >
-                        {getMonthName(currentMonth)} {currentYear}
-                    </Text>
-
-                    <Pressable
-                        onPress={() => navigateMonth(1)}
-                        style={{
-                            padding: 8,
-                            borderRadius: 8,
-                        }}
-                        hitSlop={20}
-                    >
-                        <Icon
-                            symbol={"chevron.forward"}
-                            size="sm"
-                            color={Color.gray[500]}
-                        />
+                        <Icon symbol={"chevron.backward"} size="sm" color={Color.gray[700]} />
                     </Pressable>
                 </View>
 
-                <BarChart
-                    maxValue={maxScore}
-                    stepValue={1}
-                    yAxisExtraHeight={20}
-                    barBorderRadius={4}
-                    frontColor={Color.orange[400]}
-                    data={chartData}
-                    xAxisThickness={0}
-                    yAxisThickness={0}
-                    // disableScroll
-                    width={width - CHART_HORIZONTAL_PADDING * 2}
-                    barWidth={BAR_WIDTH}
-                    spacing={SPACING}
-                    initialSpacing={INITIAL_SPACING}
-                    endSpacing={END_SPACING}
-                    xAxisLabelTextStyle={{
-                        color: Color.gray[400],
-                        fontSize: 12,
-                        fontWeight: "500",
-                    }}
-                    yAxisTextStyle={{
-                        color: Color.gray[400],
-                        fontSize: 12,
-                        fontWeight: "500",
-                    }}
-                    // onPress={(_item: any, index: number) => {
-                    //     // setActiveIndex(index);
-                    //     setSelectedBarIndex(index);
-                    // }}
-                    onPress={(_item: any, index: number) => {
-                        setSelectedBarIndex(index);
-                        setSelectedDay(days[index] ?? null);
-                    }}
-                    dashGap={10}
-                />
+                <View style={localStyles.cardBar}>
+                    <Text style={localStyles.graphTitle}>Total score</Text>
+
+                    {/* Month Navigation */}
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 16,
+                            paddingHorizontal: 16,
+                        }}
+                    >
+                        <Pressable
+                            onPress={() => navigateMonth(-1)}
+                            style={{
+                                padding: 8,
+                                borderRadius: 8,
+                            }}
+                            hitSlop={20}
+                        >
+                            <Icon
+                                symbol={"chevron.backward"}
+                                size="sm"
+                                color={Color.gray[500]}
+                            />
+                        </Pressable>
+
+                        <Text
+                            style={{
+                                fontSize: 18,
+                                fontWeight: "600",
+                                color: Color.gray[900],
+                            }}
+                        >
+                            {getMonthName(currentMonth)} {currentYear}
+                        </Text>
+
+                        <Pressable
+                            onPress={() => navigateMonth(1)}
+                            style={{
+                                padding: 8,
+                                borderRadius: 8,
+                            }}
+                            hitSlop={20}
+                        >
+                            <Icon
+                                symbol={"chevron.forward"}
+                                size="sm"
+                                color={Color.gray[500]}
+                            />
+                        </Pressable>
+                    </View>
+
+                    <BarChart
+                        maxValue={maxScore}
+                        stepValue={1}
+                        yAxisExtraHeight={20}
+                        barBorderRadius={4}
+                        frontColor={Color.orange[400]}
+                        data={chartData}
+                        xAxisThickness={0}
+                        yAxisThickness={0}
+                        // disableScroll
+                        // width={width - CHART_HORIZONTAL_PADDING * 2}
+                        barWidth={BAR_WIDTH}
+                        spacing={SPACING}
+                        initialSpacing={INITIAL_SPACING}
+                        endSpacing={END_SPACING}
+                        xAxisLabelTextStyle={{
+                            color: Color.gray[400],
+                            fontSize: 12,
+                            fontWeight: "500",
+                        }}
+                        yAxisTextStyle={{
+                            color: Color.gray[400],
+                            fontSize: 12,
+                            fontWeight: "500",
+                        }}
+                        // onPress={(_item: any, index: number) => {
+                        //     // setActiveIndex(index);
+                        //     setSelectedBarIndex(index);
+                        // }}
+                        onPress={(_item: any, index: number) => {
+                            setSelectedBarIndex(index);
+                            setSelectedDay(days[index] ?? null);
+                        }}
+                        dashGap={10}
+                    />
+                </View>
             </View>
 
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}>
+            {/* <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}> */}
+            <ScrollView 
+                style={localStyles.scroll}
+                contentContainerStyle={localStyles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
                 {/* INTERPRETATION BAR */}
-                <View style={localStyles.scaleContainer}>
+                <View style={localStyles.card}>
+                    {/* <Text style={localStyles.cardTitle}>Interpretation</Text> */}
+                {/* <View style={localStyles.scaleContainer}> */}
                     <View style={localStyles.scaleBar}>
                         {labels.map((label, index) => (
                             <View
@@ -495,93 +456,161 @@ CATEGORY LOGIC
 
                     {/* RESULT TEXT */}
 
+
+                      {/* ✅ Highlight hneď po scaleBare */}
                     <View style={localStyles.resultContainer}>
-
-                        <Text style={localStyles.resultText}>
-                            Categories completed: {categoriesCompleted}
-                        </Text>
-
-                        <Text style={localStyles.resultText}>
-                            Cards used: {trials}
-                        </Text>
-
-                        <Text style={[localStyles.resultInterpretation, { color: "black" }]}>
+                        {/* ✅ Interpretation = len malé dovysvetlenie */}
+                        <Text style={localStyles.interpretationSmall}>
                             {getCategoryInterpretation(categoryIndex)}
                         </Text>
 
-                          {/* ✅ SEM */}
+                        <View style={localStyles.highlightRow}>
+                            <View style={localStyles.highlightBox}>
+                                <Text style={localStyles.highlightValue}>
+                                {hasBest ? categoriesCompleted : "—"}
+                                </Text>
+                                <Text style={localStyles.highlightLabel}>Categories</Text>
+                            </View>
+
+                            <View style={localStyles.highlightDivider} />
+
+                            <View style={localStyles.highlightBox}>
+                                <Text style={localStyles.highlightValue}>
+                                {hasBest ? trials : "—"}
+                                </Text>
+                                <Text style={localStyles.highlightLabel}>Cards used</Text>
+                            </View>
+                        </View>
+
+                        {/* ✅ TREND = najdôležitejší text */}
                         {trendMessage ? (
-                            <Text style={localStyles.trendText}>
-                            {trendMessage}
+                            <Text style={localStyles.trendPrimary}>
+                                {trendMessage}
                             </Text>
                         ) : null}
+
                     </View>
 
                 </View>
+                
+                <View style={localStyles.card}>
+                    <Text style={localStyles.cardTitle}>Detailed stats</Text>
 
-                <StatMiniSupplementary 
-                    label={"Percentage of perseverative responses"} 
-                    value={Number(best?.perseverativepercent ?? 0)}
-                    whole={Number(best?.perseverativepercent ?? 0)} 
-                />
+                    <StatMiniSupplementary 
+                        label={"Percentage of perseverative responses"} 
+                        value={`${Number(best?.perseverativepercent ?? 0)}%`}
+                    />
 
-                <StatMiniSupplementary 
-                    label={"Percentage of perseverative errors"} 
-                    value={Number(best?.perseverativeerrorpercent ?? 0)} 
-                    whole={Number(best?.perseverativeerrorpercent ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label={"Percentage of perseverative errors"} 
+                        value={`${Number(best?.perseverativeerrorpercent ?? 0)}%`}
+                    />
 
-                <StatMiniSupplementary 
-                    label={"Percentage of non-perseverative errors"} 
-                    value={Number(best?.nonperseverativeerrorpercent ?? 0)}
-                    whole={Number(best?.nonperseverativeerrorpercent ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label={"Percentage of non-perseverative errors"} 
+                        value={`${Number(best?.nonperseverativeerrorpercent ?? 0)}%`}
+                    />
 
-                {/* <StatMiniSupplementary 
-                    label="Correct responses" 
-                    value={60} 
-                /> */}
+                    {/* <StatMiniSupplementary 
+                        label="Correct responses" 
+                        value={60} 
+                    /> */}
 
-                <StatMiniSupplementary 
-                    label="Errors" 
-                    value={Number(best?.total_error ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Errors" 
+                        value={Number(best?.total_error ?? 0)}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Percentage of errors" 
-                    value={`${Number(best?.errorpercent ?? 0)}%`}
-                />
+                    <StatMiniSupplementary 
+                        label="Percentage of errors" 
+                        value={`${Number(best?.errorpercent ?? 0)}%`}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Perseverative responses" 
-                    value={Number(best?.perseverative_responses ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Perseverative responses" 
+                        value={Number(best?.perseverative_responses ?? 0)}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Perseverative errors" 
-                    value={Number(best?.perseverative_errors ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Perseverative errors" 
+                        value={Number(best?.perseverative_errors ?? 0)}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Non-perseverative errors" 
-                    value={Number(best?.non_perseverative_errors ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Non-perseverative errors" 
+                        value={Number(best?.non_perseverative_errors ?? 0)}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Trials to complete first category" 
-                    value={Number(best?.trials_to_first_category ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Trials to complete first category" 
+                        value={Number(best?.trials_to_first_category ?? 0)}
+                    />
 
-                <StatMiniSupplementary 
-                    label="Failure to maintain set" 
-                    value={Number(best?.failure_to_maintain_set ?? 0)}
-                />
+                    <StatMiniSupplementary 
+                        label="Failure to maintain set" 
+                        value={Number(best?.failure_to_maintain_set ?? 0)}
+                    />
+                </View>
             </ScrollView>
         </View>
     );
 }
 
 const localStyles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        backgroundColor: Color.orange[100],
+        paddingTop: Math.max(12, height * 0.02),
+    },
+
+    header: {
+        paddingHorizontal: 16,
+        // paddingTop: 16,
+        // paddingBottom: 10,
+        paddingBottom: 24,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: "800",
+        color: Color.gray[900],
+    },
+    subtitle: {
+        margin: 2,
+        fontSize: 13,
+        fontWeight: "500",
+        color: Color.gray[600],
+    },
+    backBtn: {
+        padding: 8,
+        borderRadius: 12,
+        backgroundColor: "#B3B3B3"
+    },
+
+    card: {
+        marginHorizontal: 16,
+        marginBottom: 12,
+        padding: 14,
+        borderRadius: 18,
+        backgroundColor: "#FFFCF9",
+        borderWidth: 1,
+        borderColor: "#F0DFC8",
+    },
+    cardTitle: {
+        fontSize: 16,
+        fontWeight: "800",
+        color: Color.gray[900],
+    },
+    cardBar: {
+        // marginHorizontal: 16,
+        padding: 14,
+        backgroundColor: "#FFFCF9",
+        borderWidth: 1,
+        borderColor: "#F0DFC8",
+    },
+    
     container: {
         flex: 1,
         paddingTop: height * 0.026,
@@ -589,6 +618,14 @@ const localStyles = StyleSheet.create({
         justifyContent: "space-between",
         backgroundColor: "#d6c7b9",
     },
+
+    scroll: { 
+        flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: 12,
+    },
+
     statsScroll: {
         width: "100%",
         alignItems: "center"
@@ -597,7 +634,7 @@ const localStyles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         marginLeft: width * 0.1,
-        marginBottom: 8,
+        // marginBottom: 8,
         color: "black",
         textAlign: "left",
     },
@@ -660,12 +697,42 @@ const localStyles = StyleSheet.create({
     darkGreen: {
         backgroundColor: "#2e7d32"
     },
+    highlightRow: {
+        // marginTop: 12,
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius: 14,
+        backgroundColor: "#F5F5F5",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+    },
+    highlightBox: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+    },
+    highlightValue: {
+        fontSize: 22,
+        fontWeight: "900",
+        color: Color.gray[900],
+    },
+    highlightLabel: {
+        fontSize: 12,
+        fontWeight: "700",
+        color: Color.gray[600],
+    },
+    highlightDivider: {
+        width: 1,
+        height: 36,
+        backgroundColor: "#E6E6E6",
+    },
     resultContainer: {
         alignItems: "center",
-        marginTop: 32,
+        // marginTop: 16,
     },
     resultText: {
-        fontSize: 16,
+        fontSize: 24,
     },
     resultInterpretation: {
         fontSize: 18,
@@ -679,5 +746,28 @@ const localStyles = StyleSheet.create({
         color: "black",
         fontWeight: "600",
         textAlign: "center",
+    },
+
+    // resultContainer: {
+    //     alignItems: "center",
+    //     marginTop: 10, // menšie, aby to bolo bližšie k scaleBar
+    // },
+
+    trendPrimary: {
+        marginTop: 10,
+        fontSize: 15,
+        fontWeight: "800",
+        color: "#111",
+        textAlign: "center",
+        paddingHorizontal: 6,
+    },
+
+    interpretationSmall: {
+        marginVertical: 12,
+        fontSize: 12,
+        fontWeight: "600",
+        color: Color.gray[700],
+        textAlign: "center",
+        paddingHorizontal: 6,
     },
 });

@@ -19,6 +19,16 @@ export const difficultyFour = [
     { id: 18, userStack: [[], ["Č","Z"], ["M"]], targetStack: [["M","Č","Z"], [], []], targetMoves: 4 },
     { id: 19, userStack: [["M"], ["Č","Z"], []], targetStack: [[], ["Z","M"], ["Č"]], targetMoves: 4 },
     { id: 20, userStack: [["M"], ["Č","Z"], []], targetStack: [["Z","Č"], ["M"], []], targetMoves: 4 },
+    { id: 21, userStack: [["Č", "Z", "M"], [], []], targetStack: [[], ["Z", "M"], ["Č"]], targetMoves: 4 },
+    { id: 22, userStack: [["M", "Č", "Z"], [], []], targetStack: [["Č"], ["Z"], ["M"]], targetMoves: 4 },
+    { id: 23, userStack: [["Z", "M"], [], ["Č"]], targetStack: [["M"], ["Č", "Z"], []], targetMoves: 4 },
+    { id: 24, userStack: [["Z"], ["Č"], ["M"]], targetStack: [["M", "Č"], [], ["Z"]], targetMoves: 4 },
+    { id: 25, userStack: [["Z"], ["M"], ["Č"]], targetStack: [[], ["Č", "M"], ["Z"]], targetMoves: 4 },
+    { id: 26, userStack: [["Č", "M", "Z"], [], []], targetStack: [["M"], ["Z"], ["Č"]], targetMoves: 4 },
+    { id: 27, userStack: [["Č", "Z"], [], ["M"]], targetStack: [["M"], ["Z"], ["Č"]], targetMoves: 4 },
+    { id: 28, userStack: [["M"], ["Č", "Z"], []], targetStack: [["Z", "M"], [], ["Č"]], targetMoves: 4 },
+    { id: 29, userStack: [["M"], ["Z"], ["Č"]], targetStack: [[], ["Č", "Z"], ["M"]], targetMoves: 4 },
+    { id: 30, userStack: [["Z", "Č"], ["M"], []], targetStack: [["Č", "M"], [], ["Z"]], targetMoves: 4 },
 ];
 
 export const difficultyFive = [
@@ -42,6 +52,16 @@ export const difficultyFive = [
     { id: 18, userStack: [[], ["Č","Z"], ["M"]], targetStack: [[], ["M","Z"], ["Č"]], targetMoves: 5 },
     { id: 19, userStack: [[], ["Č","Z"], ["M"]], targetStack: [[], ["M","Č"], ["Z"]], targetMoves: 5 },
     { id: 20, userStack: [["M"], ["Č","Z"], []], targetStack: [["Č"], ["Z","M"], []], targetMoves: 5 },
+    { id: 21, userStack: [["Č", "M", "Z"], [], []], targetStack: [["M", "Č"], ["Z"], []], targetMoves: 5 },
+    { id: 22, userStack: [["Z"], ["M"], ["Č"]], targetStack: [["Č", "M", "Z"], [], []], targetMoves: 5 },
+    { id: 23, userStack: [["Z", "Č", "M"], [], []], targetStack: [["M", "Z"], ["Č"], []], targetMoves: 5 },
+    { id: 24, userStack: [["M", "Č"], ["Z"], []], targetStack: [["Č", "M", "Z"], [], []], targetMoves: 5 },
+    { id: 25, userStack: [["M"], ["Č"], ["Z"]], targetStack: [["Z", "Č"], ["M"], []], targetMoves: 5 },
+    { id: 26, userStack: [["M", "Z"], [], ["Č"]], targetStack: [["Č", "M"], [], ["Z"]], targetMoves: 5 },
+    { id: 27, userStack: [["Č", "Z", "M"], [], []], targetStack: [["M"], ["Z"], ["Č"]], targetMoves: 5 },
+    { id: 28, userStack: [["Z", "M"], ["Č"], []], targetStack: [["M", "Z"], [], ["Č"]], targetMoves: 5 },
+    { id: 29, userStack: [[], ["Z", "Č"], ["M"]], targetStack: [["M"], ["Č", "Z"], []], targetMoves: 5 },
+    { id: 30, userStack: [["M"], ["Z", "Č"], []], targetStack: [["Z"], ["Č", "M"], []], targetMoves: 5 },
 ];
 
 export const difficultySix = [
@@ -65,4 +85,14 @@ export const difficultySix = [
     { id: 18, userStack: [[], ["Č","Z"], ["M"]], targetStack: [["Č"], ["M"], ["Z"]], targetMoves: 6 },
     { id: 19, userStack: [[], ["Č","Z"], ["M"]], targetStack: [[], ["Z","Č"], ["M"]], targetMoves: 6 },
     { id: 20, userStack: [[], ["Č","Z"], ["M"]], targetStack: [["Č"], ["M","Z"], []], targetMoves: 6 },
+    { id: 21, userStack: [["M", "Z"], ["Č"], []], targetStack: [["Č", "M"], [], ["Z"]], targetMoves: 6 },
+    { id: 22, userStack: [["Č", "Z", "M"], [], []], targetStack: [["M", "Č", "Z"], [], []], targetMoves: 6 },
+    { id: 23, userStack: [["Z", "M"], [], ["Č"]], targetStack: [["M", "Č"], ["Z"], []], targetMoves: 6 },
+    { id: 24, userStack: [["Č", "M"], [], ["Z"]], targetStack: [["Z", "M", "Č"], [], []], targetMoves: 6 },
+    { id: 25, userStack: [["Č"], ["M"], ["Z"]], targetStack: [["M", "Č"], ["Z"], []], targetMoves: 6 },
+    { id: 26, userStack: [["Z", "Č"], [], ["M"]], targetStack: [["M"], ["Z"], ["Č"]], targetMoves: 6 },
+    { id: 27, userStack: [["Č", "M"], ["Z"], []], targetStack: [["M"], ["Č", "Z"], []], targetMoves: 6 },
+    { id: 28, userStack: [["Z"], ["Č"], ["M"]], targetStack: [[], ["Z", "M"], ["Č"]], targetMoves: 6 },
+    { id: 29, userStack: [["M", "Z"], ["Č"], []], targetStack: [["Z"], ["M", "Č"], []], targetMoves: 6 },
+    { id: 30, userStack: [["M", "Z"], [], ["Č"]], targetStack: [["Z", "M", "Č"], [], []], targetMoves: 6 },
 ];

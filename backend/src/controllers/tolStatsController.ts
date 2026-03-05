@@ -223,7 +223,7 @@ export class TolStatsController {
                     continue;
                 }
 
-                                const currentScore = Number(current.bestScore);
+                const currentScore = Number(current.bestScore);
 
                 if (score > currentScore) {
                     bestByDay.set(dayKey, { bestScore: score, bestStat: s });
@@ -336,15 +336,15 @@ export class TolStatsController {
             const declining = avgDeltaPct <= -7 && worse3Percent >= 7;
 
             let trend: "improving" | "declining" | "stable" = "stable";
-            let message =
-                "Flexibility and responding to feedback abilities are stable.";
+            let message = "Planning and decision-making performance is stable.";
 
             if (improving) {
                 trend = "improving";
-                message = "Flexibility and responding to feedback are improving.";
+                message = "Planning and decision-making performance is improving.";
             } else if (declining) {
                 trend = "declining";
-                message = "Flexibility and responding to feedback abilities show a sustained decline. If this continues, consider consulting a healthcare professional.";
+                message =
+                    "Planning and decision-making performance shows a sustained decline. If this continues, consider consulting a healthcare professional.";
             }
 
             return res.json({

@@ -1,4 +1,4 @@
-import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
+import { StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
@@ -6,6 +6,8 @@ import { BarChart } from "react-native-gifted-charts";
 import { Icon } from "../../components/ui/Icon";
 import { useRouter } from "expo-router";
 import { getToken, removeToken } from "../(auth)/tokenStorage";
+import { styles } from "../../assets/styles/statsDetail.styles";
+import { getMonthName } from "@/components/statsDetail/statsDetailComponents";
 
 const { width, height } = Dimensions.get("window");
 
@@ -57,38 +59,6 @@ type MonthlyResponse = {
     days: MonthlyDay[];
 };
 
-const getMonthName = (month: number) => {
-    const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-    return months[month];
-};
-
-interface TimeSeriesData {
-    value: number;
-    label: string;
-}
-
-const generateMonthlyData = (year: number, month: number): TimeSeriesData[] => {
-    // month je 1-12
-    const daysInMonth = new Date(year, month, 0).getDate();
-    return Array.from({ length: daysInMonth }, (_, index) => ({
-        value: Math.floor(Math.random() * 50) + 30,
-        label: `${index + 1}`,
-    }));
-};
-
 export default function WCSTStatsDetail() {
     const router = useRouter();
 
@@ -127,11 +97,6 @@ export default function WCSTStatsDetail() {
         setCurrentYear(newYear);
         setSelectedBarIndex(null);
     };
-
-    const monthlyData = useMemo(
-        () => generateMonthlyData(currentYear, currentMonth + 1),
-        [currentYear, currentMonth]
-    );
 
     useEffect(() => {
         let cancelled = false;
@@ -302,16 +267,16 @@ CATEGORY LOGIC
     const trials = Number(best?.trials_administered ?? 0);
 
     const categoryIndex =
-    selectedDay?.categoryIndex ??
-    (best ? getCategoryIndex(categoriesCompleted, trials) : 0);
+        selectedDay?.categoryIndex ??
+        (best ? getCategoryIndex(categoriesCompleted, trials) : 0);
 
     return (
-        <View style={localStyles.screen}>
+        <View style={styles.screen}>
             <View style={{ flex: 1, justifyContent: "center" }}>
-                <View style={localStyles.header}>
+                <View style={styles.header}>
                     <View>
-                        <Text style={localStyles.title}>WCST Statistics</Text>
-                        <Text style={localStyles.subtitle}>
+                        <Text style={styles.title}>WCST Statistics</Text>
+                        <Text style={styles.subtitle}>
                             Track your monthly performance
                         </Text>
                     </View>
@@ -319,15 +284,15 @@ CATEGORY LOGIC
                     {/* Tento pressable pozriet ci je dobra adresa */}
                     <Pressable
                         onPress={() => router.back()}
-                        style={localStyles.backBtn}
+                        style={styles.backBtn}
                         hitSlop={16}
                     >
                         <Icon symbol={"chevron.backward"} size="sm" color={Color.gray[700]} />
                     </Pressable>
                 </View>
 
-                <View style={localStyles.cardBar}>
-                    <Text style={localStyles.graphTitle}>Total score</Text>
+                <View style={styles.cardBar}>
+                    <Text style={styles.graphTitle}>Total score</Text>
 
                     {/* Month Navigation */}
                     <View
@@ -418,22 +383,22 @@ CATEGORY LOGIC
                 </View>
             </View>
 
-            {/* <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}> */}
+            {/* <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.statsScroll}> */}
             <ScrollView 
-                style={localStyles.scroll}
-                contentContainerStyle={localStyles.scrollContent}
+                style={styles.scroll}
+                contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
                 {/* INTERPRETATION BAR */}
-                <View style={localStyles.card}>
-                    {/* <Text style={localStyles.cardTitle}>Interpretation</Text> */}
-                {/* <View style={localStyles.scaleContainer}> */}
-                    <View style={localStyles.scaleBar}>
+                <View style={styles.card}>
+                    {/* <Text style={styles.cardTitle}>Interpretation</Text> */}
+                {/* <View style={styles.scaleContainer}> */}
+                    <View style={styles.scaleBar}>
                         {labels.map((label, index) => (
                             <View
                                 key={index}
                                 style={[
-                                    localStyles.segment,
+                                    styles.segment,
                                     {
                                         backgroundColor: index === categoryIndex
                                             ? segmentColors[index] // iba aktuálna kategória svieti
@@ -444,7 +409,7 @@ CATEGORY LOGIC
                                 ]}
                             >
                                 <Text style={[
-                                    localStyles.segmentText,
+                                    styles.segmentText,
                                     { color: categoryIndex === 2 && index === 2 ? "#333" : "white" }
                                     // { color: index === 2 ? "black" : "white" } // žltý segment čitateľný
                                 ]}>
@@ -458,33 +423,33 @@ CATEGORY LOGIC
 
 
                       {/* ✅ Highlight hneď po scaleBare */}
-                    <View style={localStyles.resultContainer}>
+                    <View style={styles.resultContainer}>
                         {/* ✅ Interpretation = len malé dovysvetlenie */}
-                        <Text style={localStyles.interpretationSmall}>
+                        <Text style={styles.interpretationSmall}>
                             {getCategoryInterpretation(categoryIndex)}
                         </Text>
 
-                        <View style={localStyles.highlightRow}>
-                            <View style={localStyles.highlightBox}>
-                                <Text style={localStyles.highlightValue}>
+                        <View style={styles.highlightRow}>
+                            <View style={styles.highlightBox}>
+                                <Text style={styles.highlightValue}>
                                 {hasBest ? categoriesCompleted : "—"}
                                 </Text>
-                                <Text style={localStyles.highlightLabel}>Categories</Text>
+                                <Text style={styles.highlightLabel}>Categories</Text>
                             </View>
 
-                            <View style={localStyles.highlightDivider} />
+                            <View style={styles.highlightDivider} />
 
-                            <View style={localStyles.highlightBox}>
-                                <Text style={localStyles.highlightValue}>
+                            <View style={styles.highlightBox}>
+                                <Text style={styles.highlightValue}>
                                 {hasBest ? trials : "—"}
                                 </Text>
-                                <Text style={localStyles.highlightLabel}>Cards used</Text>
+                                <Text style={styles.highlightLabel}>Cards used</Text>
                             </View>
                         </View>
 
                         {/* ✅ TREND = najdôležitejší text */}
                         {trendMessage ? (
-                            <Text style={localStyles.trendPrimary}>
+                            <Text style={styles.trendPrimary}>
                                 {trendMessage}
                             </Text>
                         ) : null}
@@ -493,8 +458,8 @@ CATEGORY LOGIC
 
                 </View>
                 
-                <View style={localStyles.card}>
-                    <Text style={localStyles.cardTitle}>Detailed stats</Text>
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>Detailed stats</Text>
 
                     <StatMiniSupplementary 
                         label={"Percentage of perseverative responses"} 
@@ -555,219 +520,3 @@ CATEGORY LOGIC
         </View>
     );
 }
-
-const localStyles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        backgroundColor: Color.orange[100],
-        paddingTop: Math.max(12, height * 0.02),
-    },
-
-    header: {
-        paddingHorizontal: 16,
-        // paddingTop: 16,
-        // paddingBottom: 10,
-        paddingBottom: 24,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    title: {
-        fontSize: 22,
-        fontWeight: "800",
-        color: Color.gray[900],
-    },
-    subtitle: {
-        margin: 2,
-        fontSize: 13,
-        fontWeight: "500",
-        color: Color.gray[600],
-    },
-    backBtn: {
-        padding: 8,
-        borderRadius: 12,
-        backgroundColor: "#B3B3B3"
-    },
-
-    card: {
-        marginHorizontal: 16,
-        marginBottom: 12,
-        padding: 14,
-        borderRadius: 18,
-        backgroundColor: "#FFFCF9",
-        borderWidth: 1,
-        borderColor: "#F0DFC8",
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: "800",
-        color: Color.gray[900],
-    },
-    cardBar: {
-        // marginHorizontal: 16,
-        padding: 14,
-        backgroundColor: "#FFFCF9",
-        borderWidth: 1,
-        borderColor: "#F0DFC8",
-    },
-    
-    container: {
-        flex: 1,
-        paddingTop: height * 0.026,
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#d6c7b9",
-    },
-
-    scroll: { 
-        flex: 1,
-    },
-    scrollContent: {
-        paddingBottom: 12,
-    },
-
-    statsScroll: {
-        width: "100%",
-        alignItems: "center"
-    },
-    graphTitle: {
-        fontSize: 16,
-        fontWeight: "600",
-        marginLeft: width * 0.1,
-        // marginBottom: 8,
-        color: "black",
-        textAlign: "left",
-    },
-    tooltip: {
-        backgroundColor: "white",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 8,
-        elevation: 4,
-        alignItems: "center",
-        minWidth: 140,
-        maxWidth: 180,
-    },
-    tooltipTitle: {
-        fontSize: 12,
-        fontWeight: "600",
-        color: "black",
-    },
-    tooltipSubtitle: {
-        fontSize: 11,
-        color: "gray",
-        marginTop: 2,
-    },
-    scaleContainer: {
-        width: width * 0.9,
-        flex: 2,
-        justifyContent: "center",
-    },
-    scaleBar: {
-        flexDirection: "row",
-        height: 60,
-        borderRadius: 16,
-        overflow: "hidden"
-    },
-    segment: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 4,
-    },
-    segmentText: {
-        color: "white",
-        fontSize: 10,
-        fontWeight: "bold",
-        textAlign: "center",
-        lineHeight: 12,
-    },
-    red: {
-        backgroundColor: "#e53935"
-    },
-    orange: {
-        backgroundColor: "#fb8c00"
-    },
-    yellow: {
-        backgroundColor: "#fdd835"
-    },
-    lightGreen: {
-        backgroundColor: "#7cb342"
-    },
-    darkGreen: {
-        backgroundColor: "#2e7d32"
-    },
-    highlightRow: {
-        // marginTop: 12,
-        flexDirection: "row",
-        alignItems: "center",
-        borderRadius: 14,
-        backgroundColor: "#F5F5F5",
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-    },
-    highlightBox: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 2,
-    },
-    highlightValue: {
-        fontSize: 22,
-        fontWeight: "900",
-        color: Color.gray[900],
-    },
-    highlightLabel: {
-        fontSize: 12,
-        fontWeight: "700",
-        color: Color.gray[600],
-    },
-    highlightDivider: {
-        width: 1,
-        height: 36,
-        backgroundColor: "#E6E6E6",
-    },
-    resultContainer: {
-        alignItems: "center",
-        // marginTop: 16,
-    },
-    resultText: {
-        fontSize: 24,
-    },
-    resultInterpretation: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginTop: 16,
-        textAlign: "center",
-    },
-    trendText: {
-        marginTop: 12,
-        paddingHorizontal: 12,
-        color: "black",
-        fontWeight: "600",
-        textAlign: "center",
-    },
-
-    // resultContainer: {
-    //     alignItems: "center",
-    //     marginTop: 10, // menšie, aby to bolo bližšie k scaleBar
-    // },
-
-    trendPrimary: {
-        marginTop: 10,
-        fontSize: 15,
-        fontWeight: "800",
-        color: "#111",
-        textAlign: "center",
-        paddingHorizontal: 6,
-    },
-
-    interpretationSmall: {
-        marginVertical: 12,
-        fontSize: 12,
-        fontWeight: "600",
-        color: Color.gray[700],
-        textAlign: "center",
-        paddingHorizontal: 6,
-    },
-});

@@ -1,7 +1,9 @@
 import { useRouter } from "expo-router";
-import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { styles } from "../../assets/styles/mainScreens.styles";
+import { COLORS } from "@/constants/Colors";
+import { Color } from "@/constants/TWPalette";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,7 +23,6 @@ export default function ProfileScreen() {
     
     return (
         <View style={styles.container}>
-
             <View style={styles.bgTop}>
                 <Text style={styles.header}> Profile </Text>
 
@@ -42,11 +43,21 @@ export default function ProfileScreen() {
                 {/* <CogIcon></CogIcon> */}
 
                 <View style={styles.imageContainer}>
-                    <Image
+                    {/* <Image
                         source={require('../../assets/images/profile_picture_placeholder.png')}
                         style={styles.profileImage}
-                    />
+                    /> */}
                     {/* <Text style={styles.userID}> @userID </Text> */}
+
+                                        {/* Avatar Placeholder */}
+                    <View style={localStyles.avatarPlaceholder}>
+                        <MaterialCommunityIcons
+                            name="account-outline"
+                            size={70}
+                            // color="#FF6905"
+                            color={COLORS.primary}
+                        />
+                    </View>
                     <Text style={styles.username}> Jozko Mrkvicka </Text>
                 </View>
 
@@ -57,13 +68,15 @@ export default function ProfileScreen() {
                     >
                         <MaterialCommunityIcons 
                             name="square-edit-outline" 
-                            color="#FF6905" 
+                            // color="#FF6905" 
+                            color={COLORS.primary}
                             size={24} 
                         />
                         <Text style={styles.buttonText}>Edit Profile</Text>
                         <MaterialCommunityIcons 
                             name="chevron-right" 
-                            color="#FF6905" 
+                            // color="#FF6905" 
+                            color={COLORS.primary}
                             size={24} 
                         />
                     </TouchableOpacity>
@@ -74,13 +87,15 @@ export default function ProfileScreen() {
                     >
                         <MaterialCommunityIcons 
                             name="square-edit-outline" 
-                            color="#FF6905" 
+                            // color="#FF6905" 
+                            color={COLORS.primary}
                             size={24} 
                         />
                         <Text style={styles.buttonText}>Edit Password</Text>
                         <MaterialCommunityIcons 
                             name="chevron-right" 
-                            color="#FF6905" 
+                            // color="#FF6905" 
+                            color={COLORS.primary}
                             size={24} 
                         />
                     </TouchableOpacity>
@@ -120,3 +135,21 @@ export default function ProfileScreen() {
     )
 }
 
+
+const localStyles = StyleSheet.create({
+    avatarPlaceholder: {
+        width: 140,
+        height: 140,
+        borderRadius: 70,
+        // backgroundColor: "#FFF3EC",
+        // backgroundColor: Color.orange[50],
+        backgroundColor: COLORS.primary_broskynova,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        // borderColor: "#FFD2B8",
+        borderColor: COLORS.primary_broskynova,
+        alignSelf: "center",
+        marginBottom: 10,
+    },
+})

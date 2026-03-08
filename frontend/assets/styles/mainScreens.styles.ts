@@ -6,7 +6,8 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     bgTop: {
-        flex: 1,
+        // flex: 1,
+        height: 140,
         backgroundColor: "#8B593E",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -58,7 +59,7 @@ export const styles = StyleSheet.create({
     imageContainer: {
         alignItems: "center", // horizontálne centrovanie
         justifyContent: "center", // vertikálne (ak má výšku)
-        marginTop: height * 0.05,
+        marginTop: height * 0.08,
     },
     imageText: {
         marginTop: height * 0.01,
@@ -73,7 +74,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: width * 0.05,
     },
     buttonContainer: {
-        paddingVertical: height * 0.05,
+        paddingVertical: height * 0.1,
         paddingHorizontal: width * 0.07,
         gap: height * 0.03,
     },

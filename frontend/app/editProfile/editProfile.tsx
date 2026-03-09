@@ -118,11 +118,6 @@ export default function EditProfileScreen() {
 
             const token = await getToken();
 
-            await axios.put(`${API_URL}/users/${userId}`, {
-                username: trimmedUsername,
-                currentPassword,
-            });
-
             await axios.put(
                 `${API_URL}/users/${userId}`,
                 {

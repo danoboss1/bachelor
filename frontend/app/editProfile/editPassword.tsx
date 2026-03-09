@@ -4,10 +4,25 @@ import { Image, Text, View, TouchableOpacity, StyleSheet, TextInput, Alert } fro
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "@/constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { getToken } from "../(auth)/tokenStorage";
+import { useEffect } from "react";
+
+const API_URL = "https://bachelor-pi.vercel.app";
+
+type TokenPayload = {
+    id: number;
+    username: string;
+    exp: number;
+};
 
 export default function editPasswordScreen() {
     const router = useRouter();
 
+    const [userId, setUserId] = useState<number | null>(null);
+
+    const [username, setUsername] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -15,11 +30,61 @@ export default function editPasswordScreen() {
     const [currentPasswordError, setCurrentPasswordError] = useState("");
     const [newPasswordError, setNewPasswordError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [generalError, setGeneralError] = useState("");
 
-    function handleSave() {
+    const [loading, setLoading] = useState(false);
+    const [loadingUser, setLoadingUser] = useState(true);
+
+    useEffect(() => {
+        async function loadUserFromToken() {
+            try {
+                const token = await getToken();
+
+                if (!token) {
+                    setGeneralError("User is not logget in");
+                    setLoadingUser(false);
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const decoded = jwtDecode<TokenPayload>(token);
+                setUserId(decoded.id);
+            } catch (error) {
+                console.log("Token decode error:", error);
+                setGeneralError("Failed to load user session");
+                setLoadingUser(false);
+            }
+        }
+
+        loadUserFromToken();
+    }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+
+        async function fetchUser() {
+            try {
+                setLoadingUser(true);
+                setGeneralError("");
+
+                const res = await axios.get(`${API_URL}/users/${userId}`);
+                setUsername(res.data.username ?? "");
+            } catch (error) {
+                console.log("Fetch user error:", error);
+                setGeneralError("Failed to load user data");
+            } finally {
+                setLoadingUser(false);
+            }
+        }
+
+        fetchUser();
+    }, [userId])
+
+    async function handleSave() {
         setCurrentPasswordError("");
         setNewPasswordError("");
         setConfirmPasswordError("");
+        setGeneralError("");
 
         let hasError = false;
 
@@ -58,8 +123,62 @@ export default function editPasswordScreen() {
 
         if (hasError) return;
 
-        // sem si potom doplníš API call
-        Alert.alert("Success", "Password was changed");
+        if (!userId) {
+            setGeneralError("User is not loaded");
+            return;
+        }
+
+        try { 
+            setLoading(true);
+
+            const token = await getToken();
+
+            if (!token) {
+                setGeneralError("User is not logged in");
+                router.replace("/(auth)/login");
+                return;
+            }
+
+            await axios.put(
+                `${API_URL}/users/${userId}/password`,
+                {
+                    currentPassword,
+                    newPassword,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmNewPassword("");
+
+            Alert.alert("Success", "Password was changed");
+            router.back();
+        } catch (err: any) {
+            if (err.response?.data?.errors) {
+                const errors = err.response.data.errors;
+
+                if (errors.currentPassword) {
+                    setCurrentPasswordError(errors.currentPassword);
+                }
+
+                if (errors.newPassword) {
+                    setNewPasswordError(errors.newPassword);
+                }
+            } else if (err.response?.data?.error) {
+                setGeneralError(err.response.data.error);
+            } else if (err.request) {
+                setGeneralError("Cannot connect to server");
+            } else {
+                setGeneralError("Failed to change password");
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     function handleCancel() {
@@ -101,7 +220,7 @@ export default function editPasswordScreen() {
                             color={COLORS.primary}
                         />
                     </View>
-                    <Text style={styles.username}> Jozko Mrkvicka </Text>
+                    <Text style={styles.username}>{username.trim() || "Username"}</Text>
                 </View>
 
                 <View style={localStyles.formContainer}>

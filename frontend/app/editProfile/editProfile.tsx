@@ -116,10 +116,25 @@ export default function EditProfileScreen() {
         try {
             setLoading(true);
 
+            const token = await getToken();
+
             await axios.put(`${API_URL}/users/${userId}`, {
                 username: trimmedUsername,
                 currentPassword,
             });
+
+            await axios.put(
+                `${API_URL}/users/${userId}`,
+                {
+                    username: trimmedUsername,
+                    currentPassword,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             setCurrentPassword("");
             Alert.alert("Success", "Profile changes were saved");

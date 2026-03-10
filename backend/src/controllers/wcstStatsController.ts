@@ -519,4 +519,95 @@ export class StatsController {
             return res.status(500).json({ error: "Server error" });
         }
     };
+
+    static getRecentAverageSummary = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+
+            if(!userId) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
+            const allDays = await getBestPerDay(userId);
+
+            if (!allDays.length) {
+                return res.json({
+                    userId,
+                    hasEnoughData: false,
+                    windowStart: null,
+                    windowEnd: null,
+                    daysWithResult: 0,
+                    averageCategoriesCompleted: null,
+                    averageTrialsAdministered: null,
+                });
+            }
+
+            const lastDay = allDays.at(-1);
+
+            if (!lastDay) {
+                return res.json({
+                    userId,
+                    hasEnoughData: false,
+                    windowStart: null,
+                    windowEnd: null,
+                    daysWithResult: 0,
+                    averageCategoriesCompleted: null,
+                    averageTrialsAdministered: null,
+                });
+            }
+
+            const windowEnd = new Date(lastDay.date);
+            windowEnd.setHours(0, 0, 0, 0);
+
+            const windowStart = new Date(windowEnd);
+            windowStart.setDate(windowEnd.getDate() - 9);
+
+            const recentDays = allDays.filter((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                return date >= windowStart && date <= windowEnd;
+            });
+
+            if (!recentDays.length) {
+                return res.json({
+                    userId,
+                    hasEnoughData: false,
+                    windowStart: toDateKey(windowStart),
+                    windowEnd: toDateKey(windowEnd),
+                    daysWithResults: 0,
+                    averageCategoriesCompleted: null,
+                    averageTrialsAdministered: null,
+                });
+            }
+
+            const averageCategoriesCompleted = Math.round(
+                mean(
+                    recentDays.map((d) =>
+                        Number(d.bestStat?.categories_completed ?? 0)
+                    )
+                )
+            );
+
+            const averageTrialsAdministered = Math.round(
+                mean(
+                    recentDays.map((d) => 
+                        Number(d.bestStat?.categories_completed ?? 0)
+                    )
+                )
+            );
+
+            return res.json({
+                userId,
+                hasEnoughData: true,
+                windowStart: toDateKey(windowStart),
+                windowEnd: toDateKey(windowEnd),
+                daysWithResults: recentDays.length,
+                averageCategoriesCompleted,
+                averageTrialsAdministered,
+            });
+        } catch (error) {
+            console.error("Error computing WCST recent average summary:", error);
+            return res.status(500).json({ error: "Server error"});
+        }
+    };
 }

@@ -10,6 +10,7 @@ const router = express.Router();
 // });
 
 router.get("/trend", authMiddleware, StatsController.getTrendMessage);
+router.get("/recentAverage", authMiddleware, StatsController.getRecentAverageSummary);
 
 router.get('/percentile', StatsController.getPercentile);
 router.get('/month', authMiddleware, StatsController.getMonthlyBestPerDay);

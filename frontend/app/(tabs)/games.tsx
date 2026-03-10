@@ -1,7 +1,20 @@
+import { useRouter } from "expo-router";
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { styles } from "../../assets/styles/mainScreens.styles";
 // import { Card, Red_Triangle_Card, Gr } from "@/components/Card";
 import { GameCard } from "@/components/GameComponent";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getToken } from "../(auth)/tokenStorage";
+import axios from "axios";
+
+const API_URL = "https://bachelor-pi.vercel.app";
+
+type TokenPayload = {
+    id: number;
+    username: string;
+    exp: number;
+};
 
 const gamesData = [
     {
@@ -34,6 +47,61 @@ const gamesData = [
 
 
 export default function GamesScreen() {
+    const router = useRouter();
+
+    const [userId, setUserId] = useState<number | null>(null);
+
+    const [username, setUsername] = useState("");
+
+    const [generalError, setGeneralError] = useState("");
+
+    const [loadingUser, setLoadingUser] = useState(true);
+
+    useEffect(() => {
+        async function loadUserFromToken() {
+            try {
+                const token = await getToken();
+
+                if (!token) {
+                    setGeneralError("User is not logged in");
+                    setLoadingUser(false);
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const decoded = jwtDecode<TokenPayload>(token);
+                setUserId(decoded.id);
+            } catch (error) {
+                console.log("Token decode error:", error);
+                setGeneralError("Failed to load user session");
+                setLoadingUser(false);
+            }
+        }
+
+        loadUserFromToken();
+    }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+
+        async function fetchUser() {
+            try {
+                setLoadingUser(true);
+                setGeneralError("");
+
+                const res = await axios.get(`${API_URL}/users/${userId}`);
+                setUsername(res.data.username ?? "");
+            } catch (error) {
+                console.log("Fetch user error:", error);
+                setGeneralError("Failed to load user data");
+            } finally {
+                setLoadingUser(false);
+            }
+        }
+
+        fetchUser();
+    }, [userId]);
+
     return (
         <View style={styles.container}>
             {/* vrchna cast pred upravou */}
@@ -43,7 +111,7 @@ export default function GamesScreen() {
                 alignItems: "center",
             }]}>
                 <View>
-                    <Text style={styles.header}> Hi, John </Text>
+                    <Text style={styles.header}>Hi, {username.trim() || "Username"}</Text>
                     <Text style={styles.subheader}> Let's start practising </Text>
                 </View>
 

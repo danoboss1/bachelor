@@ -1,17 +1,81 @@
 import { useRouter } from "expo-router";
-import { Dimensions, Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Image, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "@/constants/Colors";
 import { Color } from "@/constants/TWPalette";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getToken } from "../(auth)/tokenStorage";
+import axios from "axios";
 
-const { width, height } = Dimensions.get("window");
+const API_URL = "https://bachelor-pi.vercel.app";
+
+type TokenPayload = {
+    id: number;
+    username: string;
+    exp: number;
+};
 
 const EDIT_PROFILE_ROUTE = "/editProfile/editProfile";
 const EDIT_PASSWORD_ROUTE = "/editProfile/editPassword";
 
 export default function ProfileScreen() {
     const router = useRouter();
+
+    const [userId, setUserId] = useState<number | null>(null);
+
+    const [username, setUsername] = useState("");
+
+    const [usernameError, setUsernameError] = useState("");
+    const [generalError, setGeneralError] = useState("");
+
+    const [loadingUser, setLoadingUser] = useState(true);
+
+    useEffect(() => {
+        async function loadUserFromToken() {
+            try {
+                const token = await getToken();
+
+                if (!token) {
+                    setGeneralError("User is not logged in");
+                    setLoadingUser(false);
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const decoded = jwtDecode<TokenPayload>(token);
+                setUserId(decoded.id);
+            } catch (error) {
+                console.log("Token decode error:", error);
+                setGeneralError("Failed to load user session");
+                setLoadingUser(false);
+            }
+        }
+
+        loadUserFromToken();
+    }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+
+        async function fetchUser() {
+            try {
+                setLoadingUser(true);
+                setGeneralError("");
+
+                const res = await axios.get(`${API_URL}/users/${userId}`);
+                setUsername(res.data.username ?? "");
+            } catch (error) {
+                console.log("Fetch user error:", error);
+                setGeneralError("Failed to load user data");
+            } finally {
+                setLoadingUser(false);
+            }
+        }
+
+        fetchUser();
+    }, [userId]);
 
     async function handleLogout() {
         try {
@@ -58,7 +122,7 @@ export default function ProfileScreen() {
                             color={COLORS.primary}
                         />
                     </View>
-                    <Text style={styles.username}> Jozko Mrkvicka </Text>
+                    <Text style={styles.username}>{username.trim() || "Username"}</Text>
                 </View>
 
                 <View style={styles.buttonContainer}>

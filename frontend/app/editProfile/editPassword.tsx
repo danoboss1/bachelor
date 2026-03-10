@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, Text, View, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
+import { ActivityIndicator, Image, Text, View, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "@/constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -185,6 +185,14 @@ export default function editPasswordScreen() {
         router.back();
     }
 
+    if (loadingUser) {
+        return (
+            <View style={[styles.container, localStyles.loadingContainer]}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.bgTop}>
@@ -304,6 +312,10 @@ export default function editPasswordScreen() {
 
 
 const localStyles = StyleSheet.create({
+    loadingContainer: {
+        justifyContent: "center",
+        alignItems: "center",
+    },
     avatarPlaceholder: {
         width: 140,
         height: 140,

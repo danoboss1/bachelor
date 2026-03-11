@@ -181,7 +181,8 @@ export class TolStatsController {
 
     static getMonthlyBestPerDay = async (req: Request, res: Response) => {
         try {
-            const userId = req.user?.id;
+            // const userId = req.user?.id;
+            const userId = 30;
 
             if (!userId) {
                 return res.status(401).json({ error: "Unauthorized" });

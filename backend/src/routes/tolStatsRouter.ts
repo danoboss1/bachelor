@@ -5,8 +5,10 @@ import authMiddleware from '../controllers/authMiddleware.js';
 const router = express.Router();
 
 router.get("/trend", authMiddleware, TolStatsController.getTrendMessage);
+router.get("/recentAverage", authMiddleware, TolStatsController.getRecentAverageSummary);
 
-router.get('/month', authMiddleware, TolStatsController.getMonthlyBestPerDay);
+// tu pridat authMiddleware
+router.get('/month', TolStatsController.getMonthlyBestPerDay);
 
 router.get('/:statId', TolStatsController.getStat);
 router.post('/', TolStatsController.saveStat);

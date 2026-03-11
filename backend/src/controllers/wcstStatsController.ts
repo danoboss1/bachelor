@@ -524,7 +524,7 @@ export class StatsController {
         try {
             const userId = req.user?.id;
 
-            if(!userId) {
+            if (!userId) {
                 return res.status(401).json({ error: "Unauthorized" });
             }
 
@@ -607,7 +607,7 @@ export class StatsController {
             });
         } catch (error) {
             console.error("Error computing WCST recent average summary:", error);
-            return res.status(500).json({ error: "Server error"});
+            return res.status(500).json({ error: "Server error" });
         }
     };
 }

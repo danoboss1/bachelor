@@ -1,4 +1,4 @@
-import { StatsComponent } from '@/components/StatsComponent';
+import { StatsComponent, StatCard } from '@/components/StatsComponent';
 import { useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
 import { getToken, removeToken } from "../(auth)/tokenStorage";
@@ -194,6 +194,51 @@ export default function StatsScreen() {
 
             <View style={styles.bgBottom}>
                 <ScrollView showsVerticalScrollIndicator={false}>
+                    <StatCard
+                        title={"Wisconsin Card Sorting Test\nRecent Average"}
+                        path={WCST_STATS_DETAIL_ROUTE}
+                        loadingRecent={loadingRecent}
+                        windowStart={data?.windowStart ?? null}
+                        windowEnd={data?.windowEnd ?? null}
+                        categoryIndex={categoryIndex}
+                        interpretation={interpretation}
+                        hasData={hasBest}
+                        primaryValue={averageCategoriesCompleted}
+                        primaryLabel="Categories"
+                        secondaryValue={averageTrialsAdministered}
+                        secondaryLabel="Cards used"
+                    />
+
+                    <StatCard
+                        title={"Tower of London\nRecent Average"}
+                        path={WCST_STATS_DETAIL_ROUTE}
+                        loadingRecent={loadingRecent}
+                        windowStart={data?.windowStart ?? null}
+                        windowEnd={data?.windowEnd ?? null}
+                        categoryIndex={categoryIndex}
+                        interpretation={interpretation}
+                        hasData={hasBest}
+                        primaryValue={averageCategoriesCompleted}
+                        primaryLabel="Categories"
+                        // secondaryValue={averageTrialsAdministered}
+                        // secondaryLabel="Cards used"
+                    />
+
+                    <StatCard
+                        title={"Knox's Cube Test\nRecent Average"}
+                        path={WCST_STATS_DETAIL_ROUTE}
+                        loadingRecent={loadingRecent}
+                        windowStart={data?.windowStart ?? null}
+                        windowEnd={data?.windowEnd ?? null}
+                        categoryIndex={categoryIndex}
+                        interpretation={interpretation}
+                        hasData={hasBest}
+                        primaryValue={averageCategoriesCompleted}
+                        primaryLabel="Categories"
+                        // secondaryValue={averageTrialsAdministered}
+                        // secondaryLabel="Cards used"
+                    />
+
                     <View style={localStyles.card}>
                         <ImageBackground
                             source={require("../../assets/images/backgroundBroskyna.png")}
@@ -303,7 +348,106 @@ export default function StatsScreen() {
                         </ImageBackground>
                     </View>
 
-                    
+                    <View style={localStyles.card}>
+                        <ImageBackground
+                            source={require("../../assets/images/backgroundBroskyna.png")}
+                            style={localStyles.cardBackground}
+                            imageStyle={localStyles.cardImage}
+                        >
+                            <View style={localStyles.cardOverlay}>
+
+                                <View style={localStyles.titleRow}>
+                                    <Text style={localStyles.dateText}>
+                                        tu bude naformatovany datum
+                                    </Text>
+
+                                    <Text style={localStyles.cardTitle}>
+                                        Tower of London{"\n"}Recent Average
+                                    </Text>
+                                </View>
+
+                                {loadingRecent ? (
+                                    <View style={localStyles.loadingContainer}>
+                                        <ActivityIndicator size="small" color={COLORS.primary} />
+                                    </View>
+                                ) : (
+                                    <>
+                                        <View style={localStyles.scaleBar}>
+                                            {labels.map((label, index) => (
+                                                <View
+                                                    key={index}
+                                                    style={[
+                                                        localStyles.segment,
+                                                        {
+                                                            backgroundColor:
+                                                                index === categoryIndex
+                                                                    ? segmentColors[index]
+                                                                    : inactiveColor,
+                                                            borderRightWidth:
+                                                                index < labels.length - 1 ? 1 : 0,
+                                                            borderRightColor: "#999",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Text
+                                                        style={[
+                                                            localStyles.segmentText,
+                                                            {
+                                                                color:
+                                                                    categoryIndex === 2 && index === 2
+                                                                        ? "#333"
+                                                                        : "white",
+                                                            },
+                                                        ]}
+                                                    >
+                                                        {label}
+                                                    </Text>
+                                                </View>
+                                            ))}
+                                        </View>
+
+                                        <View style={localStyles.resultContainer}>
+                                            <Text style={localStyles.interpretationSmall}>
+                                                {interpretation}
+                                            </Text>
+
+                                            <View style={localStyles.highlightRow}>
+                                                <View style={localStyles.highlightBox}>
+                                                    <Text style={localStyles.highlightValue}>
+                                                        {hasBest ? averageCategoriesCompleted : "—"}
+                                                    </Text>
+                                                    <Text style={localStyles.highlightLabel}>
+                                                        Categories
+                                                    </Text>
+                                                </View>
+
+                                                <View style={localStyles.highlightDivider} />
+
+                                                <View style={localStyles.highlightBox}>
+                                                    <Text style={localStyles.highlightValue}>
+                                                        {hasBest ? averageTrialsAdministered : "—"}
+                                                    </Text>
+                                                    <Text style={localStyles.highlightLabel}>
+                                                        Cards used
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </>
+                                )}
+
+                                <TouchableOpacity
+                                    style={localStyles.moreLink}
+                                    onPress={() => router.push(WCST_STATS_DETAIL_ROUTE)}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={localStyles.moreLinkText}>View details</Text>
+                                    <Text style={localStyles.moreLinkArrow}>→</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </ImageBackground>
+                    </View>
 
                     <StatsComponent
                         title={"Tower of London\nBest Attempt"}
@@ -351,7 +495,6 @@ const localStyles = StyleSheet.create({
     },
     cardOverlay: {
         padding: 16,
-        backgroundColor: "rgba(255,255,255,0.18)",
     },
     titleRow: {
         marginBottom: 14,

@@ -591,7 +591,7 @@ export class StatsController {
             const averageTrialsAdministered = Math.round(
                 mean(
                     recentDays.map((d) => 
-                        Number(d.bestStat?.categories_completed ?? 0)
+                        Number(d.bestStat?.averageTrialsAdministered ?? 0)
                     )
                 )
             );

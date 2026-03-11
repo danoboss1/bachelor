@@ -438,7 +438,7 @@ export class TolStatsController {
                 averageTotalScore,
             });
         } catch (error) {
-            console.error("Error computing WCST recent average summary:", error);
+            console.error("Error computing ToL recent average summary:", error);
             return res.status(500).json({ error: "Server error" });
         }
     };

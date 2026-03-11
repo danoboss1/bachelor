@@ -204,7 +204,7 @@ export function StatCard({
                                             {/* {hasData ? primaryValue ?? "—" : "—"} */}
                                         </Text>
                                         <Text style={stylesStatCard.highlightLabel}>
-                                            Categories
+                                            {primaryLabel}
                                         </Text>
                                     </View>
                                     {hasSecondary ? (
@@ -216,7 +216,7 @@ export function StatCard({
                                                     {hasData ? secondaryValue : "—"}
                                                 </Text>
                                                 <Text style={stylesStatCard.highlightLabel}>
-                                                    Cards used
+                                                    {secondaryLabel}
                                                 </Text>
                                             </View>
                                         </>

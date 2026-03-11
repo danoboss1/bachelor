@@ -5,6 +5,7 @@ import authMiddleware from '../controllers/authMiddleware.js';
 const router = express.Router();
 
 router.get("/trend", authMiddleware, KnoxStatsController.getTrendMessage);
+router.get("/recentAverage", authMiddleware, KnoxStatsController.getRecentAverageSummary);
 
 router.get("/month", authMiddleware, KnoxStatsController.getMonthlyBestPerDay);
 

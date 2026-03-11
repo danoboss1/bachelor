@@ -35,6 +35,15 @@ type WcstRecentSummaryResponse = {
     averageTrialsAdministered: number | null;
 };
 
+type TolRecentSummaryResponse = {
+    userId: number;
+    hasEnoughData: boolean;
+    windowStart: string | null;
+    windowEnd: string | null;
+    daysWithResults: number;
+    averageTotalScore: number | null;
+};
+
 // const data: WcstRecentSummaryResponse = {
 //     userId: 1,
 //     hasEnoughData: true,
@@ -100,15 +109,19 @@ function getCategoryInterpretation(index: number) {
 export default function StatsScreen() {
     const router = useRouter();
 
-    const [data, setData] = useState<WcstRecentSummaryResponse | null>(null);
-    const [loadingRecent, setLoadingRecent] = useState(true);
+    const [wcstData, setWcstData] = useState<WcstRecentSummaryResponse | null>(null);
+    const [tolData, setTolData] = useState<TolRecentSummaryResponse | null>(null);
 
+    const [loadingWcstRecent, setLoadingWcstRecent] = useState(true);
+    const [loadingTolRecent, setLoadingTolRecent] = useState(true);
+
+    // WCST fetch
     useEffect(() => {
         let cancelled = false;
 
         async function loadRecentAverage() {
             try {
-                setLoadingRecent(true);
+                setLoadingWcstRecent(true);
 
                 const token = await getToken();
 
@@ -132,13 +145,13 @@ export default function StatsScreen() {
                 const json = await res.json();
 
                 if (!cancelled) {
-                    setData(json);
+                    setWcstData(json);
                 }
             } catch (error) {
                 console.log("Failed to load WCST recent average:", error);
             } finally {
                 if (!cancelled) {
-                    setLoadingRecent(false);
+                    setLoadingWcstRecent(false);
                 }
             }
         }
@@ -150,10 +163,59 @@ export default function StatsScreen() {
         };
     }, [router]);
 
-    const hasBest = !!data?.hasEnoughData;
+    // ToL fetch
+    useEffect(() => {
+        let cancelled = false;
 
-    const averageCategoriesCompleted = data?.averageCategoriesCompleted ?? null;
-    const averageTrialsAdministered = data?.averageTrialsAdministered ?? null;
+        async function loadTolRecentAverage() {
+            try {
+                setLoadingTolRecent(true);
+
+                const token = await getToken();
+
+                if (!token) {
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/tolStats/recentAverage`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    await removeToken();
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const json = await res.json();
+
+                if (!cancelled) {
+                    setTolData(json);
+                }
+            } catch (error) {
+                console.log("Failed to load TOL recent average:", error);
+            } finally {
+                if (!cancelled) {
+                    setLoadingTolRecent(false);
+                }
+            }
+        }
+
+        loadTolRecentAverage();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [router]);
+
+    // WCST derived values
+    const wcstHasBest = !!wcstData?.hasEnoughData;
+
+    const averageCategoriesCompleted = wcstData?.averageCategoriesCompleted ?? null;
+    const averageTrialsAdministered = wcstData?.averageTrialsAdministered ?? null;
 
     const categoryIndex =
         averageCategoriesCompleted != null && averageTrialsAdministered != null
@@ -163,6 +225,14 @@ export default function StatsScreen() {
     const interpretation =
         averageCategoriesCompleted != null && averageTrialsAdministered != null
             ? getCategoryInterpretation(categoryIndex)
+            : "No recent data";
+
+    // TOL derived values
+    const tolHasBest = !!tolData?.hasEnoughData;
+    const averageTolTotalScore = tolData?.averageTotalScore ?? null;
+    const tolInterpretation =
+        averageTolTotalScore != null
+            ? "Average total score from recent days"
             : "No recent data";
 
     return (
@@ -197,12 +267,12 @@ export default function StatsScreen() {
                     <StatCard
                         title={"Wisconsin Card Sorting Test\nRecent Average"}
                         path={WCST_STATS_DETAIL_ROUTE}
-                        loadingRecent={loadingRecent}
-                        windowStart={data?.windowStart ?? null}
-                        windowEnd={data?.windowEnd ?? null}
+                        loadingRecent={loadingWcstRecent}
+                        windowStart={wcstData?.windowStart ?? null}
+                        windowEnd={wcstData?.windowEnd ?? null}
                         categoryIndex={categoryIndex}
                         interpretation={interpretation}
-                        hasData={hasBest}
+                        hasData={wcstHasBest}
                         primaryValue={averageCategoriesCompleted}
                         primaryLabel="Categories"
                         secondaryValue={averageTrialsAdministered}
@@ -211,32 +281,30 @@ export default function StatsScreen() {
 
                     <StatCard
                         title={"Tower of London\nRecent Average"}
-                        path={WCST_STATS_DETAIL_ROUTE}
-                        loadingRecent={loadingRecent}
-                        windowStart={data?.windowStart ?? null}
-                        windowEnd={data?.windowEnd ?? null}
-                        categoryIndex={categoryIndex}
-                        interpretation={interpretation}
-                        hasData={hasBest}
-                        primaryValue={averageCategoriesCompleted}
-                        primaryLabel="Categories"
+                        path={TOL_STATS_DETAIL_ROUTE}
+                        loadingRecent={loadingTolRecent}
+                        windowStart={tolData?.windowStart ?? null}
+                        windowEnd={tolData?.windowEnd ?? null}
+                        categoryIndex={0}
+                        interpretation={tolInterpretation}
+                        hasData={tolHasBest}
+                        primaryValue={averageTolTotalScore}
+                        primaryLabel="Total score"
                         // secondaryValue={averageTrialsAdministered}
                         // secondaryLabel="Cards used"
                     />
 
                     <StatCard
                         title={"Knox's Cube Test\nRecent Average"}
-                        path={WCST_STATS_DETAIL_ROUTE}
-                        loadingRecent={loadingRecent}
-                        windowStart={data?.windowStart ?? null}
-                        windowEnd={data?.windowEnd ?? null}
-                        categoryIndex={categoryIndex}
-                        interpretation={interpretation}
-                        hasData={hasBest}
-                        primaryValue={averageCategoriesCompleted}
-                        primaryLabel="Categories"
-                        // secondaryValue={averageTrialsAdministered}
-                        // secondaryLabel="Cards used"
+                        path={KNOX_STATS_DETAIL_ROUTE} // CHANGED
+                        loadingRecent={false} // CHANGED
+                        windowStart={null} // CHANGED
+                        windowEnd={null} // CHANGED
+                        categoryIndex={0}
+                        interpretation={"No recent data"}
+                        hasData={false}
+                        primaryValue={null}
+                        primaryLabel="Score"
                     />
 
                     <View style={localStyles.card}>
@@ -258,7 +326,7 @@ export default function StatsScreen() {
 
                                 <View style={localStyles.titleRow}>
                                     <Text style={localStyles.dateText}>
-                                        {formatDateRange(data?.windowStart ?? null, data?.windowEnd ?? null)}
+                                        {formatDateRange(wcstData?.windowStart ?? null, wcstData?.windowEnd ?? null)}
                                     </Text>
 
                                     <Text style={localStyles.cardTitle}>
@@ -266,7 +334,7 @@ export default function StatsScreen() {
                                     </Text>
                                 </View>
                                 
-                                {loadingRecent ? (
+                                {loadingWcstRecent ? (
                                     <View style={localStyles.loadingContainer}>
                                         <ActivityIndicator size="small" color={COLORS.primary} />
                                     </View>
@@ -314,7 +382,7 @@ export default function StatsScreen() {
                                             <View style={localStyles.highlightRow}>
                                                 <View style={localStyles.highlightBox}>
                                                     <Text style={localStyles.highlightValue}>
-                                                        {hasBest ? averageCategoriesCompleted : "—"}
+                                                        {wcstHasBest ? averageCategoriesCompleted : "—"}
                                                     </Text>
                                                     <Text style={localStyles.highlightLabel}>
                                                         Categories
@@ -325,7 +393,7 @@ export default function StatsScreen() {
 
                                                 <View style={localStyles.highlightBox}>
                                                     <Text style={localStyles.highlightValue}>
-                                                        {hasBest ? averageTrialsAdministered : "—"}
+                                                        {wcstHasBest ? averageTrialsAdministered : "—"}
                                                     </Text>
                                                     <Text style={localStyles.highlightLabel}>
                                                         Cards used
@@ -366,7 +434,7 @@ export default function StatsScreen() {
                                     </Text>
                                 </View>
 
-                                {loadingRecent ? (
+                                {loadingTolRecent ? (
                                     <View style={localStyles.loadingContainer}>
                                         <ActivityIndicator size="small" color={COLORS.primary} />
                                     </View>
@@ -414,7 +482,7 @@ export default function StatsScreen() {
                                             <View style={localStyles.highlightRow}>
                                                 <View style={localStyles.highlightBox}>
                                                     <Text style={localStyles.highlightValue}>
-                                                        {hasBest ? averageCategoriesCompleted : "—"}
+                                                        {tolHasBest ? averageCategoriesCompleted : "—"}
                                                     </Text>
                                                     <Text style={localStyles.highlightLabel}>
                                                         Categories
@@ -425,7 +493,7 @@ export default function StatsScreen() {
 
                                                 <View style={localStyles.highlightBox}>
                                                     <Text style={localStyles.highlightValue}>
-                                                        {hasBest ? averageTrialsAdministered : "—"}
+                                                        {tolHasBest ? averageTrialsAdministered : "—"}
                                                     </Text>
                                                     <Text style={localStyles.highlightLabel}>
                                                         Cards used

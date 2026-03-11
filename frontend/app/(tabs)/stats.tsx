@@ -44,6 +44,15 @@ type TolRecentSummaryResponse = {
     averageTotalScore: number | null;
 };
 
+type KnoxRecentSummaryResponse = {
+    userId: number;
+    hasEnoughData: boolean;
+    windowStart: string | null;
+    windowEnd: string | null;
+    daysWithResults: number;
+    averageTotalScore: number | null;
+};
+
 // const data: WcstRecentSummaryResponse = {
 //     userId: 1,
 //     hasEnoughData: true,
@@ -111,9 +120,11 @@ export default function StatsScreen() {
 
     const [wcstData, setWcstData] = useState<WcstRecentSummaryResponse | null>(null);
     const [tolData, setTolData] = useState<TolRecentSummaryResponse | null>(null);
+    const [knoxData, setKnoxData] = useState<KnoxRecentSummaryResponse | null>(null);
 
     const [loadingWcstRecent, setLoadingWcstRecent] = useState(true);
     const [loadingTolRecent, setLoadingTolRecent] = useState(true);
+    const [loadingKnoxRecent, setLoadingKnoxRecent] = useState(true);
 
     // WCST fetch
     useEffect(() => {
@@ -211,6 +222,54 @@ export default function StatsScreen() {
         };
     }, [router]);
 
+    // Knox fetch
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadKnoxRecentAverage() {
+            try {
+                setLoadingKnoxRecent(true);
+
+                const token = await getToken();
+
+                if (!token) {
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/knoxStats/recentAverage`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    await removeToken();
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const json = await res.json();
+
+                if (!cancelled) {
+                    setKnoxData(json);
+                }
+            } catch (error) {
+                console.log("Failed to load KNOX recent average:", error);
+            } finally {
+                if (!cancelled) {
+                    setLoadingKnoxRecent(false);
+                }
+            }
+        }
+
+        loadKnoxRecentAverage();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [router]);
+
     // WCST derived values
     const wcstHasBest = !!wcstData?.hasEnoughData;
 
@@ -232,6 +291,14 @@ export default function StatsScreen() {
     const averageTolTotalScore = tolData?.averageTotalScore ?? null;
     const tolInterpretation =
         averageTolTotalScore != null
+            ? "Average total score from recent days"
+            : "No recent data";
+
+    // Knox derived values
+    const knoxHasBest = !!knoxData?.hasEnoughData;
+    const averageKnoxTotalScore = knoxData?.averageTotalScore ?? null;
+    const knoxInterpretation =
+        averageKnoxTotalScore != null
             ? "Average total score from recent days"
             : "No recent data";
 
@@ -296,244 +363,18 @@ export default function StatsScreen() {
 
                     <StatCard
                         title={"Knox's Cube Test\nRecent Average"}
-                        path={KNOX_STATS_DETAIL_ROUTE} // CHANGED
-                        loadingRecent={false} // CHANGED
-                        windowStart={null} // CHANGED
-                        windowEnd={null} // CHANGED
-                        categoryIndex={0}
-                        interpretation={"No recent data"}
-                        hasData={false}
-                        primaryValue={null}
-                        primaryLabel="Score"
-                    />
-
-                    <View style={localStyles.card}>
-                        <ImageBackground
-                            source={require("../../assets/images/backgroundBroskyna.png")}
-                            style={localStyles.cardBackground}
-                            imageStyle={localStyles.cardImage}
-                        >
-                            <View style={localStyles.cardOverlay}>
-                                {/* <View style={localStyles.titleRow}>
-                                    <Text style={localStyles.dateBadge}>
-                                        {formatDateRange(data.windowStart, data.windowEnd)}
-                                    </Text>
-
-                                    <Text style={localStyles.cardTitle}>
-                                        Wisconsin Card Sorting Test{"\n"}Recent Performance
-                                    </Text>
-                                </View> */}
-
-                                <View style={localStyles.titleRow}>
-                                    <Text style={localStyles.dateText}>
-                                        {formatDateRange(wcstData?.windowStart ?? null, wcstData?.windowEnd ?? null)}
-                                    </Text>
-
-                                    <Text style={localStyles.cardTitle}>
-                                        Wisconsin Card Sorting Test{"\n"}Recent Average
-                                    </Text>
-                                </View>
-                                
-                                {loadingWcstRecent ? (
-                                    <View style={localStyles.loadingContainer}>
-                                        <ActivityIndicator size="small" color={COLORS.primary} />
-                                    </View>
-                                ) : (
-                                    <>
-                                        <View style={localStyles.scaleBar}>
-                                            {labels.map((label, index) => (
-                                                <View
-                                                    key={index}
-                                                    style={[
-                                                        localStyles.segment,
-                                                        {
-                                                            backgroundColor:
-                                                                index === categoryIndex
-                                                                    ? segmentColors[index]
-                                                                    : inactiveColor,
-                                                            borderRightWidth:
-                                                                index < labels.length - 1 ? 1 : 0,
-                                                            borderRightColor: "#999",
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Text
-                                                        style={[
-                                                            localStyles.segmentText,
-                                                            {
-                                                                color:
-                                                                    categoryIndex === 2 && index === 2
-                                                                        ? "#333"
-                                                                        : "white",
-                                                            },
-                                                        ]}
-                                                    >
-                                                        {label}
-                                                    </Text>
-                                                </View>
-                                            ))}
-                                        </View>
-
-                                        <View style={localStyles.resultContainer}>
-                                            <Text style={localStyles.interpretationSmall}>
-                                                {interpretation}
-                                            </Text>
-
-                                            <View style={localStyles.highlightRow}>
-                                                <View style={localStyles.highlightBox}>
-                                                    <Text style={localStyles.highlightValue}>
-                                                        {wcstHasBest ? averageCategoriesCompleted : "—"}
-                                                    </Text>
-                                                    <Text style={localStyles.highlightLabel}>
-                                                        Categories
-                                                    </Text>
-                                                </View>
-
-                                                <View style={localStyles.highlightDivider} />
-
-                                                <View style={localStyles.highlightBox}>
-                                                    <Text style={localStyles.highlightValue}>
-                                                        {wcstHasBest ? averageTrialsAdministered : "—"}
-                                                    </Text>
-                                                    <Text style={localStyles.highlightLabel}>
-                                                        Cards used
-                                                    </Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </>
-                                )}
-
-                                <TouchableOpacity
-                                    style={localStyles.moreLink}
-                                    onPress={() => router.push(WCST_STATS_DETAIL_ROUTE)}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={localStyles.moreLinkText}>View details</Text>
-                                    <Text style={localStyles.moreLinkArrow}>→</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </ImageBackground>
-                    </View>
-
-                    <View style={localStyles.card}>
-                        <ImageBackground
-                            source={require("../../assets/images/backgroundBroskyna.png")}
-                            style={localStyles.cardBackground}
-                            imageStyle={localStyles.cardImage}
-                        >
-                            <View style={localStyles.cardOverlay}>
-
-                                <View style={localStyles.titleRow}>
-                                    <Text style={localStyles.dateText}>
-                                        tu bude naformatovany datum
-                                    </Text>
-
-                                    <Text style={localStyles.cardTitle}>
-                                        Tower of London{"\n"}Recent Average
-                                    </Text>
-                                </View>
-
-                                {loadingTolRecent ? (
-                                    <View style={localStyles.loadingContainer}>
-                                        <ActivityIndicator size="small" color={COLORS.primary} />
-                                    </View>
-                                ) : (
-                                    <>
-                                        <View style={localStyles.scaleBar}>
-                                            {labels.map((label, index) => (
-                                                <View
-                                                    key={index}
-                                                    style={[
-                                                        localStyles.segment,
-                                                        {
-                                                            backgroundColor:
-                                                                index === categoryIndex
-                                                                    ? segmentColors[index]
-                                                                    : inactiveColor,
-                                                            borderRightWidth:
-                                                                index < labels.length - 1 ? 1 : 0,
-                                                            borderRightColor: "#999",
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Text
-                                                        style={[
-                                                            localStyles.segmentText,
-                                                            {
-                                                                color:
-                                                                    categoryIndex === 2 && index === 2
-                                                                        ? "#333"
-                                                                        : "white",
-                                                            },
-                                                        ]}
-                                                    >
-                                                        {label}
-                                                    </Text>
-                                                </View>
-                                            ))}
-                                        </View>
-
-                                        <View style={localStyles.resultContainer}>
-                                            <Text style={localStyles.interpretationSmall}>
-                                                {interpretation}
-                                            </Text>
-
-                                            <View style={localStyles.highlightRow}>
-                                                <View style={localStyles.highlightBox}>
-                                                    <Text style={localStyles.highlightValue}>
-                                                        {tolHasBest ? averageCategoriesCompleted : "—"}
-                                                    </Text>
-                                                    <Text style={localStyles.highlightLabel}>
-                                                        Categories
-                                                    </Text>
-                                                </View>
-
-                                                <View style={localStyles.highlightDivider} />
-
-                                                <View style={localStyles.highlightBox}>
-                                                    <Text style={localStyles.highlightValue}>
-                                                        {tolHasBest ? averageTrialsAdministered : "—"}
-                                                    </Text>
-                                                    <Text style={localStyles.highlightLabel}>
-                                                        Cards used
-                                                    </Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </>
-                                )}
-
-                                <TouchableOpacity
-                                    style={localStyles.moreLink}
-                                    onPress={() => router.push(WCST_STATS_DETAIL_ROUTE)}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={localStyles.moreLinkText}>View details</Text>
-                                    <Text style={localStyles.moreLinkArrow}>→</Text>
-                                </TouchableOpacity>
-
-                            </View>
-                        </ImageBackground>
-                    </View>
-
-                    <StatsComponent
-                        title={"Tower of London\nBest Attempt"}
-                        stats={[
-                            { label: "Total score", value: 3.2, percentile: 83 },
-                        ]}
-                        image={require("../../assets/images/backgroundBroskyna.png")}
-                        path={TOL_STATS_DETAIL_ROUTE}
-                    />
-
-                    <StatsComponent
-                        title={"Knox's Cube Test\nBest Attempt"}
-                        stats={[
-                            { label: "Total score", value: 8.6, percentile: 52 },
-                        ]}
-                        image={require("../../assets/images/backgroundBroskyna.png")}
                         path={KNOX_STATS_DETAIL_ROUTE}
+                        loadingRecent={loadingKnoxRecent}
+                        windowStart={knoxData?.windowStart ?? null}
+                        windowEnd={knoxData?.windowEnd ?? null}
+                        categoryIndex={0}
+                        interpretation={knoxInterpretation}
+                        hasData={knoxHasBest}
+                        primaryValue={averageKnoxTotalScore}
+                        primaryLabel="Total score"
                     />
+
+
                 </ScrollView>
             </View>
         </View>

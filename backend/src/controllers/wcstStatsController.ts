@@ -425,6 +425,9 @@ export class StatsController {
                     userId,
                     hasEnoughData: false,
                     message: null,
+                    trend: null,
+                    recentWindowStart: toDateKey(recentStart),
+                    recentWindowEnd: toDateKey(today),
                     reason: "Need at least 3 result-days in the last 10 calendar days",
                 });
             }
@@ -434,30 +437,12 @@ export class StatsController {
                     userId,
                     hasEnoughData: false,
                     message: null,
+                    trend: null,
+                    recentWindowStart: toDateKey(recentStart),
+                    recentWindowEnd: toDateKey(today),
                     reason: "Need at least 3 result-days before the last 10 calendar days.",
                 });
             }
-
-            // if (allDays.length < 20) {
-            //     return res.json({
-            //         userId,
-            //         hasEnoughData: false,
-            //         message: null,
-            //         reason: "Need at least 20 result-days (10 recent + 10 older).",
-            //     });
-            // }
-
-            // const recent10 = allDays.slice(-10);
-            // const baselineDays = allDays.slice(0, -10);
-
-            // if (baselineDays.length < 10) {
-            //     return res.json({
-            //         userId,
-            //         hasEnoughData: false,
-            //         message: null,
-            //         reason: "Need at least 10 result-days before the last 10."
-            //     });
-            // }
 
             const baselineAvg = mean(baselineDays.map((d) => d.score));
             const recentAvg = mean(recentDays.map((d) => d.score));
@@ -508,6 +493,8 @@ export class StatsController {
                 hasEnoughData: true,
                 trend,
                 message,
+                recentWindowStart: toDateKey(recentStart),
+                recentWindowEnd: toDateKey(today),
                 baselineAvg,
                 recentAvg,
                 avgDeltaPct: Number(avgDeltaPct.toFixed(2)),

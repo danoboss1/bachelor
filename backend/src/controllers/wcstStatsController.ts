@@ -420,15 +420,18 @@ export class StatsController {
                 return date < recentStart;
             });
 
+            const insufficientDataMessage =
+                "This long-term indicator needs at least 3 WCST result-days within the last 10 calendar days and at least 3 older result-days for comparison.";
+
             if (recentDays.length < 3) {
                 return res.json({
                     userId,
                     hasEnoughData: false,
-                    message: null,
                     trend: null,
+                    message: insufficientDataMessage,
                     recentWindowStart: toDateKey(recentStart),
                     recentWindowEnd: toDateKey(today),
-                    reason: "Need at least 3 result-days in the last 10 calendar days",
+                    reason: "Need at least 3 result-days in the last 10 calendar days.",
                 });
             }
 
@@ -436,8 +439,8 @@ export class StatsController {
                 return res.json({
                     userId,
                     hasEnoughData: false,
-                    message: null,
                     trend: null,
+                    message: insufficientDataMessage,
                     recentWindowStart: toDateKey(recentStart),
                     recentWindowEnd: toDateKey(today),
                     reason: "Need at least 3 result-days before the last 10 calendar days.",
@@ -478,14 +481,16 @@ export class StatsController {
 
             let trend: "improving" | "declining" | "stable" = "stable";
             let message =
-                "Flexibility and responding to feedback abilities are stable.";
+                "Your long-term WCST trend suggests stable cognitive flexibility and responding to feedback.";
 
             if (improving) {
                 trend = "improving";
-                message = "Flexibility and responding to feedback are improving.";
+                message =
+                    "Your long-term WCST trend suggests improving cognitive flexibility and responding to feedback.";
             } else if (declining) {
                 trend = "declining";
-                message = "Flexibility and responding to feedback abilities show a sustained decline. If this continues, consider consulting a healthcare professional.";
+                message =
+                    "Your long-term WCST trend suggests a decline in cognitive flexibility and responding to feedback. If this pattern continues, consider discussing it with a healthcare professional.";
             }
 
             return res.json({

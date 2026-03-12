@@ -1,6 +1,6 @@
 import { StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { Icon } from "../../components/ui/Icon";
@@ -59,6 +59,31 @@ type MonthlyResponse = {
     days: MonthlyDay[];
 };
 
+type TrendResponse = {
+    userId: number;
+    hasEnoughData: boolean;
+    trend: "improving" | "declining" | "stable" | null;
+    message: string | null;
+    recentWindowStart: string | null;
+    recentWindowEnd: string | null;
+    baselineAvg?: number;
+    recentAvg?: number;
+    avgDeltaPct?: number;
+    reason?: string;
+};
+
+function formatDate(dateString: string | null) {
+    if (!dateString) return "—";
+
+    const [year, month, day] = dateString.split("-");
+    return `${day}.${month}.${year}`;
+}
+
+function formatDateRange(start: string | null, end: string | null) {
+    if (!start || !end) return "No recent data";
+    return `${formatDate(start)} - ${formatDate(end)}`;
+}
+
 export default function WCSTStatsDetail() {
     const router = useRouter();
 
@@ -75,7 +100,9 @@ export default function WCSTStatsDetail() {
 
     const trendUrl = "https://bachelor-pi.vercel.app/wcstStats/trend";
 
-    const [trendMessage, setTrendMessage] = useState<string | null>(null);
+    const [trendData, setTrendData] = useState<TrendResponse | null>(null);
+
+    // const [trendMessage, setTrendMessage] = useState<string | null>(null);
 
     const url = useMemo(() => {
         return `https://bachelor-pi.vercel.app/wcstStats/month?year=${currentYear}&month=${currentMonth + 1}`
@@ -148,7 +175,7 @@ export default function WCSTStatsDetail() {
         return () => {
             cancelled = true;
         };
-    }, [url]);
+    }, [url, router]);
 
     useEffect(() => {
         let cancelled = false;
@@ -166,8 +193,8 @@ export default function WCSTStatsDetail() {
 
                 if (!res.ok) return;
 
-                const json = await res.json();
-                if (!cancelled) setTrendMessage(json.message ?? null);
+                const json: TrendResponse = await res.json();
+                if (!cancelled) setTrendData(json);
             } catch {}
         }
 
@@ -269,6 +296,11 @@ CATEGORY LOGIC
     const categoryIndex =
         selectedDay?.categoryIndex ??
         (best ? getCategoryIndex(categoriesCompleted, trials) : 0);
+
+    // ✅ ADDED: rozbalené dáta z trend endpointu pre zobrazenie dátumu
+    const trendMessage = trendData?.message ?? null;
+
+    const selectedStatDate = selectedDay?.date ?? null;
 
     return (
         <View style={styles.screen}>
@@ -391,8 +423,10 @@ CATEGORY LOGIC
             >
                 {/* INTERPRETATION BAR */}
                 <View style={styles.card}>
-                    {/* <Text style={styles.cardTitle}>Interpretation</Text> */}
-                {/* <View style={styles.scaleContainer}> */}
+                    <Text style={dateHeaderStyles.dateText}>
+                        {formatDate(selectedStatDate)}
+                    </Text>
+
                     <View style={styles.scaleBar}>
                         {labels.map((label, index) => (
                             <View
@@ -520,3 +554,15 @@ CATEGORY LOGIC
         </View>
     );
 }
+
+
+// ✅ ADDED: štýly len pre nový date header, aby bol vizuálne rovnaký ako v StatCard
+const dateHeaderStyles = StyleSheet.create({
+    dateText: {
+        alignSelf: "flex-end",
+        fontSize: 11,
+        fontWeight: "600",
+        color: Color.gray[600],
+        marginBottom: 12,
+    },
+});

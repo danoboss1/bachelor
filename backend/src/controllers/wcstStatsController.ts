@@ -462,7 +462,7 @@ export class StatsController {
             // }
             // }
 
-            const avgDeltaPct = percentDiff(recentAvg, baselineAvg);
+            // const avgDeltaPct = percentDiff(recentAvg, baselineAvg);
 
             // const perDayDeltaPct = recentDays.map((d) => ({
             //     date: d.date,
@@ -476,21 +476,41 @@ export class StatsController {
             // const improving = avgDeltaPct >= 7 && better3Percent >= 7;
             // const declining = avgDeltaPct <= -7 && worse3Percent >= 7;
 
-            const improving = avgDeltaPct >= 7;
-            const declining = avgDeltaPct <= -7;
+            // const improving = avgDeltaPct >= 7;
+            // const declining = avgDeltaPct <= -7;
 
             let trend: "improving" | "declining" | "stable" = "stable";
             let message =
                 "Your long-term WCST trend suggests stable cognitive flexibility and responding to feedback.";
 
-            if (improving) {
+            let avgDeltaPct = 0;
+
+            if (baselineAvg === 0 && recentAvg === 0) {
+                trend = "stable";
+            } else if (baselineAvg === 0 && recentAvg > 0) {
                 trend = "improving";
                 message =
                     "Your long-term WCST trend suggests improving cognitive flexibility and responding to feedback.";
-            } else if (declining) {
+            } else if (baselineAvg > 0 && recentAvg === 0) {
+                avgDeltaPct = -100;
                 trend = "declining";
                 message =
                     "Your long-term WCST trend suggests a decline in cognitive flexibility and responding to feedback. If this pattern continues, consider discussing it with a healthcare professional.";
+            } else {
+                avgDeltaPct = percentDiff(recentAvg, baselineAvg);
+
+                const improving = avgDeltaPct >= 7;
+                const declining = avgDeltaPct <= -7;
+
+                if (improving) {
+                    trend = "improving";
+                    message =
+                        "Your long-term WCST trend suggests improving cognitive flexibility and responding to feedback.";
+                } else if (declining) {
+                    trend = "declining";
+                    message =
+                        "Your long-term WCST trend suggests a decline in cognitive flexibility and responding to feedback. If this pattern continues, consider discussing it with a healthcare professional.";
+                }
             }
 
             return res.json({

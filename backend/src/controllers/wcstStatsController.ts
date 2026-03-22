@@ -512,7 +512,7 @@ export class StatsController {
                         "Your long-term WCST trend suggests a decline in cognitive flexibility and responding to feedback. If this pattern continues, consider discussing it with a healthcare professional.";
                 }
             }
-
+            
             return res.json({
                 userId,
                 hasEnoughData: true,

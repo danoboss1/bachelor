@@ -1,16 +1,25 @@
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import { styles } from "../../assets/styles/auth.styles";
-import { saveToken } from './tokenStorage';
+import { saveToken } from "./tokenStorage";
 
 const { height } = Dimensions.get("window");
 
 type RegisterPayload = {
     username: string;
     password: string;
-}
+};
 
 export default function TabOneScreen() {
     const router = useRouter();
@@ -29,7 +38,7 @@ export default function TabOneScreen() {
         setUsernameError("");
         setPasswordError("");
         setErrorMessage("");
-        
+
         setLoading(true);
 
         const registration: RegisterPayload = {
@@ -39,22 +48,21 @@ export default function TabOneScreen() {
 
         try {
             const res = await axios.post(
-                "https://bachelor-pi.vercel.app/register", 
+                "https://bachelor-pi.vercel.app/register",
                 registration
             );
 
             const token = res.data?.token;
 
             if (!token) {
-                setErrorMessage("No token returned from server")
+                setErrorMessage("No token returned from server");
                 return;
             }
-            
+
             await saveToken(token);
 
             router.replace("/(tabs)/games");
         } catch (err: any) {
-
             if (err.response?.data?.errors) {
                 const errors = err.response.data.errors;
 
@@ -65,44 +73,44 @@ export default function TabOneScreen() {
                 if (errors.password) {
                     setPasswordError(errors.password);
                 }
-            
-            // toto by som si mal vyskusat nejako na-mockovat
             } else if (err.request) {
                 setErrorMessage("Cannot connect to server");
             } else {
                 setErrorMessage("Registration failed");
             }
-
-            // console.error("Registration error", err);
-
         } finally {
-
             setLoading(false);
-
         }
     }
 
     return (
         <View style={styles.container}>
-            <View style={[styles.header, {
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                // justifyContent: 'flex-end',  // zarovná obsah dole
-                // alignItems: 'flex-start',    // zarovná obsah doľava
-                // marginLeft: 16,              // odsadenie zľava
-                // marginBottom: 16,            // odsadenie zospodu
-            }]}>
-                <Text style={[styles.title, {
-                    alignSelf: 'flex-start',
-                    marginTop: 'auto',
-                    marginLeft: '5%',
-                    marginBottom: '5%',
-                }]}>Sign Up</Text>
+            <View
+                style={[
+                    styles.header,
+                    {
+                        flex: 1,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    },
+                ]}
+            >
+                <Text
+                    style={[
+                        styles.title,
+                        {
+                            alignSelf: "flex-end",
+                            marginLeft: "5%",
+                            marginBottom: 18,
+                        },
+                    ]}
+                >
+                    Sign Up
+                </Text>
 
                 <Image
-                    source={require('../../assets/images/brainee.png')}
+                    source={require("../../assets/images/brainee.png")}
                     style={{
                         width: 60,
                         height: 60,
@@ -115,12 +123,12 @@ export default function TabOneScreen() {
             </View>
 
             <View style={styles.body}>
-
-                <View style={[styles.inputGroup, { marginTop: 48 }]}>
-                    <Text style={localStyles.floatingLabel}>Username</Text>
+                <View style={[styles.inputGroup, { marginTop: height * 0.04 }]}>
+                    <Text style={styles.label}>Username</Text>
                     <TextInput
                         style={styles.input}
-                        // placeholder="Enter your username"
+                        placeholder="Enter your username"
+                        placeholderTextColor="#999"
                         value={username}
                         onChangeText={(text) => {
                             setUsername(text);
@@ -135,14 +143,14 @@ export default function TabOneScreen() {
                             {usernameError}
                         </Text>
                     ) : null}
-
                 </View>
 
-                <View style={[styles.inputGroup, { marginTop: 32 }]}>
-                    <Text style={localStyles.floatingLabel}>Password</Text>
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Password</Text>
                     <TextInput
                         style={styles.input}
-                        // placeholder="Enter your password"
+                        placeholder="Enter your password"
+                        placeholderTextColor="#999"
                         secureTextEntry={true}
                         value={password}
                         onChangeText={(text) => {
@@ -168,9 +176,8 @@ export default function TabOneScreen() {
                     ]}
                     onPress={registerUser}
                     disabled={loading}
-                >   
-                {/* tiez */}
-                    { loading ? (
+                >
+                    {loading ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
                         <Text style={styles.buttonText}>
@@ -187,7 +194,7 @@ export default function TabOneScreen() {
 
                 <Text style={styles.bottomMessage}>
                     Already have an account?{" "}
-                    <Text 
+                    <Text
                         style={localStyles.linkText}
                         onPress={() => router.push("/(auth)/login")}
                     >
@@ -195,7 +202,6 @@ export default function TabOneScreen() {
                     </Text>
                 </Text>
             </View>
-
         </View>
     );
 }
@@ -214,16 +220,5 @@ const localStyles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "500",
     },
-    floatingLabel: {
-        position: "absolute",
-        top: -8,
-        left: 12,
-        backgroundColor: "#fff",
-        paddingHorizontal: 4,
-        fontSize: 12,
-        color: "#666",
-        zIndex: 10,
-    }
-})
-
+});
 

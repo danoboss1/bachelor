@@ -1,26 +1,33 @@
-import { Text } from '@/components/Themed';
+import { Text } from "@/components/Themed";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Dimensions, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { styles } from "../../assets/styles/auth.styles";
-import { saveToken } from './tokenStorage';
+import { saveToken } from "./tokenStorage";
 
 const { height } = Dimensions.get("window");
 
 type LoginPayload = {
     username: string;
     password: string;
-}
+};
 
 export default function TabOneScreen() {
     const router = useRouter();
-    
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     const [loginError, setLoginError] = useState("");
-
     const [errorMessage, setErrorMessage] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -38,7 +45,7 @@ export default function TabOneScreen() {
 
         try {
             const res = await axios.post(
-                "https://bachelor-pi.vercel.app/login", 
+                "https://bachelor-pi.vercel.app/login",
                 login
             );
 
@@ -53,15 +60,13 @@ export default function TabOneScreen() {
 
             router.replace("/(tabs)/games");
         } catch (err: any) {
-
             if (err.response?.data?.message) {
-                setLoginError(err.response.data.message)
+                setLoginError(err.response.data.message);
             } else if (err.request) {
                 setErrorMessage("Cannot connect to server");
             } else {
                 setErrorMessage("Login failed");
             }
-
         } finally {
             setLoading(false);
         }
@@ -69,27 +74,39 @@ export default function TabOneScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={[styles.header, {
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-            }]}>
-                <Text style={[styles.title, {
-                    alignSelf: 'flex-end',
-                    marginLeft: '5%',
-                    marginBottom: 18,
-                }]}>Log In</Text>
+            <View
+                style={[
+                    styles.header,
+                    {
+                        flex: 1,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    },
+                ]}
+            >
+                <Text
+                    style={[
+                        styles.title,
+                        {
+                            alignSelf: "flex-end",
+                            marginLeft: "5%",
+                            marginBottom: 18,
+                        },
+                    ]}
+                >
+                    Log In
+                </Text>
 
                 <Image
-                    source={require('../../assets/images/brainee.png')}
+                    source={require("../../assets/images/brainee.png")}
                     style={{
                         width: 60,
                         height: 60,
-                        resizeMode: 'contain',
+                        resizeMode: "contain",
                         alignSelf: "flex-end",
                         marginBottom: 14,
-                        marginRight: '5%',
+                        marginRight: "5%",
                     }}
                 />
             </View>
@@ -100,8 +117,15 @@ export default function TabOneScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your username"
+                        placeholderTextColor="#999"
                         value={username}
-                        onChangeText={setUsername}
+                        onChangeText={(text) => {
+                            setUsername(text);
+                            setLoginError("");
+                            setErrorMessage("");
+                        }}
+                        autoCapitalize="none"
+                        autoCorrect={false}
                     />
                 </View>
 
@@ -109,10 +133,18 @@ export default function TabOneScreen() {
                     <Text style={styles.label}>Password</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder='Enter your password'
+                        placeholder="Enter your password"
+                        placeholderTextColor="#999"
                         secureTextEntry={true}
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={(text) => {
+                            setPassword(text);
+                            setLoginError("");
+                            setErrorMessage("");
+                        }}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        textContentType="password"
                     />
 
                     {loginError ? (
@@ -122,19 +154,28 @@ export default function TabOneScreen() {
                     ) : null}
                 </View>
 
-                <TouchableOpacity 
-                    style={[styles.button, loading && { opacity: 0.6 }]}
+                <TouchableOpacity
+                    style={[
+                        styles.button,
+                        loading && { opacity: 0.6 }
+                    ]}
                     onPress={loginUser}
                     disabled={loading}
                 >
                     {loading ? (
-                        <ActivityIndicator color="#fff" /> 
+                        <ActivityIndicator color="#fff" />
                     ) : (
                         <Text style={styles.buttonText}>
                             Log in
                         </Text>
                     )}
                 </TouchableOpacity>
+
+                {errorMessage ? (
+                    <Text style={localStyles.errorText}>
+                        {errorMessage}
+                    </Text>
+                ) : null}
 
                 <Text style={styles.bottomMessage}>
                     Don't have an account?{" "}
@@ -145,7 +186,6 @@ export default function TabOneScreen() {
                         Sign up
                     </Text>
                 </Text>
-
             </View>
         </View>
     );
@@ -153,7 +193,7 @@ export default function TabOneScreen() {
 
 const localStyles = StyleSheet.create({
     linkText: {
-        color:  "#1E90FF", 
+        color: "#1E90FF",
         fontWeight: "600",
         textDecorationLine: "underline",
     },
@@ -164,5 +204,5 @@ const localStyles = StyleSheet.create({
         textAlign: "left",
         fontSize: 12,
         fontWeight: "500",
-    }
-})
+    },
+});

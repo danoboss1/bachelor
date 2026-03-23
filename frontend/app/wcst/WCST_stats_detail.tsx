@@ -77,6 +77,8 @@ export default function WCSTStatsDetail() {
     const [loading, setLoading] = useState(false);
     const [selectedDay, setSelectedDay] = useState<MonthlyDay | null>(null);
 
+    const [error, setError] = useState<string | null>(null);
+
     const trendUrl = "https://bachelor-pi.vercel.app/wcstStats/trend";
 
     const [trendData, setTrendData] = useState<TrendResponse | null>(null);
@@ -123,6 +125,10 @@ export default function WCSTStatsDetail() {
             setLoading(true);
             setSelectedDay(null);
 
+            if (!cancelled) {
+                setError(null);
+            }
+
             try {
                 const token = await getToken();
 
@@ -143,16 +149,21 @@ export default function WCSTStatsDetail() {
                     return;
                 }
 
+                if (!res.ok) {
+                    throw new Error(`Request failed with status ${res.status}`);
+                }
+
                 const json = await res.json();
 
                 if (!cancelled) {
                     setData(json);
                 }
             } catch (e) {
-                // toto neviem ci budem chcet logovat takto
-                // toto este dalej premysliet
-                console.log("Load error: ", e);
-                // console.error("Failed to load WCST stats:", e);
+                console.error("Failed to load WCST stats:", e);
+
+                if (!cancelled) {
+                    setError("Failed to load statistics. Please try again.");
+                }
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -187,13 +198,13 @@ export default function WCSTStatsDetail() {
         }
 
         loadTrend();
-        return () => { cancelled = true; };
+        return () => { 
+            cancelled = true; 
+        };
     }, []);
 
-    // ✅ convenience
     const days = data?.days ?? [];
 
-    // ✅ auto-select last day with stat (or last day)
     useEffect(() => {
         if (!data?.days?.length) return;
 
@@ -218,10 +229,8 @@ export default function WCSTStatsDetail() {
             label: day.label,
             frontColor:
                 day.bestStat == null
-                    ? (selectedBarIndex === index ? Color.gray[500] : Color.gray[300]) // ✅ CHANGED
-                    : day.value === 0
-                        ? (selectedBarIndex === index ? Color.orange[800] : Color.orange[400]) // ✅ CHANGED
-                        : (selectedBarIndex === index ? Color.orange[800] : Color.orange[400]),
+                    ? (selectedBarIndex === index ? Color.gray[500] : Color.gray[300]) 
+                    : (selectedBarIndex === index ? Color.orange[800] : Color.orange[400]),
             topLabelComponent:
                 selectedBarIndex === index
                     ? () => (
@@ -229,7 +238,6 @@ export default function WCSTStatsDetail() {
                             style={{
                                 fontSize: 12,
                                 fontWeight: "600",
-                                // ✅ CHANGED: ked test nebol vykonany, aj top label bude sedy
                                 color: day.bestStat == null ? Color.gray[500] : Color.orange[800],
                                 marginBottom: 6,
                             }}
@@ -251,10 +259,6 @@ export default function WCSTStatsDetail() {
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
     const inactiveColor = "#666";
-
-    /*
-CATEGORY LOGIC
-*/
 
     function getCategoryIndex(categoriesCompleted: number, trials: number) {
         if (categoriesCompleted <= 2) return 0;
@@ -281,29 +285,18 @@ CATEGORY LOGIC
         }
     }
 
-    // pomocny kod, ked budem ziskavat data z db, tak ho zmenim
-    // const categoriesCompleted = 2;
-    // const trials = 25;
-    // const categoryIndex = getCategoryIndex(categoriesCompleted, trials);
-
     const best = selectedDay?.bestStat ?? null;
     const hasBest = !!best;
 
     const categoriesCompleted = Number(best?.categories_completed ?? 0);
     const trials = Number(best?.trials_administered ?? 0);
 
-    // const categoryIndex =
-    //     selectedDay?.categoryIndex ??
-    //     (best ? getCategoryIndex(categoriesCompleted, trials) : 0);
-
     const categoryIndex =
-        // ✅ CHANGED: ked test nebol vykonany, categoryIndex MUSI byt null, nie 0
         selectedDay?.bestStat == null
             ? null
             : (selectedDay?.categoryIndex ??
                 (best ? getCategoryIndex(categoriesCompleted, trials) : null));
 
-    // ✅ ADDED: rozbalené dáta z trend endpointu pre zobrazenie dátumu
     const trendMessage = trendData?.message ?? null;
 
     const selectedStatDate = selectedDay?.date ?? null;
@@ -316,6 +309,12 @@ CATEGORY LOGIC
                     subtitle="Track your monthly performance"
                     onBack={() => router.back()}
                 />
+
+                {error && (
+                    <View style={errorStyles.container}>
+                        <Text style={errorStyles.text}>{error}</Text>
+                    </View>
+                )}
 
                 <View style={styles.cardBar}>
                     <Text style={styles.graphTitle}>Total score</Text>
@@ -337,8 +336,6 @@ CATEGORY LOGIC
                         data={chartData}
                         xAxisThickness={0}
                         yAxisThickness={0}
-                        // disableScroll
-                        // width={width - CHART_HORIZONTAL_PADDING * 2}
                         barWidth={BAR_WIDTH}
                         spacing={SPACING}
                         initialSpacing={INITIAL_SPACING}
@@ -353,10 +350,6 @@ CATEGORY LOGIC
                             fontSize: 12,
                             fontWeight: "500",
                         }}
-                        // onPress={(_item: any, index: number) => {
-                        //     // setActiveIndex(index);
-                        //     setSelectedBarIndex(index);
-                        // }}
                         onPress={(_item: any, index: number) => {
                             setSelectedBarIndex(index);
                             setSelectedDay(days[index] ?? null);
@@ -367,13 +360,11 @@ CATEGORY LOGIC
                 </View>
             </View>
 
-            {/* <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.statsScroll}> */}
             <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* INTERPRETATION BAR */}
                 <View style={styles.card}>
                     <Text style={dateHeaderStyles.dateText}>
                         {formatDate(selectedStatDate)}
@@ -386,7 +377,6 @@ CATEGORY LOGIC
                                 style={[
                                     styles.segment,
                                     {
-                                        // ✅ CHANGED: ked test nebol vykonany, nesvieti ziaden segment
                                         backgroundColor:
                                             categoryIndex === null
                                                 ? inactiveColor
@@ -401,7 +391,6 @@ CATEGORY LOGIC
                                 <Text style={[
                                     styles.segmentText,
                                     {
-                                        // ✅ CHANGED: zachovam tvoju zlutu logiku len ked je realne vybrata kategoria 2
                                         color: categoryIndex !== null && categoryIndex === 2 && index === 2 ? "#333" : "white"
                                     }
                                 ]}>
@@ -411,12 +400,7 @@ CATEGORY LOGIC
                         ))}
                     </View>
 
-                    {/* RESULT TEXT */}
-
-
-                      {/* ✅ Highlight hneď po scaleBare */}
                     <View style={styles.resultContainer}>
-                        {/* ✅ Interpretation = len malé dovysvetlenie */}
                         <Text style={styles.interpretationSmall}>
                             {getCategoryInterpretation(categoryIndex)}
                         </Text>
@@ -439,15 +423,12 @@ CATEGORY LOGIC
                             </View>
                         </View>
 
-                        {/* ✅ TREND = najdôležitejší text */}
                         {trendMessage ? (
                             <Text style={styles.trendPrimary}>
                                 {trendMessage}
                             </Text>
                         ) : null}
-
                     </View>
-
                 </View>
 
                 <View style={styles.card}>
@@ -455,66 +436,51 @@ CATEGORY LOGIC
 
                     <StatMiniSupplementary
                         label={"Percentage of perseverative responses"}
-                        // ✅ CHANGED: ked test nebol, ukaz pomlcku
                         value={hasBest ? `${Number(best?.perseverativepercent ?? 0)}%` : "—"}
                     />
 
                     <StatMiniSupplementary
                         label={"Percentage of perseverative errors"}
-                        // ✅ CHANGED
                         value={hasBest ? `${Number(best?.perseverativeerrorpercent ?? 0)}%` : "—"}
                     />
 
                     <StatMiniSupplementary
                         label={"Percentage of non-perseverative errors"}
-                        // ✅ CHANGED
                         value={hasBest ? `${Number(best?.nonperseverativeerrorpercent ?? 0)}%` : "—"}
                     />
 
-                    {/* <StatMiniSupplementary
-                        label="Correct responses"
-                        value={60}
-                    /> */}
-
                     <StatMiniSupplementary
                         label="Errors"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.total_error ?? 0) : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Percentage of errors"
-                        // ✅ CHANGED
                         value={hasBest ? `${Number(best?.errorpercent ?? 0)}%` : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Perseverative responses"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.perseverative_responses ?? 0) : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Perseverative errors"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.perseverative_errors ?? 0) : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Non-perseverative errors"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.non_perseverative_errors ?? 0) : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Trials to complete first category"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.trials_to_first_category ?? 0) : "—"}
                     />
 
                     <StatMiniSupplementary
                         label="Failure to maintain set"
-                        // ✅ CHANGED
                         value={hasBest ? Number(best?.failure_to_maintain_set ?? 0) : "—"}
                     />
                 </View>
@@ -524,7 +490,6 @@ CATEGORY LOGIC
 }
 
 
-// ✅ ADDED: štýly len pre nový date header, aby bol vizuálne rovnaký ako v StatCard
 const dateHeaderStyles = StyleSheet.create({
     dateText: {
         alignSelf: "flex-end",
@@ -532,5 +497,24 @@ const dateHeaderStyles = StyleSheet.create({
         fontWeight: "600",
         color: Color.gray[600],
         marginBottom: 12,
+    },
+});
+
+const errorStyles = StyleSheet.create({
+    container: {
+        marginHorizontal: 16,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        backgroundColor: "#FEE2E2",
+        borderWidth: 1,
+        borderColor: "#FCA5A5",
+    },
+    text: {
+        color: "#B91C1C",
+        fontSize: 14,
+        fontWeight: "500",
+        textAlign: "center",
     },
 });

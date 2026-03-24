@@ -1,175 +1,510 @@
-import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
+import { StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
+import { BAR_WIDTH, END_SPACING, INITIAL_SPACING, SPACING} from "@/components/statsDetail/chartConstants";
+import { useRouter } from "expo-router";
+import { getToken, removeToken } from "@/app/(auth)/tokenStorage";
+import { styles } from "@/assets/styles/statsDetail.styles";
+import { StatsDetailHeader } from "@/components/statsDetail/statsDetailHeader";
+import { MonthNavigator } from "@/components/statsDetail/monthNavigator";
+import { formatDate } from "@/components/statsDetail/utils";
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
-const CHART_HORIZONTAL_PADDING = width * 0.08;
-const NUMBER_OF_BARS = 7;
-const SPACING = 12;
-const INITIAL_SPACING = 6;
-const END_SPACING = 6;
+// toto zmenime ked budeme mat koeficienty 
+const MAX_SCORE = 30;
 
-const BAR_WIDTH =
-    (width - CHART_HORIZONTAL_PADDING * 2 - INITIAL_SPACING - END_SPACING - SPACING * (NUMBER_OF_BARS - 1)) /
-    NUMBER_OF_BARS;
+type KnoxStatRow = {
+    id: number;
+    time: string | null;
+    threestepsequencescorrect: number;
+    fourstepsequencescorrect: number;
+    fivestepsequencescorrect: number;
+    sixstepsequencescorrect: number;
+    sevenstepsequencescorrect: number;
+    eightstepsequencescorrect: number;
+    totalcorrect: number;
+    user_id: number;
+    totalscore: number | null;
+};
 
-const rawData = [
-    {value: 50, dataPointText: '50', label: '15/1'},
-    {value: 80, dataPointText: '80', label: '16/1'},
-    {value: 100, dataPointText: '100', label: '17/1'},
-    {value: 70, dataPointText: '70', label: '18/1'},
-    {value: 56, dataPointText: '56', label: '19/1'},
-    {value: 78, dataPointText: '78', label: '20/1'},
-    {value: 74, dataPointText: '74', label: '21/1', frontColor: '#177AD5'},
-];
+type MonthlyDay = {
+    date: string;
+    label: string;
+    value: number;
+    bestStat: KnoxStatRow | null;
+    categoryIndex: number | null;
+};
+
+type MonthlyResponse = {
+    userId: number;
+    range: { year: number, month: number };
+    scoreDefinition: string;
+    days: MonthlyDay[];
+};
+
+type TrendResponse = {
+    userId: number;
+    hasEnoughData: boolean;
+    trend: "improving" | "declining" | "stable" | null;
+    message: string | null;
+    baselineAvg?: number;
+    recentAvg?: number;
+    avgDeltaPct?: number;
+    reason?: string;
+};
+
 
 export default function TOLStatsDetail() {
-    const [activeIndex, setActiveIndex] = useState(rawData.length - 1);
+    const router = useRouter();
 
-    const barData = useMemo(
-        () =>
-            rawData.map((item, index) => ({
-                ...item,
-                frontColor:
-                    index === activeIndex
-                        ? Color.blue[800]
-                        : Color.blue[400],
+    const now = new Date();
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-                topLabelComponent:
-                    index === activeIndex
-                        ? () => (
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: "600",
-                                    color: Color.blue[800],
-                                    marginBottom: 6,
-                                }}
-                            >
-                                {item.value}
-                            </Text>
-                            )
-                        : undefined,
-            })),
-        [activeIndex]    
-    );
+    const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
+
+    const [data, setData] = useState<MonthlyResponse | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [selectedDay, setSelectedDay] = useState<MonthlyDay | null>(null);
+    
+    const [error, setError] = useState<string | null>(null);
+
+    const trendUrl = "https://bachelor-pi.vercel.app/knoxStats/trend";
+
+    const [trendData, setTrendData] = useState<TrendResponse | null>(null);
+
+    const chartScrollRef = useRef<any>(null);
+
+    const scrollToBar = (index: number) => {
+        const x =
+            INITIAL_SPACING +
+            index * (BAR_WIDTH + SPACING) -
+                width * 0.35;
+
+        chartScrollRef.current?.scrollTo?.({
+            x: Math.max(0, x),
+            animated: true,
+        });
+    };
+
+    const url = useMemo(() => {
+        return `https://bachelor-pi.vercel.app/knoxStats/month?year=${currentYear}&month=${currentMonth + 1}`
+    }, [currentYear, currentMonth]);
+
+    const navigateMonth = (direction: number) => {
+        let newMonth = currentMonth + direction;
+        let newYear = currentYear;
+
+        if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
+        } else if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+        }
+
+        setCurrentMonth(newMonth);
+        setCurrentYear(newYear);
+        setSelectedBarIndex(null);
+    };
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function load() {
+            setLoading(true);
+            setSelectedDay(null);
+
+            if (!cancelled) {
+                setError(null);
+            }
+
+            try {
+                const token = await getToken();
+
+                if (!token) {
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    await removeToken();
+                    router.replace("/(auth)/login");
+                    return;
+                }
+
+                if (!res.ok) {
+                    throw new Error(`Request failed with status ${res.status}`);
+                }
+
+                const json = await res.json();
+
+                if (!cancelled) {
+                    setData(json);
+                }
+            } catch (e) {
+                console.error("Failed to load Knox stats:", e);
+
+                if (!cancelled) {
+                    setError("Failed to load statistics. Please try again.");
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        }
+
+        load();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [url, router]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadTrend() {
+            try {
+                const token = await getToken();
+                if (!token) return;
+
+                const res = await fetch(trendUrl, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+
+                if (!res.ok) return;
+
+                const json: TrendResponse = await res.json();
+                if (!cancelled) setTrendData(json);
+            } catch {}
+        }
+
+        loadTrend();
+        return () => { 
+            cancelled = true; 
+        };
+    }, []);
+
+    const days = data?.days ?? [];
+
+    useEffect(() => {
+        if (!data?.days?.length) return;
+
+        const lastWithStatIndex = [...data.days]
+            .map((d, i) => ({ d, i }))
+            .filter((x) => x.d.bestStat != null)
+            .pop()?.i;
+
+        const idx = lastWithStatIndex ?? data.days.length - 1;
+
+        setSelectedBarIndex(idx);
+        setSelectedDay(data.days[idx] ?? null);
+
+        requestAnimationFrame(() => {
+            scrollToBar(idx);
+        });
+    }, [data]);
+
+    const chartData = useMemo(() => {
+        return days.map((day, index) => ({
+            value: day.value,
+            label: day.label,
+            frontColor:
+                day.bestStat == null
+                    ? (selectedBarIndex === index ? Color.gray[500] : Color.gray[300]) 
+                    : (selectedBarIndex === index ? Color.orange[800] : Color.orange[400]),
+            topLabelComponent:
+                selectedBarIndex === index
+                    ? () => (
+                        <Text
+                            style={{
+                                fontSize: 12,
+                                fontWeight: "600",
+                                color: day.bestStat == null ? Color.gray[500] : Color.orange[800],
+                                marginBottom: 6,
+                            }}
+                        >
+                            {day.bestStat == null ? "—" : day.value}
+                        </Text>
+                    )
+                    : undefined,
+        }));
+    }, [days, selectedBarIndex]);
+    
+    const labels = [
+        "VERY POOR\n0–3 points",
+        "POOR\n4–5 points",
+        "NORMAL\n6–8 points",
+        "GOOD\n9–11 points",
+        "EXCELLENT\n12+ points"
+    ];
+
+    const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
+    const inactiveColor = "#666";
+
+    function getKnoxCategoryIndex(totalScore: number) {
+        if (totalScore <= 3) return 0;
+        if (totalScore <= 5) return 1;
+        if (totalScore <= 8) return 2;
+        if (totalScore <= 11) return 3;
+        return 4;
+    }
+
+    function getKnoxCategoryInterpretation(index: number | null) {
+        if (index === null) {
+            return "No test was performed on this day";
+        }
+
+        switch (index) {
+            case 0:
+                return "Severe impairment in working memory and inhibitory control";
+            case 1:
+                return "Reduced working memory and inhibitory control";
+            case 2:
+                return "Average working memory and inhibitory control";
+            case 3:
+                return "Above average working memory and inhibitory control";
+            case 4:
+                return "Superior working memory and inhibitory control";
+            default:
+                return "";
+        }
+    }
+
+    const best = selectedDay?.bestStat ?? null;
+    const hasBest = !!best;
+
+    const totalScore = Number(best?.totalscore ?? 0);
+
+    const categoryIndex =
+    selectedDay?.bestStat == null
+        ? null
+        : (selectedDay?.categoryIndex ??
+            (best ? getKnoxCategoryIndex(totalScore) : null));
+    
+    const trendMessage = trendData?.message ?? null;
+
+    const selectedStatDate = selectedDay?.date ?? null;
 
     return (
-        <View style={{
-            flex: 1,
-            backgroundColor: Color.blue[100]
-            // justifyContent: "center", // vertikálne centrovanie
-            // alignItems: "center",     // horizontálne centrovanie
-        }}>
-            <View style={{flex:1, justifyContent:"center"}}>
-                <Text style={localStyles.graphTitle}>Total score</Text>
-
-                <BarChart
-                    maxValue={100}     
-                    stepValue={20}
-                    yAxisExtraHeight={20}
-                    barBorderRadius={4}
-                    // frontColor="lightgray"
-                    // showGradient
-                    // gradientColor={Color.orange[400]}
-                    frontColor={Color.orange[400]}
-                    data={barData}
-                    xAxisThickness={0}
-                    yAxisThickness={0}
-                    disableScroll
-
-                    width={width - CHART_HORIZONTAL_PADDING * 2}
-                    barWidth={BAR_WIDTH}
-                    spacing={SPACING}
-                    initialSpacing={INITIAL_SPACING}
-                    endSpacing={END_SPACING}  
-
-                    xAxisLabelTextStyle={{
-                        color: Color.gray[400],
-                        fontSize: 12,
-                        fontWeight: "500",
-                    }}
-                    yAxisTextStyle={{
-                        color: Color.gray[400],
-                        fontSize: 12,
-                        fontWeight: "500",
-                    }}
-
-                    onPress={(_item: any, index: number) => {
-                        setActiveIndex(index);
-                    }}
-
-                    // renderTooltip={(item: any, index: number) => {
-                    //     if (index !== activeIndex) return null;
-
-                    //     return <FocusLabel item={item} />;
-                    // }}
-
-                    dashGap={10}
+        <View style={styles.screen}>
+            <View style={{ flex:1, justifyContent:"center" }}>
+                <StatsDetailHeader
+                    title="Knox Statistics"
+                    subtitle="Track your monthly performance"
+                    onBack={() => router.back()}
                 />
+                
+                {error && (
+                    <View style={errorStyles.container}>
+                        <Text style={errorStyles.text}>{error}</Text>
+                    </View>
+                )}
+
+                <View style={styles.cardBar}>
+                    <Text style={styles.graphTitle}>Total score</Text>
+
+                    <MonthNavigator
+                        month={currentMonth}
+                        year={currentYear}
+                        onPrev={() => navigateMonth(-1)}
+                        onNext={() => navigateMonth(1)}
+                    />
+
+                    <BarChart
+                        maxValue={MAX_SCORE}
+                        stepValue={5}
+                        yAxisExtraHeight={20}
+                        scrollRef={chartScrollRef}
+                        barBorderRadius={4}
+                        frontColor={Color.orange[400]}
+                        data={chartData}
+                        xAxisThickness={0}
+                        yAxisThickness={0}
+                        barWidth={BAR_WIDTH}
+                        spacing={SPACING}
+                        initialSpacing={INITIAL_SPACING}
+                        endSpacing={END_SPACING}
+                        xAxisLabelTextStyle={{
+                            color: Color.gray[400],
+                            fontSize: 12,
+                            fontWeight: "500",
+                        }}
+                        yAxisTextStyle={{
+                            color: Color.gray[400],
+                            fontSize: 12,
+                            fontWeight: "500",
+                        }}
+                        onPress={(_item: any, index: number) => {
+                            setSelectedBarIndex(index);
+                            setSelectedDay(days[index] ?? null);
+                            scrollToBar(index);
+                        }}
+                        dashGap={10}
+                    />
+                </View>
             </View>
 
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={localStyles.statsScroll}>
-                <StatMini
-                    label="Total score"
-                    value={8.6}
-                    percentile={52}
-                    max={100}
-                />
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >   
+                <View style={styles.card}>
+                    <Text style={dateHeaderStyles.dateText}>
+                        {formatDate(selectedStatDate)}
+                    </Text>
 
-                <StatMiniSupplementary label="3-step sequences" value={2} whole={2} />
-                <StatMiniSupplementary label="4-step sequences" value={4} whole={4} />
-                <StatMiniSupplementary label="5-step sequences" value={3} whole={4} />
-                <StatMiniSupplementary label="6-step sequences" value={1} whole={3} />
-                <StatMiniSupplementary label="7-step sequences" value={0} whole={3} />
-                <StatMiniSupplementary label="8-step sequences" value={1} whole={2} />
-                <StatMiniSupplementary label="Total correct sequences" value={11} whole={18} />
+                    <View style={styles.scaleBar}>
+                        {labels.map((label, index) => (
+                            <View
+                                key={index}
+                                style={[
+                                    styles.segment,
+                                    {
+                                        backgroundColor:
+                                            categoryIndex === null
+                                                ? inactiveColor
+                                                : index === categoryIndex
+                                                    ? segmentColors[index]
+                                                    : inactiveColor,
+                                        borderRightWidth: index < labels.length - 1 ? 1 : 0,
+                                        borderRightColor: "#999",
+                                    },
+                                ]}
+                            >
+                                <Text
+                                    style={[
+                                        styles.segmentText,
+                                        {
+                                            color:
+                                                categoryIndex !== null &&
+                                                categoryIndex === 2 &&
+                                                index === 2
+                                                    ? "#333"
+                                                    : "white",
+                                        },
+                                    ]}
+                                >
+                                    {label}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    <View style={styles.resultContainer}>
+                        <Text style={styles.interpretationSmall}>
+                            {getKnoxCategoryInterpretation(categoryIndex)}
+                        </Text>
+
+                        {/* ✅ KNOX: iba jedna hodnota cez celú šírku */}
+                        <View style={knoxStyles.singleHighlightBox}>
+                            <Text style={styles.highlightValue}>
+                                {hasBest ? totalScore : "—"}
+                            </Text>
+                            <Text style={styles.highlightLabel}>Total score</Text>
+                        </View>
+
+                        {trendMessage ? (
+                            <Text style={styles.trendPrimary}>
+                                {trendMessage}
+                            </Text>
+                        ) : null}
+                    </View>
+                </View>
+                
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>Detailed stats</Text>
+
+                    <StatMiniSupplementary 
+                        label={"3-step sequences"}
+                        value={hasBest ? `${Number(best?.threestepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"4-step sequences"}
+                        value={hasBest ? `${Number(best?.fourstepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"5-step sequences"}
+                        value={hasBest ? `${Number(best?.fivestepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"6-step sequences"}
+                        value={hasBest ? `${Number(best?.sixstepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"7-step sequences"}
+                        value={hasBest ? `${Number(best?.sevenstepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"8-step sequences"}
+                        value={hasBest ? `${Number(best?.eightstepsequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"Total correct sequences"}
+                        value={hasBest ? `${Number(best?.totalcorrect ?? 0)}` : "—"}
+                    />
+                 </View>
             </ScrollView>
         </View>
     )
 }
 
-const localStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop: height * 0.026,
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#d6c7b9",
-    },
-    statsScroll: {
-        width: "100%",
-    },
-    graphTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginLeft: width * 0.1,
-        marginBottom: 8,
-        color: "black",
-        textAlign: "left",
-    },
-    tooltip: {
-        backgroundColor: "white",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 8,
-        elevation: 4,
-        alignItems: "center",
 
-        minWidth: 140,
-        maxWidth: 180,
-    },
-    tooltipTitle: {
-        fontSize: 12,
-        fontWeight: "600",
-        color: "black",
-    },
-    tooltipSubtitle: {
+const dateHeaderStyles = StyleSheet.create({
+    dateText: {
+        alignSelf: "flex-end",
         fontSize: 11,
-        color: "gray",
-        marginTop: 2,
-    }
-})
+        fontWeight: "600",
+        color: Color.gray[600],
+        marginBottom: 12,
+    },
+});
+
+const errorStyles = StyleSheet.create({
+    container: {
+        marginHorizontal: 16,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        backgroundColor: "#FEE2E2",
+        borderWidth: 1,
+        borderColor: "#FCA5A5",
+    },
+    text: {
+        color: "#B91C1C",
+        fontSize: 14,
+        fontWeight: "500",
+        textAlign: "center",
+    },
+});
+
+const knoxStyles = StyleSheet.create({
+    singleHighlightBox: {
+        marginTop: 12,
+        borderRadius: 16,
+        paddingVertical: 18,
+        paddingHorizontal: 16,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "white",
+    },
+});

@@ -13,8 +13,9 @@ export const styles = StyleSheet.create({
     },
 
     header: {
+        marginTop: 8,
         paddingHorizontal: 16,
-        paddingBottom: 24,
+        paddingBottom: 20,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -31,14 +32,15 @@ export const styles = StyleSheet.create({
         color: Color.gray[600],
     },
     backBtn: {
-        padding: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
         borderRadius: 12,
         backgroundColor: "#B3B3B3"
     },
 
     card: {
         marginHorizontal: 16,
-        marginBottom: 12,
+        marginTop: 12,
         padding: 14,
         borderRadius: 18,
         backgroundColor: "#FFFCF9",

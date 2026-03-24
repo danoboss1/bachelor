@@ -4,11 +4,11 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { useRouter } from "expo-router";
-import { getToken, removeToken } from "../(auth)/tokenStorage";
-import { styles } from "../../assets/styles/statsDetail.styles";
+import { getToken, removeToken } from "@/app/(auth)/tokenStorage";
+import { styles } from "@/assets/styles/statsDetail.styles";
 import { formatDate } from "@/components/statsDetail/utils";
 import { BAR_WIDTH, END_SPACING, INITIAL_SPACING, SPACING } from "@/components/statsDetail/chartConstants";
-import { StatsDetailHeader } from "@/components/statsDetail/statsDetailHeader"
+import { StatsDetailHeader } from "@/components/statsDetail/statsDetailHeader";
 import { MonthNavigator } from "@/components/statsDetail/monthNavigator";
 
 const { width, height } = Dimensions.get("window");
@@ -70,7 +70,6 @@ export default function WCSTStatsDetail() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-    // activeIndex je mozno selectedBarIndex, ze to je to iste
     const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
 
     const [data, setData] = useState<MonthlyResponse | null>(null);

@@ -35,11 +35,14 @@ export function MonthNavigator({
                 }}
                 hitSlop={20}
             >
-                <Icon
+                {/* <Icon
                     symbol={"chevron.backward"}
                     size="sm"
                     color={Color.gray[500]}
-                />
+                /> */}
+                <Text style={{ fontSize: 30, color: "black", fontWeight: "400" }}>
+                    ‹
+                </Text>
             </Pressable>
 
             <Text
@@ -60,11 +63,14 @@ export function MonthNavigator({
                 }}
                 hitSlop={20}
             >
-                <Icon
+                {/* <Icon
                     symbol={"chevron.forward"}
                     size="sm"
                     color={Color.gray[500]}
-                />
+                /> */}
+                <Text style={{ fontSize: 30, color: "black", fontWeight: "400" }}>
+                    ›
+                </Text>
             </Pressable>
         </View>
     );

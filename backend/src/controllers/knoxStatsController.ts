@@ -297,62 +297,89 @@ export class KnoxStatsController {
         try {
             const userId = req.user?.id;
             if (!userId) return res.status(401).json({ error: "Unauthorized" });
-    
+
             const allDays = await getBestPerDay(userId);
 
-            if (allDays.length < 20) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const recentStart = new Date(today);
+            recentStart.setDate(today.getDate() - 9);
+
+            const recentDays = allDays.filter((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                return date >= recentStart && date <= today;
+            });
+
+            const baselineDays = allDays.filter((d) => {
+                const date = new Date(d.date);
+                date.setHours(0, 0, 0, 0);
+                return date < recentStart;
+            });
+
+            const insufficientDataMessage =
+                "This long-term indicator needs at least 3 Knox result-days within the last 10 calendar days and at least 3 older result-days for comparison.";
+
+            if (recentDays.length < 3) {
                 return res.json({
                     userId,
                     hasEnoughData: false,
-                    message: null,
-                    reason: "Need at least 20 result-days (10 recent + 10 older).",
+                    trend: null,
+                    message: insufficientDataMessage,
+                    recentWindowStart: toDateKey(recentStart),
+                    recentWindowEnd: toDateKey(today),
+                    reason: "Need at least 3 result-days in the last 10 calendar days.",
                 });
             }
 
-            const recent10 = allDays.slice(-10);
-            const baselineDays = allDays.slice(0, -10);
-
-            if (baselineDays.length < 10) {
+            if (baselineDays.length < 3) {
                 return res.json({
                     userId,
                     hasEnoughData: false,
-                    message: null,
-                    reason: "Need at least 10 result-days before the last 10."
+                    trend: null,
+                    message: insufficientDataMessage,
+                    recentWindowStart: toDateKey(recentStart),
+                    recentWindowEnd: toDateKey(today),
+                    reason: "Need at least 3 result-days before the last 10 calendar days.",
                 });
             }
 
             const baselineAvg = mean(baselineDays.map((d) => d.score));
-            const recentAvg = mean(recent10.map((d) => d.score));
-
-            // toto este treba vyriesit lebo moze nastat
-            // if (baselineAvg === 0) {
-
-            // }
-
-            const avgDeltaPct = percentDiff(recentAvg, baselineAvg);
-
-            const perDayDeltaPct = recent10.map((d) => ({
-                date: d.date,
-                score: d.score,
-                deltaPct: percentDiff(d.score, baselineAvg),
-            }));
-
-            const better3Percent = perDayDeltaPct.filter((x) => x.deltaPct >= 3).length;
-            const worse3Percent = perDayDeltaPct.filter((x) => x.deltaPct <= -3).length;
-
-            const improving = avgDeltaPct >= 7 && better3Percent >= 7;
-            const declining = avgDeltaPct <= -7 && worse3Percent >= 7;
+            const recentAvg = mean(recentDays.map((d) => d.score));
 
             let trend: "improving" | "declining" | "stable" = "stable";
-            let message = "Working memory and inhibitory control performance is stable.";
+            let message =
+                "Your long-term Knox trend suggests stable working memory and inhibitory control performance.";
 
-            if (improving) {
+            let avgDeltaPct = 0;
+
+            if (baselineAvg === 0 && recentAvg === 0) {
+                trend = "stable";
+            } else if (baselineAvg === 0 && recentAvg > 0) {
                 trend = "improving";
-                message = "Working memory and inhibitory control performance is improving.";
-            } else if (declining) {
+                message =
+                    "Your long-term Knox trend suggests improving working memory and inhibitory control performance.";
+            } else if (baselineAvg > 0 && recentAvg === 0) {
+                avgDeltaPct = -100;
                 trend = "declining";
                 message =
-                    "Working memory and inhibitory control performance shows a sustained decline. If this continues, consider consulting a healthcare professional.";
+                    "Your long-term Knox trend suggests a decline in working memory and inhibitory control performance. If this pattern continues, consider discussing it with a healthcare professional.";
+            } else {
+                avgDeltaPct = percentDiff(recentAvg, baselineAvg);
+
+                const improving = avgDeltaPct >= 7;
+                const declining = avgDeltaPct <= -7;
+
+                if (improving) {
+                    trend = "improving";
+                    message =
+                        "Your long-term Knox trend suggests improving working memory and inhibitory control performance.";
+                } else if (declining) {
+                    trend = "declining";
+                    message =
+                        "Your long-term Knox trend suggests a decline in working memory and inhibitory control performance. If this pattern continues, consider discussing it with a healthcare professional.";
+                }
             }
 
             return res.json({
@@ -360,18 +387,18 @@ export class KnoxStatsController {
                 hasEnoughData: true,
                 trend,
                 message,
+                recentWindowStart: toDateKey(recentStart),
+                recentWindowEnd: toDateKey(today),
                 baselineAvg,
                 recentAvg,
                 avgDeltaPct: Number(avgDeltaPct.toFixed(2)),
-                counts: { better3Percent, worse3Percent },
-                recent10: perDayDeltaPct,
             });
         } catch (error) {
             console.error("Error computing KNOX trend:", error);
             return res.status(500).json({ error: "Server error" });
         }
     };
-
+    
     static getRecentAverageSummary = async (req: Request, res: Response) => {
         try {
             const userId = req.user?.id;

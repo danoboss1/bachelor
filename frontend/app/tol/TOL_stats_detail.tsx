@@ -1,29 +1,22 @@
-import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
+import { StatMiniSupplementary } from "@/components/StatsComponent";
 import { Color } from "@/constants/TWPalette";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { getMonthName } from "@/components/statsDetail/statsDetailComponents";
-import { useRouter } from "expo-router";
-import { getToken, removeToken } from "../(auth)/tokenStorage";
-import { styles } from "../../assets/styles/statsDetail.styles";
 import { Icon } from "../../components/ui/Icon";
+import { BAR_WIDTH, END_SPACING, INITIAL_SPACING, SPACING} from "@/components/statsDetail/chartConstants";
+import { useRouter } from "expo-router";
+import { getToken, removeToken } from "@/app/(auth)/tokenStorage";
+import { styles } from "@/assets/styles/statsDetail.styles";
+import { StatsDetailHeader } from "@/components/statsDetail/statsDetailHeader";
+import { MonthNavigator } from "@/components/statsDetail/monthNavigator";
+import { formatDate } from "@/components/statsDetail/utils";
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
-const CHART_HORIZONTAL_PADDING = width * 0.08;
-const NUMBER_OF_BARS = 7;
-const SPACING = 12;
-const INITIAL_SPACING = 6;
-const END_SPACING = 6;
-
-const BAR_WIDTH =
-    (width -
-        CHART_HORIZONTAL_PADDING * 2 -
-        INITIAL_SPACING -
-        END_SPACING -
-        SPACING * (NUMBER_OF_BARS - 1)) /
-    NUMBER_OF_BARS;
+// toto zmenime ked budeme mat koeficienty 
+const MAX_SCORE = 30;
 
 type TolStatRow = {
     id: number;
@@ -51,15 +44,16 @@ type MonthlyResponse = {
     days: MonthlyDay[];
 };
 
-const rawData = [
-    {value: 50, dataPointText: '50', label: '15/1'},
-    {value: 80, dataPointText: '80', label: '16/1'},
-    {value: 100, dataPointText: '100', label: '17/1'},
-    {value: 70, dataPointText: '70', label: '18/1'},
-    {value: 56, dataPointText: '56', label: '19/1'},
-    {value: 78, dataPointText: '78', label: '20/1'},
-    {value: 74, dataPointText: '74', label: '21/1', frontColor: '#177AD5'},
-];
+type TrendResponse = {
+    userId: number;
+    hasEnoughData: boolean;
+    trend: "improving" | "declining" | "stable" | null;
+    message: string | null;
+    baselineAvg?: number;
+    recentAvg?: number;
+    avgDeltaPct?: number;
+    reason?: string;
+};
 
 
 export default function TOLStatsDetail() {
@@ -69,18 +63,31 @@ export default function TOLStatsDetail() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-    // activeIndex je mozno selectedBarIndex, ze to je to iste
     const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
 
     const [data, setData] = useState<MonthlyResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedDay, setSelectedDay] = useState<MonthlyDay | null>(null);
     
-    const [activeIndex, setActiveIndex] = useState(rawData.length - 1);
+    const [error, setError] = useState<string | null>(null);
 
     const trendUrl = "https://bachelor-pi.vercel.app/tolStats/trend";
 
-    const [trendMessage, setTrendMessage] = useState<string | null>(null);
+    const [trendData, setTrendData] = useState<TrendResponse | null>(null);
+    
+    const chartScrollRef = useRef<any>(null);
+
+    const scrollToBar = (index: number) => {
+        const x =
+            INITIAL_SPACING +
+            index * (BAR_WIDTH + SPACING) -
+                width * 0.35;
+
+        chartScrollRef.current?.scrollTo?.({
+            x: Math.max(0, x),
+            animated: true,
+        });
+    };
 
     const url = useMemo(() => {
         return `https://bachelor-pi.vercel.app/tolStats/month?year=${currentYear}&month=${currentMonth + 1}`
@@ -110,10 +117,13 @@ export default function TOLStatsDetail() {
             setLoading(true);
             setSelectedDay(null);
 
+            if (!cancelled) {
+                setError(null);
+            }
+
             try {
                 const token = await getToken();
-                
-                // tuto mozno session expired napisat uzivatelovi
+
                 if (!token) {
                     router.replace("/(auth)/login");
                     return;
@@ -130,34 +140,37 @@ export default function TOLStatsDetail() {
                     router.replace("/(auth)/login");
                     return;
                 }
-                
-                // toto je naco ten druhy riadok
+
+                if (!res.ok) {
+                    throw new Error(`Request failed with status ${res.status}`);
+                }
+
                 const json = await res.json();
 
-                // jak toto cancelled sa moze zrazu zmenit
                 if (!cancelled) {
                     setData(json);
                 }
             } catch (e) {
-                // toto neviem ci budem chcet logovat takto
-                console.log("Load error: ", e);
+                console.error("Failed to load ToL stats:", e);
+
+                if (!cancelled) {
+                    setError("Failed to load statistics. Please try again.");
+                }
             } finally {
-                // idk
                 if (!cancelled) setLoading(false);
             }
         }
 
         load();
 
-        // idk
         return () => {
             cancelled = true;
         };
-    }, [url]);
+    }, [url, router]);
 
     useEffect(() => {
         let cancelled = false;
-        
+
         async function loadTrend() {
             try {
                 const token = await getToken();
@@ -171,21 +184,19 @@ export default function TOLStatsDetail() {
 
                 if (!res.ok) return;
 
-                const json = await res.json();
-                if (!cancelled) setTrendMessage(json.message ?? null);
+                const json: TrendResponse = await res.json();
+                if (!cancelled) setTrendData(json);
             } catch {}
         }
 
         loadTrend();
-        return () => { cancelled = true; };
+        return () => { 
+            cancelled = true; 
+        };
     }, []);
 
-    const maxScore = 6;
-
-    // ✅ convenience
     const days = data?.days ?? [];
 
-    // ✅ auto-select last day with stat (or last day)
     useEffect(() => {
         if (!data?.days?.length) return;
 
@@ -198,6 +209,10 @@ export default function TOLStatsDetail() {
 
         setSelectedBarIndex(idx);
         setSelectedDay(data.days[idx] ?? null);
+
+        requestAnimationFrame(() => {
+            scrollToBar(idx);
+        });
     }, [data]);
 
     const chartData = useMemo(() => {
@@ -205,7 +220,9 @@ export default function TOLStatsDetail() {
             value: day.value,
             label: day.label,
             frontColor:
-                selectedBarIndex === index ? Color.orange[800] : Color.orange[400],
+                day.bestStat == null
+                    ? (selectedBarIndex === index ? Color.gray[500] : Color.gray[300]) 
+                    : (selectedBarIndex === index ? Color.orange[800] : Color.orange[400]),
             topLabelComponent:
                 selectedBarIndex === index
                     ? () => (
@@ -213,11 +230,11 @@ export default function TOLStatsDetail() {
                             style={{
                                 fontSize: 12,
                                 fontWeight: "600",
-                                color: Color.orange[800],
+                                color: day.bestStat == null ? Color.gray[500] : Color.orange[800],
                                 marginBottom: 6,
                             }}
                         >
-                            {day.value}
+                            {day.bestStat == null ? "—" : day.value}
                         </Text>
                     )
                     : undefined,
@@ -225,11 +242,11 @@ export default function TOLStatsDetail() {
     }, [days, selectedBarIndex]);
 
     const labels = [
-        "SEVERE\n0–3 points",
+        "VERY POOR\n0–3 points",
         "POOR\n4–5 points",
-        "AVERAGE\n6–8 points",
+        "NORMAL\n6–8 points",
         "GOOD\n9–11 points",
-        "EXCELLENT\n12+ points",
+        "EXCELLENT\n12+ points"
     ];
     
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
@@ -243,7 +260,11 @@ export default function TOLStatsDetail() {
         return 4; // 12+
     }
 
-    function getCategoryInterpretation(index: number) {
+    function getTolCategoryInterpretation(index: number | null) {
+        if (index === null) {
+            return "No test was performed on this day";
+        }
+
         switch (index) {
             case 0: return "Severe difficulties in planning and decision-making";
             case 1: return "Reduced planning and decision-making abilities";
@@ -259,124 +280,51 @@ export default function TOLStatsDetail() {
 
     const totalScore = Number(best?.totalscore ?? 0);
 
-    const categoryIndex = 
-        selectedDay?.categoryIndex ??
-        (best ? getTolCategoryIndex(totalScore) : 0);
+    const categoryIndex =
+    selectedDay?.bestStat == null
+        ? null
+        : (selectedDay?.categoryIndex ??
+            (best ? getTolCategoryIndex(totalScore) : null));
+    
+    const trendMessage = trendData?.message ?? null;
 
-    // const barData = useMemo(
-    //     () =>
-    //         rawData.map((item, index) => ({
-    //             ...item,
-    //             frontColor:
-    //                 index === activeIndex
-    //                     ? Color.brown[800]
-    //                     : Color.brown[400],
-
-    //             topLabelComponent:
-    //                 index === activeIndex
-    //                     ? () => (
-    //                         <Text
-    //                             style={{
-    //                                 fontSize: 12,
-    //                                 fontWeight: "600",
-    //                                 color: Color.brown[800],
-    //                                 marginBottom: 6,
-    //                             }}
-    //                         >
-    //                             {item.value}
-    //                         </Text>
-    //                         )
-    //                     : undefined,
-    //         })),
-    //     [activeIndex]    
-    // );
+    const selectedStatDate = selectedDay?.date ?? null;
 
     return (
         <View style={styles.screen}>
             <View style={{ flex: 1, justifyContent: "center" }}>
-                <View style={styles.header}>
-                    <View>
-                        <Text style={styles.title}>ToL Statistics</Text>
-                        <Text style={styles.subtitle}>
-                            Track your monthly performance
-                        </Text>
-                    </View>
+                <StatsDetailHeader
+                    title="ToL Statistics"
+                    subtitle="Track your monthly performance"
+                    onBack={() => router.back()}
+                />
 
-                    {/* Tento pressable pozriet ci je dobra adresa */}
-                    <Pressable
-                        onPress={() => router.back()}
-                        style={styles.backBtn}
-                        hitSlop={16}
-                    >
-                        <Icon symbol={"chevron.backward"} size="sm" color={Color.gray[700]} />
-                    </Pressable>
-                </View>
+                {error && (
+                    <View style={errorStyles.container}>
+                        <Text style={errorStyles.text}>{error}</Text>
+                    </View>
+                )}
 
                 <View style={styles.cardBar}>
                     <Text style={styles.graphTitle}>Total score</Text>
 
-                    {/* Month Navigation */}
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 16,
-                            paddingHorizontal: 16,
-                        }}
-                    >
-                        <Pressable
-                            onPress={() => navigateMonth(-1)}
-                            style={{
-                                padding: 8,
-                                borderRadius: 8,
-                            }}
-                            hitSlop={20}
-                        >
-                            <Icon
-                                symbol={"chevron.backward"}
-                                size="sm"
-                                color={Color.gray[500]}
-                            />
-                        </Pressable>
-
-                        <Text
-                            style={{
-                                fontSize: 18,
-                                fontWeight: "600",
-                                color: Color.gray[900],
-                            }}
-                        >
-                            {getMonthName(currentMonth)} {currentYear}
-                        </Text>
-
-                        <Pressable
-                            onPress={() => navigateMonth(1)}
-                            style={{
-                                padding: 8,
-                                borderRadius: 8,
-                            }}
-                            hitSlop={20}
-                        >
-                            <Icon
-                                symbol={"chevron.forward"}
-                                size="sm"
-                                color={Color.gray[500]}
-                            />
-                        </Pressable>
-                    </View>
+                    <MonthNavigator
+                        month={currentMonth}
+                        year={currentYear}
+                        onPrev={() => navigateMonth(-1)}
+                        onNext={() => navigateMonth(1)}
+                    />
 
                     <BarChart
-                        maxValue={20}
+                        maxValue={MAX_SCORE}
                         stepValue={5}
                         yAxisExtraHeight={20}
+                        scrollRef={chartScrollRef}
                         barBorderRadius={4}
                         frontColor={Color.orange[400]}
                         data={chartData}
                         xAxisThickness={0}
                         yAxisThickness={0}
-                        // disableScroll
-                        // width={width - CHART_HORIZONTAL_PADDING * 2}
                         barWidth={BAR_WIDTH}
                         spacing={SPACING}
                         initialSpacing={INITIAL_SPACING}
@@ -391,29 +339,26 @@ export default function TOLStatsDetail() {
                             fontSize: 12,
                             fontWeight: "500",
                         }}
-                        // onPress={(_item: any, index: number) => {
-                        //     // setActiveIndex(index);
-                        //     setSelectedBarIndex(index);
-                        // }}
                         onPress={(_item: any, index: number) => {
                             setSelectedBarIndex(index);
                             setSelectedDay(days[index] ?? null);
+                            scrollToBar(index);
                         }}
                         dashGap={10}
                     />
                 </View>
             </View>
 
-            {/* <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.statsScroll}> */}
-            <ScrollView 
+            <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
-            >
-                {/* INTERPRETATION BAR */}
+            >   
                 <View style={styles.card}>
-                    {/* <Text style={styles.cardTitle}>Interpretation</Text> */}
-                {/* <View style={styles.scaleContainer}> */}
+                    <Text style={dateHeaderStyles.dateText}>
+                        {formatDate(selectedStatDate)}
+                    </Text>
+
                     <View style={styles.scaleBar}>
                         {labels.map((label, index) => (
                             <View
@@ -421,106 +366,125 @@ export default function TOLStatsDetail() {
                                 style={[
                                     styles.segment,
                                     {
-                                        backgroundColor: index === categoryIndex
-                                            ? segmentColors[index] // iba aktuálna kategória svieti
-                                            : inactiveColor,       // ostatné tmavosivé
+                                        backgroundColor:
+                                            categoryIndex === null
+                                                ? inactiveColor
+                                                : index === categoryIndex
+                                                    ? segmentColors[index]
+                                                    : inactiveColor,
                                         borderRightWidth: index < labels.length - 1 ? 1 : 0,
-                                        borderRightColor: "#999" // tenká čiarka medzi segmentmi
-                                    }
+                                        borderRightColor: "#999",
+                                    },
                                 ]}
                             >
-                                <Text style={[
-                                    styles.segmentText,
-                                    { color: categoryIndex === 2 && index === 2 ? "#333" : "white" }
-                                    // { color: index === 2 ? "black" : "white" } // žltý segment čitateľný
-                                ]}>
+                                <Text
+                                    style={[
+                                        styles.segmentText,
+                                        {
+                                            color:
+                                                categoryIndex !== null &&
+                                                categoryIndex === 2 &&
+                                                index === 2
+                                                    ? "#333"
+                                                    : "white",
+                                        },
+                                    ]}
+                                >
                                     {label}
                                 </Text>
                             </View>
                         ))}
                     </View>
 
-                    {/* RESULT TEXT */}
-
-
-                      {/* ✅ Highlight hneď po scaleBare */}
                     <View style={styles.resultContainer}>
-                        {/* ✅ Interpretation = len malé dovysvetlenie */}
                         <Text style={styles.interpretationSmall}>
-                            {getCategoryInterpretation(categoryIndex)}
+                            {getTolCategoryInterpretation(categoryIndex)}
                         </Text>
 
-                        <View style={styles.highlightSingle}>
+                        {/* ✅ KNOX: iba jedna hodnota cez celú šírku */}
+                        <View style={tolStyles.singleHighlightBox}>
                             <Text style={styles.highlightValue}>
                                 {hasBest ? totalScore : "—"}
                             </Text>
                             <Text style={styles.highlightLabel}>Total score</Text>
                         </View>
 
-                        {/* ✅ TREND = najdôležitejší text */}
                         {trendMessage ? (
                             <Text style={styles.trendPrimary}>
                                 {trendMessage}
                             </Text>
                         ) : null}
-
                     </View>
-
                 </View>
 
                 {/* Vedľajšie štatistiky */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Detailed stats</Text>
 
-                    <StatMiniSupplementary label="4-moves sequences" value={5} whole={8} />
-                    <StatMiniSupplementary label="5-moves sequences" value={5} whole={8} />
-                    <StatMiniSupplementary label="6-moves sequences" value={3} whole={8} />
-                    <StatMiniSupplementary label="Total correct sequences" value={13} whole={24} />
+                    <StatMiniSupplementary 
+                        label={"4-moves sequences"}
+                        value={hasBest ? `${Number(best?.fourmovessequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"5-moves sequences"}
+                        value={hasBest ? `${Number(best?.fivemovessequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"6-moves sequences"}
+                        value={hasBest ? `${Number(best?.sixmovessequencescorrect ?? 0)}%` : "—"}
+                    />
+
+                    <StatMiniSupplementary 
+                        label={"Total correct sequences"}
+                        value={hasBest ? `${Number(best?.totalcorrect ?? 0)}` : "—"}
+                    />
                 </View>
             </ScrollView>
         </View>
     )
 }
 
-const localStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop: height * 0.026,
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#d6c7b9",
-    },
-    statsScroll: {
-        width: "100%",
-    },
-    graphTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginLeft: width * 0.1,
-        marginBottom: 8,
-        color: "black",
-        textAlign: "left",
-    },
-    tooltip: {
-        backgroundColor: "white",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 8,
-        elevation: 4,
-        alignItems: "center",
 
-        minWidth: 140,
-        maxWidth: 180,
-    },
-    tooltipTitle: {
-        fontSize: 12,
-        fontWeight: "600",
-        color: "black",
-    },
-    tooltipSubtitle: {
+const dateHeaderStyles = StyleSheet.create({
+    dateText: {
+        alignSelf: "flex-end",
         fontSize: 11,
-        color: "gray",
-        marginTop: 2,
-    }
-})
+        fontWeight: "600",
+        color: Color.gray[600],
+        marginBottom: 12,
+    },
+});
+
+const errorStyles = StyleSheet.create({
+    container: {
+        marginHorizontal: 16,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        backgroundColor: "#FEE2E2",
+        borderWidth: 1,
+        borderColor: "#FCA5A5",
+    },
+    text: {
+        color: "#B91C1C",
+        fontSize: 14,
+        fontWeight: "500",
+        textAlign: "center",
+    },
+});
+
+const tolStyles = StyleSheet.create({
+    singleHighlightBox: {
+        marginTop: 12,
+        borderRadius: 16,
+        paddingVertical: 18,
+        paddingHorizontal: 16,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "white",
+    },
+});
 

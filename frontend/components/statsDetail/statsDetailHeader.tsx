@@ -27,7 +27,10 @@ export function StatsDetailHeader({
                 style={styles.backBtn}
                 hitSlop={16}
             >
-                <Icon symbol={"chevron.backward"} size="sm" color={Color.gray[700]} />
+                {/* <Icon symbol={"chevron.backward"} size="sm" color={Color.gray[700]} /> */}
+                <Text style={{ fontSize: 30, color: "black", fontWeight: "400" }}>
+                    ‹
+                </Text>
             </Pressable>
         </View>
     )

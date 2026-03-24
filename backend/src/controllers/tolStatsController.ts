@@ -311,7 +311,7 @@ export class TolStatsController {
             });
 
                         const insufficientDataMessage =
-                "This long-term indicator needs at least 3 WCST result-days within the last 10 calendar days and at least 3 older result-days for comparison.";
+                "This long-term indicator needs at least 3 ToL result-days within the last 10 calendar days and at least 3 older result-days for comparison.";
 
             if (recentDays.length < 3) {
                 return res.json({

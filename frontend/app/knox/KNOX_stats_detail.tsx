@@ -429,37 +429,44 @@ export default function TOLStatsDetail() {
 
                     <StatMiniSupplementary 
                         label={"3-step sequences"}
-                        value={hasBest ? `${Number(best?.threestepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.threestepsequencescorrect ?? 0)}` : "—"}
+                        whole={2}
                     />
 
                     <StatMiniSupplementary 
                         label={"4-step sequences"}
-                        value={hasBest ? `${Number(best?.fourstepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.fourstepsequencescorrect ?? 0)}` : "—"}
+                        whole={4}
                     />
 
                     <StatMiniSupplementary 
                         label={"5-step sequences"}
-                        value={hasBest ? `${Number(best?.fivestepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.fivestepsequencescorrect ?? 0)}` : "—"}
+                        whole={4}
                     />
 
                     <StatMiniSupplementary 
                         label={"6-step sequences"}
-                        value={hasBest ? `${Number(best?.sixstepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.sixstepsequencescorrect ?? 0)}` : "—"}
+                        whole={3}
                     />
 
                     <StatMiniSupplementary 
                         label={"7-step sequences"}
-                        value={hasBest ? `${Number(best?.sevenstepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.sevenstepsequencescorrect ?? 0)}` : "—"}
+                        whole={3}
                     />
 
                     <StatMiniSupplementary 
                         label={"8-step sequences"}
-                        value={hasBest ? `${Number(best?.eightstepsequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.eightstepsequencescorrect ?? 0)}` : "—"}
+                        whole={2}
                     />
 
                     <StatMiniSupplementary 
                         label={"Total correct sequences"}
                         value={hasBest ? `${Number(best?.totalcorrect ?? 0)}` : "—"}
+                        whole={18}
                     />
                  </View>
             </ScrollView>

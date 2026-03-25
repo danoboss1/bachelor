@@ -80,18 +80,18 @@ export function useKNOXGame() {
 
     const [sequenceLengths] = React.useState([
         // testovacie sekvencie
-        3, 4
+        // 3, 4
         // 3, 4, 5, 6, 7, 8
         // 4,
         // 5,
 
         // skutocne sekvencie
-        // 3, 3,
-        // 4, 4, 4, 4,
-        // 5, 5, 5, 5,
-        // 6, 6, 6,
-        // 7, 7, 7,
-        // 8, 8,
+        3, 3,
+        4, 4, 4, 4,
+        5, 5, 5, 5,
+        6, 6, 6,
+        7, 7, 7,
+        8, 8,
     ]);
 
 

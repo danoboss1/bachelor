@@ -423,22 +423,26 @@ export default function TOLStatsDetail() {
 
                     <StatMiniSupplementary 
                         label={"4-moves sequences"}
-                        value={hasBest ? `${Number(best?.fourmovessequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.fourmovessequencescorrect ?? 0)}` : "—"}
+                        whole={8}
                     />
 
                     <StatMiniSupplementary 
                         label={"5-moves sequences"}
-                        value={hasBest ? `${Number(best?.fivemovessequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.fivemovessequencescorrect ?? 0)}` : "—"}
+                        whole={8}
                     />
 
                     <StatMiniSupplementary 
                         label={"6-moves sequences"}
-                        value={hasBest ? `${Number(best?.sixmovessequencescorrect ?? 0)}%` : "—"}
+                        value={hasBest ? `${Number(best?.sixmovessequencescorrect ?? 0)}` : "—"}
+                        whole={8}
                     />
 
                     <StatMiniSupplementary 
                         label={"Total correct sequences"}
                         value={hasBest ? `${Number(best?.totalcorrect ?? 0)}` : "—"}
+                        whole={24}
                     />
                 </View>
             </ScrollView>

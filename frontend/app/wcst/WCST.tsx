@@ -1,5 +1,4 @@
 import { AllCard, Blue_Circles_Card, Green_Stars_Card, Red_Triangle_Card, Yellow_Pluses_Card } from "@/components/cards/AllCard";
-import { LinearGradient } from 'expo-linear-gradient';
 import React from "react";
 import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useWCSTGame } from "../hooks/useWCSTGame";
@@ -29,23 +28,7 @@ export default function WCST_Screen() {
     } = useWCSTGame();
 
     return (
-        // <LinearGradient
-        //     colors={["#FF8C00", "#FFD700"]}
-        //     start={{ x: 0, y: 0.5 }}
-        //     end={{ x: 1, y: 0.5 }}
-        //     style={styles.container}
-        // >
         <View style={[styles.container, {backgroundColor: "#ffd6a5"}]}>
-            {/* <View style={styles.timer}>
-                <Text style={styles.timerText}>Timer: {formatTime(timeLeft)}</Text>
-
-                <TouchableOpacity
-                    style={styles.button}
-                >
-                    <Text style={styles.exitButton}> Exit Test </Text>
-                </TouchableOpacity>
-            </View> */}
-
             <View style={styles.header}>
                 <Text style={styles.timerText}>
                     Timer: {formatTime(timeLeft)}

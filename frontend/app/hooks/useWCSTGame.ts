@@ -171,7 +171,7 @@ export function useWCSTGame() {
     
     // toto zmenit neskor na 6
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
-        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
+        if (newCategoriesCompleted >= 6 || newAttemptsUsed >= 128) {
             setIsLocked(true);
             
             // zobraz finished message

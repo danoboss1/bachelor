@@ -127,6 +127,12 @@ export class KnoxStatsController {
 
     static saveStat = async (req: Request, res: Response) => {
         try {
+            const userId = req.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
             const {
                 time,
                 threeStepSequencesCorrect,
@@ -137,7 +143,6 @@ export class KnoxStatsController {
                 eightStepSequencesCorrect,
                 totalCorrect,
                 totalScore,
-                user_id,
             } = req.body;
 
             if (time == null) return res.status(400).json({ error: "time is required" })
@@ -149,7 +154,6 @@ export class KnoxStatsController {
             if (eightStepSequencesCorrect == null) return res.status(400).json({ error: "eightStepSequencesCorrect is required" });
             if (totalCorrect == null) return res.status(400).json({ error: "totalCorrect is required" });
             if (totalScore == null) return res.status(400).json({ error: "totalScore is required" });
-            if (user_id == null) return res.status(400).json({ error: "user_id is required" });
 
             const stat = await prisma.stats_knox.create({
                 data: {
@@ -162,7 +166,7 @@ export class KnoxStatsController {
                     eightstepsequencescorrect: eightStepSequencesCorrect,
                     totalcorrect: totalCorrect,
                     totalscore: totalScore, 
-                    user_id: user_id,
+                    user_id: userId,
                 },
                 select: {
                     id: true,
@@ -398,7 +402,7 @@ export class KnoxStatsController {
             return res.status(500).json({ error: "Server error" });
         }
     };
-    
+
     static getRecentAverageSummary = async (req: Request, res: Response) => {
         try {
             const userId = req.user?.id;

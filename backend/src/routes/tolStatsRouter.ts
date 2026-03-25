@@ -10,6 +10,6 @@ router.get("/recentAverage", authMiddleware, TolStatsController.getRecentAverage
 router.get('/month', authMiddleware, TolStatsController.getMonthlyBestPerDay);
 
 router.get('/:statId', TolStatsController.getStat);
-router.post('/', TolStatsController.saveStat);
+router.post('/', authMiddleware, TolStatsController.saveStat);
 
 export default router;

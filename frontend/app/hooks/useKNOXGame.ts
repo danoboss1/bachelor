@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
 import { Alert, BackHandler } from "react-native";
+import { getToken } from "@/app/(auth)/tokenStorage";
 
 const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
 
@@ -15,7 +16,6 @@ type KnoxStatsPayload = {
     eightStepSequencesCorrect: number,
     totalCorrect: number,
     totalScore: number,
-    user_id: number,
 };
 
 const COEFFICIENTS: Record<number, number> = {
@@ -134,6 +134,13 @@ export function useKNOXGame() {
     }
 
     async function saveKnoxStatstoBackend(finalScore: number) {
+        const token = await getToken();
+
+        if (!token) {
+            console.error("No JWT token found");
+            return;
+        }
+
         const payload: KnoxStatsPayload = {
             time: new Date().toISOString(),
             threeStepSequencesCorrect: threeStepSequencesCorrect,
@@ -144,11 +151,14 @@ export function useKNOXGame() {
             eightStepSequencesCorrect: eightStepSequencesCorrect,
             totalCorrect: totalCorrect,
             totalScore: finalScore,
-            user_id: 1,
         };
 
         try {
-            await axios.post("https://bachelor-pi.vercel.app/knoxStats", payload);
+            await axios.post("https://bachelor-pi.vercel.app/knoxStats", payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }

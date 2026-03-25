@@ -131,6 +131,12 @@ export class TolStatsController {
 
     static saveStat = async (req: Request, res: Response) => {
         try {
+            const userId = req.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
             const {
                 time,
                 fourMovesSequencesCorrect,
@@ -138,7 +144,6 @@ export class TolStatsController {
                 sixMovesSequencesCorrect,
                 totalCorrect,
                 totalScore,
-                user_id,
             } = req.body;
 
             if (time == null) return res.status(400).json({ error: "time is required" })
@@ -147,7 +152,6 @@ export class TolStatsController {
             if (sixMovesSequencesCorrect == null) return res.status(400).json({ error: "sixMovesSequencesCorrect is required" });
             if (totalCorrect == null) return res.status(400).json({ error: "totalCorrect is required" });
             if (totalScore == null) return res.status(400).json({ error: "totalScore is required" });
-            if (user_id == null) return res.status(400).json({ error: "user_id is required" });
 
             const stat = await prisma.stats_tol.create({
                 data: {
@@ -157,7 +161,7 @@ export class TolStatsController {
                     sixmovessequencescorrect: sixMovesSequencesCorrect,
                     totalcorrect: totalCorrect,
                     totalscore: totalScore,
-                    user_id: user_id,
+                    user_id: userId,
                 },
                 select: {
                     id: true,
@@ -174,7 +178,7 @@ export class TolStatsController {
             // nema tu byt status 200?
             res.status(201).json(stat);
         } catch (error) {
-            console.error("Error saving tol statistics", error);
+            console.error("Error saving ToL statistics", error);
             res.status(500).json({ error: "Server error" });
         }
     };

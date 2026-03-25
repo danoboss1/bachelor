@@ -3,6 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Alert, BackHandler, Dimensions, View } from "react-native";
 import { difficultyFive, difficultyFour, difficultySix } from "../tol/TOL_data";
+import { getToken } from "@/app/(auth)/tokenStorage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,7 +16,6 @@ type TolStatsPayload = {
     sixMovesSequencesCorrect: number;
     totalCorrect: number;
     totalScore: number;
-    user_id: number;
 };
 
 type DiscData = {
@@ -161,6 +161,13 @@ export function useTOLGame() {
     }
 
     async function saveTolStatstoBackend(score: number) {
+        const token = await getToken();
+
+        if (!token) {
+            console.error("No JWT token found");
+            return;
+        }
+
         const payload: TolStatsPayload = {
             time: new Date().toISOString(),
             fourMovesSequencesCorrect: fourMovesSequencesCorrect,
@@ -168,11 +175,14 @@ export function useTOLGame() {
             sixMovesSequencesCorrect: sixMovesSequencesCorrect,
             totalCorrect: totalCorrect,
             totalScore: score,
-            user_id: 1,
         }
 
         try {
-            await axios.post("https://bachelor-pi.vercel.app/tolStats", payload);
+            await axios.post("https://bachelor-pi.vercel.app/tolStats", payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }
@@ -255,7 +265,7 @@ export function useTOLGame() {
         // tu som skoncil odtial to pokracujem dalej 
         // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
 
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 1; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFour.length,
                 usedFourIndexesRef.current
@@ -277,7 +287,7 @@ export function useTOLGame() {
             await delay(1500);
         }
 
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 0; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFive.length,
                 usedFiveIndexesRef.current
@@ -299,7 +309,7 @@ export function useTOLGame() {
         }
 
         // pocet uloh
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 0; i++) {
             const index = getUniqueRandomIndex(
                 difficultySix.length,
                 usedSixIndexesRef.current

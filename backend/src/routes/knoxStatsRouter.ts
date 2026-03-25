@@ -10,6 +10,6 @@ router.get("/recentAverage", authMiddleware, KnoxStatsController.getRecentAverag
 router.get("/month", authMiddleware, KnoxStatsController.getMonthlyBestPerDay);
 
 router.get('/:statId', KnoxStatsController.getStat);
-router.post('/', KnoxStatsController.saveStat);
+router.post('/', authMiddleware, KnoxStatsController.saveStat);
 
 export default router;

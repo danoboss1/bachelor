@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
 import { Animated, View, Alert, BackHandler, AppState, AppStateStatus } from "react-native";
+import { getToken } from "@/app/(auth)/tokenStorage";
 
 const WCST_ROUTE_ENDSCREEN = "/wcst/WCST_endscreen";
 
@@ -36,7 +37,6 @@ type StatsPayload = {
     perseverativeerrorpercent: number;
     nonperseverativeerrorpercent: number;
     errorpercent: number;
-    user_id: number;
 };
 
 const TEST_DURATION_SEC = 1200;
@@ -171,7 +171,7 @@ export function useWCSTGame() {
     
     // toto zmenit neskor na 6
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
-        if (newCategoriesCompleted >= 6 || newAttemptsUsed >= 128) {
+        if (newCategoriesCompleted >= 1 || newAttemptsUsed >= 128) {
             setIsLocked(true);
             
             // zobraz finished message
@@ -193,6 +193,13 @@ export function useWCSTGame() {
     }
     
     async function saveStatsToBackend() {
+        const token = await getToken();
+
+        if (!token) {
+            console.error("No JWT token found");
+            return;
+        }
+
         const payload: StatsPayload = {
             time: new Date().toISOString(),
             categories_completed: categoriesCompleted,
@@ -208,11 +215,14 @@ export function useWCSTGame() {
             perseverativeerrorpercent: trialsAdministered > 0 ? Number(((perseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
             nonperseverativeerrorpercent: trialsAdministered > 0 ? Number(((nonPerseverativeErrors / trialsAdministered) * 100).toFixed(2)) : 0,
             errorpercent: trialsAdministered > 0 ? Number(((totalError / trialsAdministered) * 100).toFixed(2)) : 0,
-            user_id: 1
         };
         
         try {
-            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload);
+            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
         } catch (err: any) {
             console.error("Error saving stats:", err);
         }

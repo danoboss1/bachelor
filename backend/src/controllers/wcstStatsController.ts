@@ -132,6 +132,12 @@ export class StatsController {
 
     static saveStat = async (req: Request, res: Response) => {
         try {
+            const userId = req.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
             const {
                 time,
                 categories_completed,
@@ -147,7 +153,6 @@ export class StatsController {
                 perseverativeerrorpercent,
                 nonperseverativeerrorpercent,
                 errorpercent,
-                user_id
             } = req.body;
 
             if (time == null) return res.status(400).json({ error: "time is required" });
@@ -170,8 +175,6 @@ export class StatsController {
             if (nonperseverativeerrorpercent == null) return res.status(400).json({ error: "nonperseverativeerrorpercent is required" });
             if (errorpercent == null) return res.status(400).json({ error: "errorpercent is required" });
 
-            if (user_id == null) return res.status(400).json({ error: "user_id is required" });
-
             const stat = await prisma.stats_wcst.create({
                 data: {
                     time,
@@ -188,7 +191,7 @@ export class StatsController {
                     perseverativeerrorpercent,
                     nonperseverativeerrorpercent,
                     errorpercent,
-                    user_id
+                    user_id: userId,
                 },
                 select: {
                     id: true,

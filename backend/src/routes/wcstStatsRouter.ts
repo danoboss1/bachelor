@@ -16,7 +16,7 @@ router.get('/percentile', StatsController.getPercentile);
 router.get('/month', authMiddleware, StatsController.getMonthlyBestPerDay);
 
 router.get('/:statId', StatsController.getStat);
-router.post('/', StatsController.saveStat);
+router.post('/', authMiddleware, StatsController.saveStat);
 
 
 export default router;

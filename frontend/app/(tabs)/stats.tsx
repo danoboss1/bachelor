@@ -31,8 +31,11 @@ type WcstRecentSummaryResponse = {
     windowStart: string | null;
     windowEnd: string | null;
     daysWithResults: number;
-    averageCategoriesCompleted: number | null;
-    averageTrialsAdministered: number | null;
+    bestStat: {
+        id: number;
+        categories_completed: number;
+        trials_administered: number;
+    } | null;
 };
 
 type TolRecentSummaryResponse = {
@@ -273,16 +276,16 @@ export default function StatsScreen() {
     // WCST derived values
     const wcstHasBest = !!wcstData?.hasEnoughData;
 
-    const averageCategoriesCompleted = wcstData?.averageCategoriesCompleted ?? null;
-    const averageTrialsAdministered = wcstData?.averageTrialsAdministered ?? null;
+    const bestCategoriesCompleted = wcstData?.bestStat?.categories_completed ?? null;
+    const bestTrialsAdministered = wcstData?.bestStat?.trials_administered ?? null;
 
     const categoryIndex =
-        averageCategoriesCompleted != null && averageTrialsAdministered != null
-            ? getCategoryIndexWCST(averageCategoriesCompleted, averageTrialsAdministered)
+        bestCategoriesCompleted != null && bestTrialsAdministered != null
+            ? getCategoryIndexWCST(bestCategoriesCompleted, bestTrialsAdministered)
             : 0;
 
     const interpretation =
-        averageCategoriesCompleted != null && averageTrialsAdministered != null
+        bestCategoriesCompleted != null && bestTrialsAdministered != null
             ? getCategoryInterpretation(categoryIndex)
             : "No recent data";
 
@@ -340,9 +343,9 @@ export default function StatsScreen() {
                         categoryIndex={categoryIndex}
                         interpretation={interpretation}
                         hasData={wcstHasBest}
-                        primaryValue={averageCategoriesCompleted}
+                        primaryValue={bestCategoriesCompleted}
                         primaryLabel="Categories"
-                        secondaryValue={averageTrialsAdministered}
+                        secondaryValue={bestTrialsAdministered}
                         secondaryLabel="Cards used"
                     />
 

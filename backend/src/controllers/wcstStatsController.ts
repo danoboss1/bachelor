@@ -545,16 +545,15 @@ export class StatsController {
 
             const allDays = await getBestPerDay(userId);
 
-            if (!allDays.length) {
+            if(!allDays.length) {
                 return res.json({
                     userId,
                     hasEnoughData: false,
                     windowStart: null,
                     windowEnd: null,
                     daysWithResult: 0,
-                    averageCategoriesCompleted: null,
-                    averageTrialsAdministered: null,
-                });
+                    bestStat: null,
+                })
             }
 
             const lastDay = allDays.at(-1);
@@ -566,8 +565,7 @@ export class StatsController {
                     windowStart: null,
                     windowEnd: null,
                     daysWithResult: 0,
-                    averageCategoriesCompleted: null,
-                    averageTrialsAdministered: null,
+                    bestStat: null,
                 });
             }
 
@@ -590,26 +588,24 @@ export class StatsController {
                     windowStart: toDateKey(windowStart),
                     windowEnd: toDateKey(windowEnd),
                     daysWithResults: 0,
-                    averageCategoriesCompleted: null,
-                    averageTrialsAdministered: null,
+                    bestStat: null,
                 });
             }
 
-            const averageCategoriesCompleted = Math.round(
-                mean(
-                    recentDays.map((d) =>
-                        Number(d.bestStat?.categories_completed ?? 0)
-                    )
-                )
-            );
+            let bestDay = recentDays[0]!;
 
-            const averageTrialsAdministered = Math.round(
-                mean(
-                    recentDays.map((d) => 
-                        Number(d.bestStat?.trials_administered ?? 0)
-                    )
-                )
-            );
+            for (const current of recentDays) {
+                const isBetter = current.score > bestDay.score;
+
+                const isSameButNewer =
+                    current.score === bestDay.score &&
+                    safeTimeMs(current.bestStat?.time ?? null) >
+                    safeTimeMs(bestDay.bestStat?.time ?? null);
+
+                if (isBetter || isSameButNewer) {
+                    bestDay = current;
+                }
+            }
 
             return res.json({
                 userId,
@@ -617,11 +613,18 @@ export class StatsController {
                 windowStart: toDateKey(windowStart),
                 windowEnd: toDateKey(windowEnd),
                 daysWithResults: recentDays.length,
-                averageCategoriesCompleted,
-                averageTrialsAdministered,
+                bestStat: {
+                    id: bestDay.bestStat.id,
+                    categories_completed: Number(
+                        bestDay.bestStat.categories_completed ?? 0
+                    ),
+                    trials_administered: Number(
+                        bestDay.bestStat.trials_administered ?? 0
+                    ),
+                },
             });
         } catch (error) {
-            console.error("Error computing WCST recent average summary:", error);
+            console.error("Error computing WCST recent best summary:", error);
             return res.status(500).json({ error: "Server error" });
         }
     };

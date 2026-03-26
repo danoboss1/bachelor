@@ -412,7 +412,7 @@ export class TolStatsController {
                     windowStart: null,
                     windowEnd: null,
                     daysWithResult: 0,
-                    averageTotalScore: null,
+                    bestStat: null,
                 });
             }
 
@@ -425,7 +425,7 @@ export class TolStatsController {
                     windowStart: null,
                     windowEnd: null,
                     daysWithResult: 0,
-                    averageTotalScore: null,
+                    bestStat: null,
                 });
             }
 
@@ -448,17 +448,24 @@ export class TolStatsController {
                     windowStart: toDateKey(windowStart),
                     windowEnd: toDateKey(windowEnd),
                     daysWithResults: 0,
-                    averageTotalScore: null,
+                    bestStat: null,
                 });
             }
 
-            const averageTotalScore = Math.round(
-                mean (
-                    recentDays.map((d) =>
-                        Number(d.bestStat?.totalscore ?? 0)
-                    )
-                )
-            );
+            let bestDay = recentDays[0]!;
+            
+            for (const current of recentDays) {
+                const isBetter = current.score > bestDay.score;
+
+                const isSameButNewer =
+                    current.score === bestDay.score &&
+                    safeTimeMs(current.bestStat?.time ?? null) >
+                        safeTimeMs(bestDay.bestStat?.time ?? null);
+
+                if (isBetter || isSameButNewer) {
+                    bestDay = current;
+                }
+            }
 
             return res.json({
                 userId,
@@ -466,10 +473,13 @@ export class TolStatsController {
                 windowStart: toDateKey(windowStart),
                 windowEnd: toDateKey(windowEnd),
                 daysWithResults: recentDays.length,
-                averageTotalScore,
+                bestStat: {
+                    id: bestDay.bestStat.id,
+                    totalscore: Number(bestDay.bestStat.totalscore ?? 0),
+                },
             });
         } catch (error) {
-            console.error("Error computing ToL recent average summary:", error);
+            console.error("Error computing ToL recent best summary:", error);
             return res.status(500).json({ error: "Server error" });
         }
     };

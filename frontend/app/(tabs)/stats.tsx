@@ -44,7 +44,10 @@ type TolRecentSummaryResponse = {
     windowStart: string | null;
     windowEnd: string | null;
     daysWithResults: number;
-    averageTotalScore: number | null;
+    bestStat: {
+        id: number;
+        totalscore: number;
+    } | null;
 };
 
 type KnoxRecentSummaryResponse = {
@@ -53,20 +56,11 @@ type KnoxRecentSummaryResponse = {
     windowStart: string | null;
     windowEnd: string | null;
     daysWithResults: number;
-    averageTotalScore: number | null;
+    bestStat: {
+        id: number;
+        totalscore: number;
+    } | null;
 };
-
-// const data: WcstRecentSummaryResponse = {
-//     userId: 1,
-//     hasEnoughData: true,
-//     windowStart: "2026-03-01",
-//     windowEnd: "2026-03-10",
-//     daysWithResults: 4,
-//     averageCategoriesCompleted: 6,
-//     averageTrialsAdministered: 82,
-//     // categoryIndex: 4,
-//     // interpretation: "Superior cognitive flexibility",
-// };
 
 function formatDate(dateString: string | null) {
     if (!dateString) return "—";
@@ -291,18 +285,20 @@ export default function StatsScreen() {
 
     // TOL derived values
     const tolHasBest = !!tolData?.hasEnoughData;
-    const averageTolTotalScore = tolData?.averageTotalScore ?? null;
+    const bestTolTotalScore = tolData?.bestStat?.totalscore ?? null;
+
     const tolInterpretation =
-        averageTolTotalScore != null
-            ? "Average total score from recent days"
+        bestTolTotalScore != null
+            ? "Best total score from recent days"
             : "No recent data";
 
     // Knox derived values
     const knoxHasBest = !!knoxData?.hasEnoughData;
-    const averageKnoxTotalScore = knoxData?.averageTotalScore ?? null;
+    const bestKnoxTotalScore = knoxData?.bestStat?.totalscore ?? null;
+
     const knoxInterpretation =
-        averageKnoxTotalScore != null
-            ? "Average total score from recent days"
+        bestKnoxTotalScore != null
+            ? "Best total score from recent days"
             : "No recent data";
 
     return (
@@ -335,7 +331,7 @@ export default function StatsScreen() {
             <View style={styles.bgBottom}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <StatCard
-                        title={"Wisconsin Card Sorting Test\nRecent Average"}
+                        title={"Wisconsin Card Sorting Test\nRecent Best"}
                         path={WCST_STATS_DETAIL_ROUTE}
                         loadingRecent={loadingWcstRecent}
                         windowStart={wcstData?.windowStart ?? null}
@@ -350,7 +346,7 @@ export default function StatsScreen() {
                     />
 
                     <StatCard
-                        title={"Tower of London\nRecent Average"}
+                        title={"Tower of London\nRecent Best"}
                         path={TOL_STATS_DETAIL_ROUTE}
                         loadingRecent={loadingTolRecent}
                         windowStart={tolData?.windowStart ?? null}
@@ -358,14 +354,14 @@ export default function StatsScreen() {
                         categoryIndex={0}
                         interpretation={tolInterpretation}
                         hasData={tolHasBest}
-                        primaryValue={averageTolTotalScore}
+                        primaryValue={bestTolTotalScore}
                         primaryLabel="Total score"
                         // secondaryValue={averageTrialsAdministered}
                         // secondaryLabel="Cards used"
                     />
 
                     <StatCard
-                        title={"Knox's Cube Test\nRecent Average"}
+                        title={"Knox's Cube Test\nRecent Best"}
                         path={KNOX_STATS_DETAIL_ROUTE}
                         loadingRecent={loadingKnoxRecent}
                         windowStart={knoxData?.windowStart ?? null}
@@ -373,7 +369,7 @@ export default function StatsScreen() {
                         categoryIndex={0}
                         interpretation={knoxInterpretation}
                         hasData={knoxHasBest}
-                        primaryValue={averageKnoxTotalScore}
+                        primaryValue={bestKnoxTotalScore}
                         primaryLabel="Total score"
                     />
 

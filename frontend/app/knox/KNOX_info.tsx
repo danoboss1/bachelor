@@ -24,8 +24,7 @@ export default function KNOXInfoScreen() {
             <Text style={localStyles.subtitle}>🔄 Game Info</Text>
             <Text style={localStyles.item}>• 18 sequences (3-step to 8-step sequences)</Text>
             <Text style={localStyles.item}>• The test ends after completing all sequences</Text>
-            <Text style={localStyles.item}>• The test ends early if two consecutive levels are completed without a correct sequence</Text>
-            <Text style={localStyles.item}>• Time limit per problem: 1 minute</Text>
+            <Text style={localStyles.item}>• The test ends early if you fail to solve any sequences in two consecutive levels (for example, 4-step and 5-step sequences)</Text>
             
             <Text style={localStyles.subtitle}>🎮 Controls</Text>
             <Text style={localStyles.section}>

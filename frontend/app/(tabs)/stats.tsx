@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { Color } from "@/constants/TWPalette";
-import { COLORS } from '@/constants/Colors';
 
 const { width } = Dimensions.get("window");
 
@@ -67,11 +66,6 @@ function formatDate(dateString: string | null) {
 
     const [year, month, day] = dateString.split("-");
     return `${day}.${month}.${year}`;
-}
-
-function formatDateRange(start: string | null, end: string | null) {
-    if (!start || !end) return "No recent data";
-    return `${formatDate(start)} - ${formatDate(end)}`;
 }
 
 const labels = [

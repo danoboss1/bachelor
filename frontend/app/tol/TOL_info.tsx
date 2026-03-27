@@ -30,9 +30,8 @@ export default function TOLInfoScreen() {
             <Text style={localStyles.subtitle}>🔄 Game Info</Text>
             <Text style={localStyles.item}>• 24 problems (4–6 move sequences)</Text>
             <Text style={localStyles.item}>• 3 colored discs</Text>
-            <Text style={localStyles.item}>• Total time limit: 20 minutes</Text>
-            <Text style={localStyles.item}>• Time limit per problem: 1 minute</Text>
             <Text style={localStyles.item}>• Test ends after 3 consecutive time-outs</Text>
+            <Text style={localStyles.item}>• The test ends early if you fail all problems within a level (for example, all 4-move tasks)</Text>
 
             <Text style={localStyles.subtitle}>🎮 Controls</Text>
             <Text style={localStyles.section}>

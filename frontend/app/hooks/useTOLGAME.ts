@@ -78,43 +78,6 @@ export function useTOLGame() {
 
     const handRef = React.useRef<View>(null);
 
-    // toto je nova funkcia, vysvetlit
-    useFocusEffect(
-        React.useCallback(() => {
-            const onBackPress = () => {
-                // ⚠️ Clash Royale štýl: zobrazí sa modal
-                Alert.alert(
-                    "Exit Test",
-                    "Are you sure you want to exit?\nYour progress will not be saved.",
-                    [
-                    {
-                        text: "Cancel",
-                        style: "cancel",
-                    },
-                    {
-                        text: "Exit",
-                        style: "destructive",
-                        onPress: () => {
-                        // tu môžeš buď router.replace("/main") alebo router.back()
-                            router.replace("/"); // ide späť do hlavného menu
-                        },
-                    },
-                    ],
-                    { cancelable: true }
-                );
-
-                // return true → zabránime default back správanie
-                return true;
-            };
-
-            const subscription = BackHandler.addEventListener(
-                "hardwareBackPress",
-                onBackPress
-            );
-
-            return () => subscription.remove();
-        }, [router])
-    );
     
     const fourRef = useRef(0);
     const fiveRef = useRef(0);
@@ -127,7 +90,7 @@ export function useTOLGame() {
     const [fiveMovesSequencesCorrect, setFiveMovesSequencesCorrect] = useState(0);
     const [sixMovesSequencesCorrect, setSixMovesSequencesCorrect] = useState(0);
     const [totalCorrect, setTotalCorrect] = useState(0);
-
+    
     const [stacks, setStacks] = useState<DiscData[][]>([]);
     const [targetStacks, setTargetStacks] = useState<DiscData[][]>([]);
     const [userMoves, setUserMoves] = useState(0); 
@@ -136,16 +99,16 @@ export function useTOLGame() {
     const [discInHand, setDiscInHand] = useState<DiscData | null>(null);
 
     const [feedback, setFeedback] = React.useState<
-        | "" 
-        | "Well done!"
-        | "Incorrect!"
-        | "Well done. You have completed the test!"
-        | "Incorrect. You have completed the test!"
-        >("");
-        
+    | "" 
+    | "Well done!"
+    | "Incorrect!"
+    | "Well done. You have completed the test!"
+    | "Incorrect. You have completed the test!"
+    >("");
+    
     const [showFeedback, setShowFeedback] = useState(false);
     const [finished, setFinished] = React.useState(false);
-
+    
     const usedFourIndexesRef = useRef<Set<number>>(new Set());
     const usedFiveIndexesRef = useRef<Set<number>>(new Set());
     const usedSixIndexesRef = useRef<Set<number>>(new Set());
@@ -159,15 +122,15 @@ export function useTOLGame() {
             userAnsweredResolve.current = resolve;
         });
     }
-
+    
     async function saveTolStatstoBackend(score: number) {
         const token = await getToken();
-
+        
         if (!token) {
             console.error("No JWT token found");
             return;
         }
-
+        
         const payload: TolStatsPayload = {
             time: new Date().toISOString(),
             fourMovesSequencesCorrect: fourMovesSequencesCorrect,
@@ -176,7 +139,7 @@ export function useTOLGame() {
             totalCorrect: totalCorrect,
             totalScore: score,
         }
-
+        
         try {
             await axios.post("https://bachelor-pi.vercel.app/tolStats", payload, {
                 headers: {
@@ -187,10 +150,10 @@ export function useTOLGame() {
             console.error("Error saving stats:", err);
         }
     }
-
+    
     const onStackPress = (stackIndex: number) => {
         if (showFeedback) return;
-
+        
         setStacks(prev => {
             const newStacks = prev.map(s => [...s]);
             
@@ -211,13 +174,13 @@ export function useTOLGame() {
             // const isFull = discs.length >= STACK_CAPACITY[index];
             
             const nextMove = userMoves + 1;
-
+            
             newStacks[stackIndex].push(discInHand);
             setDiscInHand(null);
             setUserMoves(nextMove);
-
+            
             const isCorrect = areStacksEqual(newStacks, targetStacks);
-
+            
             if (isCorrect) {
                 if (targetMoves === 4) {
                     fourRef.current++;
@@ -234,76 +197,76 @@ export function useTOLGame() {
 
                 totalCorrectRef.current++;
                 setTotalCorrect(prev => prev + 1);
-
+                
                 setFeedback("Well done!");
                 setShowFeedback(true);
-
+                
                 userAnsweredResolve.current?.();
                 // mam sem dat return;???
             } else if (nextMove === targetMoves) {
                 setFeedback("Incorrect!");
                 setShowFeedback(true);
-
+                
                 userAnsweredResolve.current?.();
                 // mam sem dat return;???
             }
-
+            
             return newStacks;
         });
     };
-
-
+    
+    
     let fourSequenceIndex: number;
     let fiveSequenceIndex: number;
     let sixSequenceIndex: number;
-
+    
     async function startGame() {
         usedFourIndexesRef.current.clear();
         usedFiveIndexesRef.current.clear();
         usedSixIndexesRef.current.clear();
-
+        
         // tu som skoncil odtial to pokracujem dalej 
         // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
-
+        
         for(let i = 0; i < 1; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFour.length,
                 usedFourIndexesRef.current
             );
             const level = difficultyFour[index];
-
+            
             setUserMoves(0);
             setDiscInHand(null);
             setFeedback("");
             setShowFeedback(false);
-
+            
             // fourSequenceIndex = Math.floor(Math.random() * 21);
-
+            
             setStacks(convertStacks(level.userStack))
             setTargetStacks(convertStacks(level.targetStack))
             setTargetMoves(level.targetMoves);
-
+            
             await waitForUser();
             await delay(1500);
         }
-
+        
         for(let i = 0; i < 0; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFive.length,
                 usedFiveIndexesRef.current
             );
             const level = difficultyFive[index];
-
+            
             setUserMoves(0);
             setDiscInHand(null);
             setFeedback("");
             setShowFeedback(false);
-
-
+            
+            
             setStacks(convertStacks(level.userStack))
             setTargetStacks(convertStacks(level.targetStack))
             setTargetMoves(level.targetMoves);
-
+            
             await waitForUser();
             await delay(1500);
         }
@@ -315,20 +278,20 @@ export function useTOLGame() {
                 usedSixIndexesRef.current
             );
             const level = difficultySix[index];
-
+            
             setUserMoves(0);
             setDiscInHand(null);
             setFeedback("");
             setShowFeedback(false);
-
+            
             setStacks(convertStacks(level.userStack))
             setTargetStacks(convertStacks(level.targetStack))
             setTargetMoves(level.targetMoves);
-
+            
             await waitForUser();
             await delay(1500);
         }
-
+        
         // neviem ci treba aj sem return;???
         setFinished(true);
     }
@@ -336,8 +299,6 @@ export function useTOLGame() {
     React.useEffect(() => {
         startGame();
     }, []);
-
-
 
     React.useEffect(() => {
         if (finished) {
@@ -361,15 +322,70 @@ export function useTOLGame() {
         };
     }, [finished]);
 
+    const exitTest = React.useCallback(() => {
+        Alert.alert(
+            "Exit Test",
+            "Are you sure you want to exit?\nYour progress will not be saved.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Exit",
+                    style: "destructive",
+                    onPress: () => {
+                        router.replace("/(tabs)/games");
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    }, [router]);
+    
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                Alert.alert(
+                    "Exit Test",
+                    "Are you sure you want to exit?\nYour progress will not be saved.",
+                    [
+                    {
+                        text: "Cancel",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Exit",
+                        style: "destructive",
+                        onPress: () => {
+                            router.replace("/(tabs)/games");
+                        },
+                    },
+                    ],
+                    { cancelable: true }
+                );
+
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                "hardwareBackPress",
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [router])
+    );
+
     return {
         // refs
         handRef,
-
+        
         // game state 
         stacks,
         targetStacks,
         discInHand,
-
+        
         userMoves,
         targetMoves,
 
@@ -380,9 +396,10 @@ export function useTOLGame() {
 
         // handlers
         onStackPress,
+
+        exitTest,
     };
 
     // tu budem mozno presuvat aj to Start Game 
     // alebo to upravim aj pri inych suboroch, aby to bolo konzistentne vsade
-
 }

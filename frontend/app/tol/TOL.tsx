@@ -1,6 +1,6 @@
 import { DiscInHand, Hand, StackWithDiscs } from "@/components/tol/ToLComponents";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTOLGame } from "../hooks/useTOLGAME";
 
 const { width, height } = Dimensions.get("window");
@@ -84,14 +84,30 @@ export default function TOL_Screen() {
         showFeedback,
         finished,
         onStackPress,
+        exitTest,
     } = useTOLGame();
 
     return (
         // #f9f9f9
         <View style={localStyles.container}>
-            <View style={localStyles.timer}>
-                <Text style={localStyles.targetAttemptsText}>Move limit: {targetMoves}</Text>
-                <Text style={localStyles.userAttemptsText}>Moves used: {userMoves}</Text>
+            <View style={localStyles.header}>
+                <Text style={localStyles.targetAttemptsText}>
+                    Move limit: {targetMoves}
+                </Text>
+                <Text style={localStyles.userAttemptsText}>
+                    Moves used: {userMoves}
+                </Text>
+
+                <TouchableOpacity
+                    style={localStyles.exitButtonContainer}
+                    activeOpacity={0.7}
+                    onPress={exitTest}
+                >
+
+                    <Text style={localStyles.exitButtonText}>
+                        Exit Test
+                    </Text>
+                </TouchableOpacity>
             </View>
 
             {/* TARGET */}
@@ -188,46 +204,45 @@ const localStyles = StyleSheet.create({
         alignItems: "center",
         // backgroundColor: "green",
     },
+    header: {
+        flexDirection: "row",
+        // flex: 1,
+        width: "100%",
+        // justifyContent: "flex-end",
+        justifyContent: "space-between",
+        alignItems: "center",
+        // paddingHorizontal: width * 0.05,
+        paddingTop: height * 0.03, 
+        paddingBottom: 8,
+        paddingHorizontal: 8,
+    },
     targetAttemptsText: {
         fontSize: 20, 
         color: "black",
-        marginLeft: 12,
-        marginTop: 15, 
+        // marginLeft: 12,
+        marginLeft: 4,
+        // marginTop: 15, 
         fontWeight: "600",
     },
     userAttemptsText: {
         fontSize: 20, 
         color: "black", 
-        marginRight: 12,
-        marginTop: 15,
+        // marginRight: 12,
+        // marginTop: 15,
         fontWeight: "600",
     },
     targetPegs: {
         flex: 3,
-        // backgroundColor: "#bcc0dd",
         backgroundColor: "#d6c7b9",
-
-        // backgroundColor: "green",
-        // backgroundColor: "#5B5FE9",
-        // backgroundColor: "#f9f9f9",
-        // backgroundColor: "#d6c7b9",
-        // orange
         justifyContent: "flex-end",
     },
     userPegs: {
         flex: 3,
-        // backgroundColor: "#d6c7b9",
         backgroundColor: "#bcc0dd",
-
-        // backgroundColor: "orange",
-        // backgroundColor: "#bcc0dd",
-        // backgroundColor: "#2b2f77",
-        // backgroundColor: "#f9f9f9",
         justifyContent: "flex-end",
     },
     footer: {
         flex: 1,
-        // backgroundColor: "orange",
     },
     stacksRow: {
         flexDirection: "row",
@@ -269,6 +284,19 @@ const localStyles = StyleSheet.create({
         color: "#555",
         marginTop: 4,
         opacity: 0.8,
+    },
+    exitButtonContainer: {
+        paddingVertical: height * 0.012,
+        paddingHorizontal: width * 0.04,
+        borderRadius: 8,
+        // backgroundColor: "#8B593E",
+        // backgroundColor: "#c4b8a8",
+        backgroundColor: "#A5A5A5",
+    },
+    exitButtonText: {
+        fontSize: 16,
+        color: "#fff",
+        fontWeight: "500",
     },
 });
 

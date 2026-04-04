@@ -116,9 +116,9 @@ export default function WCST_ENDSCREEN() {
     }, []);
 
     const labels = [
-        "VERY POOR\n0-2 categories",
+        "SEVERE\n0-2 categories",
         "POOR\n3-4 categories",
-        "NORMAL\n5 categories",
+        "AVERAGE\n5 categories",
         "GOOD\n6 categories",
         "EXCELLENT\n<85 cards"
     ];

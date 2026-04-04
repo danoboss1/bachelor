@@ -37,9 +37,9 @@ export default function KNOX_ENDSCREEN() {
 
     function getCategoryIndex(totalScore: number) {
         if (totalScore < 0.6) return 0;
-        if (totalScore < 1.6) return 1;
-        if (totalScore < 3.3) return 2;
-        if (totalScore < 4.3) return 3;
+        if (totalScore < 1.5) return 1;
+        if (totalScore < 3) return 2;
+        if (totalScore < 4) return 3;
         return 4;
     }
 
@@ -63,11 +63,11 @@ export default function KNOX_ENDSCREEN() {
     const categoryIndex = getCategoryIndex(totalScore);
 
     const labels = [
-        "VERY POOR\n0 – 0.6",
-        "POOR\n0.6 – 1.8",
-        "AVERAGE\n1.8 – 3.8",
-        "GOOD\n3.8 – 5.0",
-        "VERY GOOD\n5.0 – 5.6"
+        "SEVERE\n0 – <0.6",
+        "POOR\n0.6 – <1.5",
+        "AVERAGE\n1.5 – <3.0",
+        "GOOD\n3.0 – <4.0",
+        "EXCELLENT\n4.0 – 4.6"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];

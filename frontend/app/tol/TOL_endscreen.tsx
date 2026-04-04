@@ -52,10 +52,10 @@ export default function TOL_ENDSCREEN() {
     const categoryIndex = getCategoryIndex(totalScore);
 
     const labels = [
-        "SEVERE\n0 – 0.8",
-        "POOR\n0.8 – 2.3",
-        "AVERAGE\n2.3 – 4.5",
-        "GOOD\n4.5 – 6.0",
+        "SEVERE\n0 – <0.8",
+        "POOR\n0.8 – <2.3",
+        "AVERAGE\n2.3 – <4.5",
+        "GOOD\n4.5 – <6.0",
         "EXCELLENT\n6.0 – 6.8"
     ];
 

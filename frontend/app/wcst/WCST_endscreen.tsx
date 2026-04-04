@@ -59,8 +59,8 @@ export default function WCST_ENDSCREEN() {
         if (categoriesCompleted <= 2) return 0;
         if (categoriesCompleted <= 4) return 1;
         if (categoriesCompleted === 5) return 2;
-        if (categoriesCompleted === 6 && trials > 85) return 3;
-        if (categoriesCompleted === 6 && trials <= 85) return 4;
+        if (categoriesCompleted === 6 && trials >= 85) return 3;
+        if (categoriesCompleted === 6 && trials < 85) return 4;
 
         return 0;
     }
@@ -120,7 +120,7 @@ export default function WCST_ENDSCREEN() {
         "POOR\n3-4 categories",
         "NORMAL\n5 categories",
         "GOOD\n6 categories",
-        "EXCELLENT\n≤85 cards"
+        "EXCELLENT\n<85 cards"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];

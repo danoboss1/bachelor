@@ -30,10 +30,10 @@ export default function TOL_ENDSCREEN() {
     */
 
     function getCategoryIndex(score: number) {
-        if (score <= 0.8) return 0;
-        if (score <= 2.3) return 1;
-        if (score <= 4.5) return 2;
-        if (score <= 6.0) return 3;
+        if (score < 0.8) return 0;
+        if (score < 2.3) return 1;
+        if (score < 4.5) return 2;
+        if (score < 6.0) return 3;
 
         return 4;
     }

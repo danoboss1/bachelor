@@ -36,10 +36,10 @@ export default function KNOX_ENDSCREEN() {
     */
 
     function getCategoryIndex(totalScore: number) {
-        if (totalScore <= 0.6) return 0;
-        if (totalScore <= 1.8) return 1;
-        if (totalScore <= 3.8) return 2;
-        if (totalScore <= 5.0) return 3;
+        if (totalScore < 0.6) return 0;
+        if (totalScore < 1.6) return 1;
+        if (totalScore < 3.3) return 2;
+        if (totalScore < 4.3) return 3;
         return 4;
     }
 

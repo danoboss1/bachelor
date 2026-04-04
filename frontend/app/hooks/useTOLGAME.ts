@@ -33,9 +33,9 @@ const DISC_MAP: Record<string, DiscData> = {
 };
 
 const COEFFICIENTS = {
-    4: 0.3,
-    5: 0.6,
-    6: 1.0,
+    4: 0.15,
+    5: 0.325,
+    6: 0.375,
 };
 
 const convertStacks = (rawStacks: string[][]): DiscData[][] => {
@@ -228,7 +228,7 @@ export function useTOLGame() {
         // tu som skoncil odtial to pokracujem dalej 
         // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
         
-        for(let i = 0; i < 1; i++) {
+        for(let i = 0; i < 8; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFour.length,
                 usedFourIndexesRef.current
@@ -250,7 +250,7 @@ export function useTOLGame() {
             await delay(1500);
         }
         
-        for(let i = 0; i < 0; i++) {
+        for(let i = 0; i < 8; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFive.length,
                 usedFiveIndexesRef.current
@@ -272,7 +272,7 @@ export function useTOLGame() {
         }
 
         // pocet uloh
-        for(let i = 0; i < 0; i++) {
+        for(let i = 0; i < 8; i++) {
             const index = getUniqueRandomIndex(
                 difficultySix.length,
                 usedSixIndexesRef.current

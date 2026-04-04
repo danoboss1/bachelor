@@ -36,18 +36,14 @@ export default function KNOX_ENDSCREEN() {
     */
 
     function getCategoryIndex(totalScore: number) {
-        if (totalScore <= 3) return 0;
-        if (totalScore <= 5) return 1;
-        if (totalScore <= 8) return 2;
-        if (totalScore <= 11) return 3;
-        if (totalScore > 11) return 4;
-
-        return 0;
+        if (totalScore <= 0.6) return 0;
+        if (totalScore <= 1.8) return 1;
+        if (totalScore <= 3.8) return 2;
+        if (totalScore <= 5.0) return 3;
+        return 4;
     }
 
-    function getCategoryInterpretation(totalScore: number) {
-        const index = getCategoryIndex(totalScore);
-
+    function getCategoryInterpretation(index: number) {
         switch (index) {
             case 0:
                 return "Severe difficulties in working memory and inhibition";
@@ -67,11 +63,11 @@ export default function KNOX_ENDSCREEN() {
     const categoryIndex = getCategoryIndex(totalScore);
 
     const labels = [
-        "SEVERE\n0-3 points",
-        "POOR\n4-5 points",
-        "AVERAGE\n6-8 points",
-        "GOOD\n9-11 points",
-        "EXCELLENT\n12+ points"
+        "VERY POOR\n0 – 0.6",
+        "POOR\n0.6 – 1.8",
+        "AVERAGE\n1.8 – 3.8",
+        "GOOD\n3.8 – 5.0",
+        "VERY GOOD\n5.0 – 5.6"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];

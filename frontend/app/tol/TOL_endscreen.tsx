@@ -28,20 +28,17 @@ export default function TOL_ENDSCREEN() {
     /*
     CATEGORY LOGIC
     */
-    
-    function getCategoryIndex(totalScore: number) {
-        if (totalScore <= 3) return 0;
-        if (totalScore <= 5) return 1;
-        if (totalScore <= 8) return 2;
-        if (totalScore <= 11) return 3;
-        if (totalScore > 11) return 4;
 
-        return 0;
+    function getCategoryIndex(score: number) {
+        if (score <= 0.8) return 0;
+        if (score <= 2.3) return 1;
+        if (score <= 4.5) return 2;
+        if (score <= 6.0) return 3;
+
+        return 4;
     }
 
-    function getCategoryInterpretation(totalScore: number) {
-        const index = getCategoryIndex(totalScore);
-
+    function getCategoryInterpretation(index: number) {
         switch (index) {
             case 0: return "Severe difficulties in planning and decision-making";
             case 1: return "Reduced planning and decision-making skills";
@@ -55,11 +52,11 @@ export default function TOL_ENDSCREEN() {
     const categoryIndex = getCategoryIndex(totalScore);
 
     const labels = [
-        "SEVERE\n0-3 points",
-        "POOR\n4-5 points",
-        "AVERAGE\n6-8 points",
-        "GOOD\n9-11 points",
-        "EXCELLENT\n12+ points"
+        "SEVERE\n0 – 0.8",
+        "POOR\n0.8 – 2.3",
+        "AVERAGE\n2.3 – 4.5",
+        "GOOD\n4.5 – 6.0",
+        "EXCELLENT\n6.0 – 6.8"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];

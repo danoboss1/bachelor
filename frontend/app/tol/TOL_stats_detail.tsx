@@ -252,12 +252,13 @@ export default function TOLStatsDetail() {
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
     const inactiveColor = "#666";
 
-    function getTolCategoryIndex(totalScore: number) {
-        if (totalScore <= 3) return 0;
-        if (totalScore <= 5) return 1;
-        if (totalScore <= 8) return 2;
-        if (totalScore <= 11) return 3;
-        return 4; // 12+
+    function getTolCategoryIndex(score: number) {
+        if (score <= 0.8) return 0;
+        if (score <= 2.3) return 1;
+        if (score <= 4.5) return 2;
+        if (score <= 6.0) return 3;
+
+        return 4;
     }
 
     function getTolCategoryInterpretation(index: number | null) {

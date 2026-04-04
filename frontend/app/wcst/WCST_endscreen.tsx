@@ -67,11 +67,11 @@ export default function WCST_ENDSCREEN() {
 
     function getCategoryInterpretation(index: number) {
         switch (index) {
-            case 0: return "Severe impairment of cognitive flexibility";
-            case 1: return "Reduced cognitive flexibility";
-            case 2: return "Average cognitive flexibility";
-            case 3: return "Above average cognitive flexibility";
-            case 4: return "Superior cognitive flexibility";
+            case 0: return "Severe difficulties in responding to feedback and cognitive flexibility";
+            case 1: return "Reduced ability in responding to feedback and cognitive flexibility";
+            case 2: return "Average responding to feedback and cognitive flexibility";
+            case 3: return "Above average responding to feedback and cognitive flexibility";
+            case 4: return "Excellent responding to feedback and cognitive flexibility";
             default: return "";
         }
     }

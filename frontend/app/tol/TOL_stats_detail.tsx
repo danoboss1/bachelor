@@ -16,7 +16,7 @@ import { formatDate } from "@/components/statsDetail/utils";
 const { width, height } = Dimensions.get("window");
 
 // toto zmenime ked budeme mat koeficienty 
-const MAX_SCORE = 30;
+const MAX_SCORE = 7;
 
 type TolStatRow = {
     id: number;
@@ -242,21 +242,21 @@ export default function TOLStatsDetail() {
     }, [days, selectedBarIndex]);
 
     const labels = [
-        "VERY POOR\n0–3 points",
-        "POOR\n4–5 points",
-        "NORMAL\n6–8 points",
-        "GOOD\n9–11 points",
-        "EXCELLENT\n12+ points"
+        "SEVERE\n0 – <0.8",
+        "POOR\n0.8 – <2.3",
+        "AVERAGE\n2.3 – <4.5",
+        "GOOD\n4.5 – <6.0",
+        "EXCELLENT\n6.0 – 6.8"
     ];
     
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
     const inactiveColor = "#666";
 
     function getTolCategoryIndex(score: number) {
-        if (score <= 0.8) return 0;
-        if (score <= 2.3) return 1;
-        if (score <= 4.5) return 2;
-        if (score <= 6.0) return 3;
+        if (score < 0.8) return 0;
+        if (score < 2.3) return 1;
+        if (score < 4.5) return 2;
+        if (score < 6.0) return 3;
 
         return 4;
     }
@@ -268,10 +268,10 @@ export default function TOLStatsDetail() {
 
         switch (index) {
             case 0: return "Severe difficulties in planning and decision-making";
-            case 1: return "Reduced planning and decision-making abilities";
-            case 2: return "Average planning and decision-making abilities";
-            case 3: return "Above average planning and decision-making abilities";
-            case 4: return "Excellent planning and decision-making abilities";
+            case 1: return "Reduced planning and decision-making skills";
+            case 2: return "Average planning and decision-making skills";
+            case 3: return "Above average planning and decision-making skills";
+            case 4: return "Excellent planning and decision-making skills";
             default: return "";
         }
     }
@@ -318,8 +318,9 @@ export default function TOLStatsDetail() {
 
                     <BarChart
                         maxValue={MAX_SCORE}
-                        stepValue={5}
+                        stepValue={1}
                         yAxisExtraHeight={20}
+                        formatYLabel={(label) => Number(label).toFixed(1)}
                         scrollRef={chartScrollRef}
                         barBorderRadius={4}
                         frontColor={Color.orange[400]}

@@ -228,7 +228,7 @@ export function useTOLGame() {
         // tu som skoncil odtial to pokracujem dalej 
         // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
         
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 1; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFour.length,
                 usedFourIndexesRef.current
@@ -250,7 +250,7 @@ export function useTOLGame() {
             await delay(1500);
         }
         
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 0; i++) {
             const index = getUniqueRandomIndex(
                 difficultyFive.length,
                 usedFiveIndexesRef.current
@@ -272,7 +272,7 @@ export function useTOLGame() {
         }
 
         // pocet uloh
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 0; i++) {
             const index = getUniqueRandomIndex(
                 difficultySix.length,
                 usedSixIndexesRef.current

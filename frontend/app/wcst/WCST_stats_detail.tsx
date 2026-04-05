@@ -249,11 +249,11 @@ export default function WCSTStatsDetail() {
     }, [days, selectedBarIndex]);
 
     const labels = [
-        "VERY POOR\n0-2 categories",
+        "SEVERE\n0-2 categories",
         "POOR\n3-4 categories",
-        "NORMAL\n5 categories",
+        "AVERAGE\n5 categories",
         "GOOD\n6 categories",
-        "EXCELLENT\n≤85 cards"
+        "EXCELLENT\n<85 cards"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
@@ -263,9 +263,8 @@ export default function WCSTStatsDetail() {
         if (categoriesCompleted <= 2) return 0;
         if (categoriesCompleted <= 4) return 1;
         if (categoriesCompleted === 5) return 2;
-        if (categoriesCompleted === 6 && trials > 85) return 3;
-        if (categoriesCompleted === 6 && trials <= 85) return 4;
-
+        if (categoriesCompleted === 6 && trials >= 85) return 3;
+        if (categoriesCompleted === 6 && trials < 85) return 4;
         return 0;
     }
 
@@ -275,11 +274,11 @@ export default function WCSTStatsDetail() {
         }
 
         switch (index) {
-            case 0: return "Severe impairment of cognitive flexibility";
-            case 1: return "Reduced cognitive flexibility";
-            case 2: return "Average cognitive flexibility";
-            case 3: return "Above average cognitive flexibility";
-            case 4: return "Superior cognitive flexibility";
+            case 0: return "Severe difficulties in responding to feedback and cognitive flexibility";
+            case 1: return "Reduced ability in responding to feedback and cognitive flexibility";
+            case 2: return "Average responding to feedback and cognitive flexibility";
+            case 3: return "Above average responding to feedback and cognitive flexibility";
+            case 4: return "Excellent responding to feedback and cognitive flexibility";
             default: return "";
         }
     }

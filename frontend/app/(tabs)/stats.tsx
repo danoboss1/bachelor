@@ -68,27 +68,43 @@ function formatDate(dateString: string | null) {
     return `${day}.${month}.${year}`;
 }
 
-const labels = [
-    "VERY POOR\n0-2 categories",
+const labelsWCST = [
+    "SEVERE\n0-2 categories",
     "POOR\n3-4 categories",
-    "NORMAL\n5 categories",
+    "AVERAGE\n5 categories",
     "GOOD\n6 categories",
-    "EXCELLENT\n≤85 cards",
+    "EXCELLENT\n<85 cards"
+];
+
+const labelsToL = [
+    "SEVERE\n0 – <0.8",
+    "POOR\n0.8 – <2.3",
+    "AVERAGE\n2.3 – <4.5",
+    "GOOD\n4.5 – <6.0",
+    "EXCELLENT\n6.0 – 6.8"
+];
+
+const labelsKnox = [
+    "SEVERE\n0 – <0.6",
+    "POOR\n0.6 – <1.5",
+    "AVERAGE\n1.5 – <3.0",
+    "GOOD\n3.0 – <4.0",
+    "EXCELLENT\n4.0 – 4.6"
 ];
 
 const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
 const inactiveColor = "#666";
 
-function getCategoryIndexWCST(categoriesCompleted: number, trials: number): number{
+function getWCSTCategoryIndex(categoriesCompleted: number, trials: number): number{
     if (categoriesCompleted <= 2) return 0;
     if (categoriesCompleted <= 4) return 1;
     if (categoriesCompleted === 5) return 2;
-    if (categoriesCompleted === 6 && trials > 85) return 3;
-    if (categoriesCompleted === 6 && trials <= 85) return 4;
+    if (categoriesCompleted === 6 && trials >= 85) return 3;
+    if (categoriesCompleted === 6 && trials < 85) return 4;
     return 0;
 }
 
-function getCategoryInterpretation(index: number) {
+function getWCSTCategoryInterpretation(index: number) {
     switch (index) {
         case 0: return "Severe difficulties in responding to feedback and cognitive flexibility";
         case 1: return "Reduced ability in responding to feedback and cognitive flexibility";
@@ -100,17 +116,15 @@ function getCategoryInterpretation(index: number) {
 }
 
 function getTolCategoryIndex(score: number) {
-    if (score <= 0.8) return 0;
-    if (score <= 2.3) return 1;
-    if (score <= 4.5) return 2;
-    if (score <= 6.0) return 3;
+    if (score < 0.8) return 0;
+    if (score < 2.3) return 1;
+    if (score < 4.5) return 2;
+    if (score < 6.0) return 3;
 
     return 4;
 }
 
-function getTolCategoryInterpretation(totalScore: number) {
-    const index = getTolCategoryIndex(totalScore);
-
+function getTolCategoryInterpretation(index: number) {
     switch (index) {
         case 0: return "Severe difficulties in planning and decision-making";
         case 1: return "Reduced planning and decision-making skills";
@@ -118,6 +132,31 @@ function getTolCategoryInterpretation(totalScore: number) {
         case 3: return "Above average planning and decision-making skills";
         case 4: return "Excellent planning and decision-making skills";
         default: return "";
+    }
+}
+
+function getKnoxCategoryIndex(totalScore: number) {
+    if (totalScore < 0.6) return 0;
+    if (totalScore < 1.5) return 1;
+    if (totalScore < 3) return 2;
+    if (totalScore < 4) return 3;
+    return 4;
+}
+
+function getKnoxCategoryInterpretation(index: number) {
+    switch (index) {
+        case 0:
+            return "Severe difficulties in working memory and inhibition";
+        case 1:
+            return "Reduced working memory and inhibitory control";
+        case 2:
+            return "Average working memory and inhibition";
+        case 3:
+            return "Above average working memory and inhibitory skills";
+        case 4:
+            return "Excellent working memory and inhibition";
+        default:
+            return "";
     }
 }
 
@@ -282,32 +321,44 @@ export default function StatsScreen() {
     const bestCategoriesCompleted = wcstData?.bestStat?.categories_completed ?? null;
     const bestTrialsAdministered = wcstData?.bestStat?.trials_administered ?? null;
 
-    const categoryIndex =
+    const WCSTcategoryIndex =
         bestCategoriesCompleted != null && bestTrialsAdministered != null
-            ? getCategoryIndexWCST(bestCategoriesCompleted, bestTrialsAdministered)
+            ? getWCSTCategoryIndex(bestCategoriesCompleted, bestTrialsAdministered)
             : 0;
 
-    const interpretation =
+    const WCSTinterpretation =
         bestCategoriesCompleted != null && bestTrialsAdministered != null
-            ? getCategoryInterpretation(categoryIndex)
+            ? getWCSTCategoryInterpretation(WCSTcategoryIndex)
             : "No recent data";
 
     // TOL derived values
     const tolHasBest = !!tolData?.hasEnoughData;
+
     const bestTolTotalScore = tolData?.bestStat?.totalscore ?? null;
+
+    const tolCategoryIndex = 
+        bestTolTotalScore != null
+            ? getTolCategoryIndex(bestTolTotalScore)
+            : 0;
 
     const tolInterpretation =
         bestTolTotalScore != null
-            ? "Best total score from recent days"
+            ? getTolCategoryInterpretation(tolCategoryIndex)
             : "No recent data";
 
     // Knox derived values
     const knoxHasBest = !!knoxData?.hasEnoughData;
+
     const bestKnoxTotalScore = knoxData?.bestStat?.totalscore ?? null;
+
+    const knoxCategoryIndex =
+        bestKnoxTotalScore != null
+            ? getKnoxCategoryIndex(bestKnoxTotalScore)
+            : 0;
 
     const knoxInterpretation =
         bestKnoxTotalScore != null
-            ? "Best total score from recent days"
+            ? getKnoxCategoryInterpretation(knoxCategoryIndex)
             : "No recent data";
 
     return (
@@ -345,8 +396,9 @@ export default function StatsScreen() {
                         loadingRecent={loadingWcstRecent}
                         windowStart={wcstData?.windowStart ?? null}
                         windowEnd={wcstData?.windowEnd ?? null}
-                        categoryIndex={categoryIndex}
-                        interpretation={interpretation}
+                        labels={labelsWCST}
+                        categoryIndex={WCSTcategoryIndex}
+                        interpretation={WCSTinterpretation}
                         hasData={wcstHasBest}
                         primaryValue={bestCategoriesCompleted}
                         primaryLabel="Categories"
@@ -360,7 +412,8 @@ export default function StatsScreen() {
                         loadingRecent={loadingTolRecent}
                         windowStart={tolData?.windowStart ?? null}
                         windowEnd={tolData?.windowEnd ?? null}
-                        categoryIndex={0}
+                        labels={labelsToL}
+                        categoryIndex={tolCategoryIndex}
                         interpretation={tolInterpretation}
                         hasData={tolHasBest}
                         primaryValue={bestTolTotalScore}
@@ -375,7 +428,8 @@ export default function StatsScreen() {
                         loadingRecent={loadingKnoxRecent}
                         windowStart={knoxData?.windowStart ?? null}
                         windowEnd={knoxData?.windowEnd ?? null}
-                        categoryIndex={0}
+                        labels={labelsKnox}
+                        categoryIndex={knoxCategoryIndex}
                         interpretation={knoxInterpretation}
                         hasData={knoxHasBest}
                         primaryValue={bestKnoxTotalScore}

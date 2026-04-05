@@ -14,7 +14,7 @@ import { formatDate } from "@/components/statsDetail/utils";
 const { width, height } = Dimensions.get("window");
 
 // toto zmenime ked budeme mat koeficienty 
-const MAX_SCORE = 30;
+const MAX_SCORE = 5;
 
 type KnoxStatRow = {
     id: number;
@@ -243,21 +243,21 @@ export default function TOLStatsDetail() {
     }, [days, selectedBarIndex]);
     
     const labels = [
-        "VERY POOR\n0–3 points",
-        "POOR\n4–5 points",
-        "NORMAL\n6–8 points",
-        "GOOD\n9–11 points",
-        "EXCELLENT\n12+ points"
+        "SEVERE\n0 – <0.6",
+        "POOR\n0.6 – <1.5",
+        "AVERAGE\n1.5 – <3.0",
+        "GOOD\n3.0 – <4.0",
+        "EXCELLENT\n4.0 – 4.6"
     ];
 
     const segmentColors = ["#e53935", "#fb8c00", "#FBC02D", "#7cb342", "#2e7d32"];
     const inactiveColor = "#666";
 
     function getKnoxCategoryIndex(totalScore: number) {
-        if (totalScore <= 3) return 0;
-        if (totalScore <= 5) return 1;
-        if (totalScore <= 8) return 2;
-        if (totalScore <= 11) return 3;
+        if (totalScore < 0.6) return 0;
+        if (totalScore < 1.5) return 1;
+        if (totalScore < 3) return 2;
+        if (totalScore < 4) return 3;
         return 4;
     }
 
@@ -268,15 +268,15 @@ export default function TOLStatsDetail() {
 
         switch (index) {
             case 0:
-                return "Severe impairment in working memory and inhibitory control";
+                return "Severe difficulties in working memory and inhibition";
             case 1:
                 return "Reduced working memory and inhibitory control";
             case 2:
-                return "Average working memory and inhibitory control";
+                return "Average working memory and inhibition";
             case 3:
-                return "Above average working memory and inhibitory control";
+                return "Above average working memory and inhibitory skills";
             case 4:
-                return "Superior working memory and inhibitory control";
+                return "Excellent working memory and inhibition";
             default:
                 return "";
         }
@@ -324,8 +324,9 @@ export default function TOLStatsDetail() {
 
                     <BarChart
                         maxValue={MAX_SCORE}
-                        stepValue={5}
+                        stepValue={1}
                         yAxisExtraHeight={20}
+                        formatYLabel={(label) => Number(label).toFixed(1)}
                         scrollRef={chartScrollRef}
                         barBorderRadius={4}
                         frontColor={Color.orange[400]}

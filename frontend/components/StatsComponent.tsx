@@ -92,7 +92,7 @@ type StatCardProps = {
     loadingRecent: boolean;
     windowStart: string | null;
     windowEnd: string | null;
-    // labels: string[];
+    labels: string[];
     categoryIndex: number;
     interpretation: string;
     hasData: boolean;
@@ -109,7 +109,7 @@ export function StatCard({
     loadingRecent,
     windowStart,
     windowEnd,
-    // labels,
+    labels,
     categoryIndex,
     interpretation,
     hasData,

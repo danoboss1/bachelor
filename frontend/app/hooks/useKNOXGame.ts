@@ -85,6 +85,7 @@ export function useKNOXGame() {
         // 4,
         // 5,
         // 3, 3, 3
+        // 3
 
         // skutocne sekvencie
         3, 3,
@@ -423,7 +424,7 @@ export function useKNOXGame() {
             console.log("final score", finalScore);
 
             saveKnoxStatstoBackend(finalScore).then(() => {
-                router.push({
+                router.replace({
                     pathname: KNOX_ROUTE_ENDSCREEN,
                     params: {
                         threeStepSequencesCorrect,

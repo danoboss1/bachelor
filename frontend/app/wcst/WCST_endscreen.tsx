@@ -1,8 +1,8 @@
 import { StatMiniSupplementary } from '@/components/StatsComponent';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler, Alert } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "../../constants/Colors";
 import { Theme } from "../../constants/Theme";
@@ -114,6 +114,26 @@ export default function WCST_ENDSCREEN() {
 
         fetchAll();
     }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                // Blokuje návrat na predchádzajúcu hru
+                Alert.alert(
+                    "Return to Home",
+                    "Do you want to go back to Games Home?",
+                    [
+                        { text: "Cancel", style: "cancel" },
+                        { text: "Yes", style: "destructive", onPress: () => router.replace(RETURN_HOME) }
+                    ]
+                );
+                return true; // blokuje default behavior
+            };
+
+            const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+            return () => subscription.remove();
+        }, [])
+    );
 
     const labels = [
         "SEVERE\n0-2 categories",

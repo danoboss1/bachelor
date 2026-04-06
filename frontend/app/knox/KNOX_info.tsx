@@ -35,7 +35,7 @@ export default function KNOXInfoScreen() {
 
             <TouchableOpacity
                 style={localStyles.button}
-                onPress={() => router.push(KNOX_ROUTE)}
+                onPress={() => router.replace(KNOX_ROUTE)}
             >
                 <Text style={styles.buttonTextWhite}> Start Test </Text>
             </TouchableOpacity>

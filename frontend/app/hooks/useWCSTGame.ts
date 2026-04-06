@@ -329,7 +329,7 @@ export function useWCSTGame() {
     React.useEffect(() => {
         if (finished) {
             saveStatsToBackend().then(() => {
-                router.push({
+                router.replace({
                     pathname: WCST_ROUTE_ENDSCREEN,
                     params: {
                         trialsAdministered,

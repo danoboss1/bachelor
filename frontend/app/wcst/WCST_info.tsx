@@ -40,7 +40,7 @@ export default function GameInfo() {
 
             <TouchableOpacity 
                 style={localStyles.button}
-                onPress={() => router.push(WCST_ROUTE)}
+                onPress={() => router.replace(WCST_ROUTE)}
             >
                 <Text style={styles.buttonTextWhite}> Start Test </Text>
             </TouchableOpacity>

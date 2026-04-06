@@ -1,9 +1,10 @@
 import { StatMini, StatMiniSupplementary } from "@/components/StatsComponent";
-import { router, useLocalSearchParams } from "expo-router";
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { Alert, BackHandler, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "../../constants/Colors";
 import { Theme } from "../../constants/Theme";
+import React from "react";
 
 const { width, height } = Dimensions.get("window");
 
@@ -50,6 +51,26 @@ export default function TOL_ENDSCREEN() {
     }
 
     const categoryIndex = getCategoryIndex(totalScore);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                // Blokuje návrat na predchádzajúcu hru
+                Alert.alert(
+                    "Return to Home",
+                    "Do you want to go back to Games Home?",
+                    [
+                        { text: "Cancel", style: "cancel" },
+                        { text: "Yes", style: "destructive", onPress: () => router.replace(RETURN_HOME) }
+                    ]
+                );
+                return true; // blokuje default behavior
+            };
+
+            const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+            return () => subscription.remove();
+        }, [])
+    );
 
     const labels = [
         "SEVERE\n0 – <0.8",
@@ -103,7 +124,7 @@ export default function TOL_ENDSCREEN() {
                 <View style={localStyles.resultContainer}>
 
                     <Text style={localStyles.resultText}>
-                        Total score: {totalScore}
+                        Total score: {Number(totalScore.toFixed(3))}
                     </Text>
 
                     <Text style={[localStyles.resultInterpretation, { color: "black" }]}>

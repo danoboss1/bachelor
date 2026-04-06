@@ -324,7 +324,7 @@ export function useTOLGame() {
                 sixRef.current * COEFFICIENTS[6];
 
             saveTolStatstoBackend(totalScore).then(() => {
-                router.push({
+                router.replace({
                     pathname: TOL_ROUTE_ENDSCREEN,
                     params: {
                         fourMovesSequencesCorrect,

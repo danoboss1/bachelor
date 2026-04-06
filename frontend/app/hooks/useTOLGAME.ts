@@ -78,7 +78,6 @@ export function useTOLGame() {
 
     const handRef = React.useRef<View>(null);
 
-    
     const fourRef = useRef(0);
     const fiveRef = useRef(0);
     const sixRef = useRef(0);
@@ -108,6 +107,9 @@ export function useTOLGame() {
     
     const [showFeedback, setShowFeedback] = useState(false);
     const [finished, setFinished] = React.useState(false);
+
+    const [currentTask, setCurrentTask] = useState(1);
+    const totalTasks = 24;
     
     const usedFourIndexesRef = useRef<Set<number>>(new Set());
     const usedFiveIndexesRef = useRef<Set<number>>(new Set());
@@ -228,7 +230,11 @@ export function useTOLGame() {
         // tu som skoncil odtial to pokracujem dalej 
         // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
         
-        for(let i = 0; i < 1; i++) {
+        let taskCounter = 1;
+
+        for(let i = 0; i < 8; i++) {
+            setCurrentTask(taskCounter);
+
             const index = getUniqueRandomIndex(
                 difficultyFour.length,
                 usedFourIndexesRef.current
@@ -248,9 +254,13 @@ export function useTOLGame() {
             
             await waitForUser();
             await delay(1500);
+
+            taskCounter++;
         }
         
-        for(let i = 0; i < 0; i++) {
+        for(let i = 0; i < 8; i++) {
+            setCurrentTask(taskCounter);
+
             const index = getUniqueRandomIndex(
                 difficultyFive.length,
                 usedFiveIndexesRef.current
@@ -269,10 +279,14 @@ export function useTOLGame() {
             
             await waitForUser();
             await delay(1500);
+
+            taskCounter++;
         }
 
         // pocet uloh
-        for(let i = 0; i < 0; i++) {
+        for(let i = 0; i < 8; i++) {
+            setCurrentTask(taskCounter);
+
             const index = getUniqueRandomIndex(
                 difficultySix.length,
                 usedSixIndexesRef.current
@@ -290,6 +304,8 @@ export function useTOLGame() {
             
             await waitForUser();
             await delay(1500);
+
+            taskCounter++;
         }
         
         // neviem ci treba aj sem return;???
@@ -393,6 +409,9 @@ export function useTOLGame() {
         showFeedback,
 
         finished,
+
+        currentTask,
+        totalTasks,
 
         // handlers
         onStackPress,

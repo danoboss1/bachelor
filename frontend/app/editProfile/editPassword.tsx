@@ -219,13 +219,15 @@ export default function editPasswordScreen() {
                     /> */}
                     {/* <Text style={styles.userID}> @userID </Text> */}
 
-                                        {/* Avatar Placeholder */}
                     <View style={localStyles.avatarPlaceholder}>
-                        <MaterialCommunityIcons
-                            name="account-outline"
-                            size={70}
-                            // color="#FF6905"
-                            color={COLORS.primary}
+                        <Image
+                            source={require('@/assets/images/profilePicture.png')}
+                            style={{
+                                width: 80,
+                                height: 80,
+                                borderRadius: 50,
+                                resizeMode: "cover",
+                            }}
                         />
                     </View>
                     <Text style={styles.username}>{username.trim() || "Username"}</Text>

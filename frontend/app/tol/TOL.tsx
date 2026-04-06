@@ -83,6 +83,8 @@ export default function TOL_Screen() {
         feedback,
         showFeedback,
         finished,
+        currentTask,
+        totalTasks,
         onStackPress,
         exitTest,
     } = useTOLGame();
@@ -166,7 +168,13 @@ export default function TOL_Screen() {
                     ))}
                 </View>
 
-                <Text style={localStyles.sectionLabel}>YOUR BOARD</Text>
+                <View style={localStyles.sectionRow}>
+                    <Text style={localStyles.sectionLabel}>YOUR BOARD</Text>
+
+                    <Text style={localStyles.progressText}>
+                        {currentTask}/{totalTasks}
+                    </Text>
+                </View>
                 {/* <Text style={localStyles.hintText}>Tap a peg to move a disc</Text> */}
             </View>
 
@@ -272,6 +280,21 @@ const localStyles = StyleSheet.create({
     },
     sectionLabel: {
         textAlign: "center",
+        fontSize: 16,
+        fontWeight: "700",
+        letterSpacing: 1.5,
+        marginBottom: 8,
+        color: "#333",
+    },
+    sectionRow: {
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative", 
+    },
+    progressText: {
+        position: "absolute",
+        right: 10,
         fontSize: 16,
         fontWeight: "700",
         letterSpacing: 1.5,

@@ -104,24 +104,20 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.bgBottom}>
-                {/* <CogIcon></CogIcon> */}
-
                 <View style={styles.imageContainer}>
-                    {/* <Image
-                        source={require('../../assets/images/profile_picture_placeholder.png')}
-                        style={styles.profileImage}
-                    /> */}
-                    {/* <Text style={styles.userID}> @userID </Text> */}
 
-                                        {/* Avatar Placeholder */}
                     <View style={localStyles.avatarPlaceholder}>
-                        <MaterialCommunityIcons
-                            name="account-outline"
-                            size={70}
-                            // color="#FF6905"
-                            color={COLORS.primary}
+                        <Image
+                            source={require('@/assets/images/profilePicture.png')}
+                            style={{
+                                width: 80,
+                                height: 80,
+                                borderRadius: 50,
+                                resizeMode: "cover",
+                            }}
                         />
                     </View>
+
                     <Text style={styles.username}>{username.trim() || "Username"}</Text>
                 </View>
 
@@ -130,69 +126,53 @@ export default function ProfileScreen() {
                         style={styles.editButton}
                         onPress={() => router.push(EDIT_PROFILE_ROUTE)}
                     >
-                        <MaterialCommunityIcons 
+                        {/* <MaterialCommunityIcons 
                             name="square-edit-outline" 
                             // color="#FF6905" 
                             color={COLORS.primary}
                             size={24} 
-                        />
+                        /> */}
+                        <Text style={{ fontSize: 14, color: "#FF6905", fontWeight: "400" }}>
+                            {"<"}
+                        </Text>
                         <Text style={styles.buttonText}>Edit Profile</Text>
-                        <MaterialCommunityIcons 
+                        <Text style={{ fontSize: 14, color: "#FF6905", fontWeight: "400" }}>
+                            {">"}
+                        </Text>
+                        {/* <MaterialCommunityIcons 
                             name="chevron-right" 
                             // color="#FF6905" 
                             color={COLORS.primary}
                             size={24} 
-                        />
+                        /> */}
                     </TouchableOpacity>
 
                     <TouchableOpacity 
                         style={styles.editButton}
                         onPress={() => router.push(EDIT_PASSWORD_ROUTE)}
                     >
-                        <MaterialCommunityIcons 
-                            name="square-edit-outline" 
-                            // color="#FF6905" 
-                            color={COLORS.primary}
-                            size={24} 
-                        />
+                        <Text style={{  fontSize: 14, color: "#FF6905", fontWeight: "400" }}>
+                            {"<"}
+                        </Text>
                         <Text style={styles.buttonText}>Edit Password</Text>
-                        <MaterialCommunityIcons 
-                            name="chevron-right" 
-                            // color="#FF6905" 
-                            color={COLORS.primary}
-                            size={24} 
-                        />
+                        <Text style={{ fontSize: 14, color: "#FF6905", fontWeight: "400" }}>
+                            {">"}
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
                         style={styles.logoutButton}
                         onPress={handleLogout}
                     >
-                        <MaterialCommunityIcons 
-                            name="logout" 
-                            color="#FF1E1E" 
-                            size={24} 
-                        />
+                        <Text style={{  fontSize: 14, color: "#FF1E1E" , fontWeight: "400" }}>
+                            {"<"}
+                        </Text>
                         <Text style={styles.buttonText}>Logout</Text>
-                        <MaterialCommunityIcons 
-                            name="chevron-right" 
-                            color="#FF1E1E" 
-                            size={24} 
-                        />
+                        <Text style={{ fontSize: 14, color: "#FF1E1E" , fontWeight: "400" }}>
+                            {">"}
+                        </Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* <View style={{ flex: 1, justifyContent: "flex-end" }}>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>Edit Profile</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>Edit Password</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View> */}
 
             </View>
         </View>

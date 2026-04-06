@@ -183,10 +183,14 @@ export default function EditProfileScreen() {
             <View style={styles.bgBottom}>
                 <View style={styles.imageContainer}>
                     <View style={localStyles.avatarPlaceholder}>
-                        <MaterialCommunityIcons
-                            name="account-outline"
-                            size={70}
-                            color={COLORS.primary}
+                        <Image
+                            source={require('@/assets/images/profilePicture.png')}
+                            style={{
+                                width: 80,
+                                height: 80,
+                                borderRadius: 50,
+                                resizeMode: "cover",
+                            }}
                         />
                     </View>
 

@@ -84,15 +84,15 @@ export function useKNOXGame() {
         // 3, 4, 5, 6, 7, 8
         // 4,
         // 5,
-        3
+        // 3, 3, 3
 
         // skutocne sekvencie
-        // 3, 3,
-        // 4, 4, 4, 4,
-        // 5, 5, 5, 5,
-        // 6, 6, 6,
-        // 7, 7, 7,
-        // 8, 8,
+        3, 3,
+        4, 4, 4, 4,
+        5, 5, 5, 5,
+        6, 6, 6,
+        7, 7, 7,
+        8, 8,
     ]);
 
 
@@ -352,7 +352,7 @@ export function useKNOXGame() {
         for (let u = 0; u < uniqueLengthsInOrder.length; u++) {
             const len = uniqueLengthsInOrder[u];
 
-            setIsLastSequence(u + 1 === uniqueLengthsInOrder.length);
+            // setIsLastSequence(u + 1 === uniqueLengthsInOrder.length);
 
             const correctRef = getCorrectRefByLength(len);
             const before = correctRef.current;
@@ -362,6 +362,12 @@ export function useKNOXGame() {
                 .filter(idx => idx !== -1);
 
             for (let j = 0; j < indices.length; j++) {
+
+                const isLastLength = u === uniqueLengthsInOrder.length - 1;
+                const isLastIndex = j === indices.length - 1;
+
+                setIsLastSequence(isLastLength && isLastIndex);
+
                 setUserAnswered(false);
                 setUserSequence([]);
                 userSequenceRef.current = [];

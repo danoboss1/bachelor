@@ -79,7 +79,7 @@ export function useKNOXGame() {
     const userAnsweredResolve = React.useRef<() => void | null>(null);
 
     const [sequenceLengths] = React.useState([
-        // testovacie sekvencie
+        // testing sequences
         // 3, 4
         // 3, 4, 5, 6, 7, 8
         // 4,
@@ -87,7 +87,7 @@ export function useKNOXGame() {
         // 3, 3, 3
         // 3
 
-        // skutocne sekvencie
+        // real sequences
         3, 3,
         4, 4, 4, 4,
         5, 5, 5, 5,

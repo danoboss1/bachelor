@@ -289,11 +289,16 @@ export default function WCSTStatsDetail() {
     const categoriesCompleted = Number(best?.categories_completed ?? 0);
     const trials = Number(best?.trials_administered ?? 0);
 
+    // const categoryIndex =
+    //     selectedDay?.bestStat == null
+    //         ? null
+    //         : (selectedDay?.categoryIndex ??
+    //             (best ? getCategoryIndex(categoriesCompleted, trials) : null));
+
     const categoryIndex =
-        selectedDay?.bestStat == null
+        best == null
             ? null
-            : (selectedDay?.categoryIndex ??
-                (best ? getCategoryIndex(categoriesCompleted, trials) : null));
+            : getCategoryIndex(categoriesCompleted, trials); 
 
     const trendMessage = trendData?.message ?? null;
 

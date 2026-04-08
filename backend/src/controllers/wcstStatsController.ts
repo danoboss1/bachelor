@@ -45,20 +45,6 @@ function percentDiff(current: number, baseline: number): number {
     return ((current - baseline) / baseline) * 100;
 }
 
-/**
- * Optional: Your category bar index logic (0..4) from the frontend.
- * Useful to include in responses for UI.
- */
-// Mozem to nechat tu na backende, ale potom to musim odstranit z frontendu
-function getCategoryIndex(categoriesCompleted: number, trials: number): number {
-    if (categoriesCompleted <= 2) return 0;
-    if (categoriesCompleted <= 4) return 1;
-    if (categoriesCompleted === 5) return 2;
-    if (categoriesCompleted === 6 && trials > 85) return 3;
-    if (categoriesCompleted === 6 && trials <= 85) return 4;
-    return 0;
-}
-
 // toto robi co, skor ako to robi
 function safeTimeMs(t: Date | null): number {
     return t ? t.getTime() : 0;
@@ -356,7 +342,6 @@ export class StatsController {
                         label: String(i + 1), // "1"
                         value: 0,
                         bestStat: null,
-                        categoryIndex: null,
                     };
                 }
 
@@ -368,7 +353,6 @@ export class StatsController {
                     label: String(i + 1),
                     value: Number(found.bestScore),
                     bestStat: found.bestStat,
-                    categoryIndex: getCategoryIndex(cc, trials),
                 };
             });
 

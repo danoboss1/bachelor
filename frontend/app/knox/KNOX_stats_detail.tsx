@@ -288,10 +288,9 @@ export default function TOLStatsDetail() {
     const totalScore = Number(best?.totalscore ?? 0);
 
     const categoryIndex =
-    selectedDay?.bestStat == null
-        ? null
-        : (selectedDay?.categoryIndex ??
-            (best ? getKnoxCategoryIndex(totalScore) : null));
+        selectedDay?.bestStat == null
+            ? null
+            : getKnoxCategoryIndex(totalScore);
     
     const trendMessage = trendData?.message ?? null;
 

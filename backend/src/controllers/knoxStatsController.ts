@@ -45,18 +45,6 @@ function percentDiff(current: number, baseline: number): number {
     return ((current - baseline) / baseline) * 100;
 }
 
-/**
- * Optional: Your category bar index logic (0..4) from the frontend.
- * Useful to include in responses for UI.
- */
-// Mozem to nechat tu na backende, ale potom to musim odstranit z frontendu
-function getKnoxCategoryIndex(totalScore: number) {
-    if (totalScore <= 3) return 0;
-    if (totalScore <= 5) return 1;
-    if (totalScore <= 8) return 2;
-    if (totalScore <= 11) return 3;
-    return 4; // 12+
-}
 
 // toto robi co, skor ako to robi
 function safeTimeMs(t: Date | null): number {
@@ -270,7 +258,6 @@ export class KnoxStatsController {
                         label: String(i + 1), // "1"
                         value: 0,
                         bestStat: null,
-                        categoryIndex: null,
                     };
                 }
 
@@ -281,7 +268,6 @@ export class KnoxStatsController {
                     label: String(i + 1),
                     value: Number(found.bestScore),
                     bestStat: found.bestStat,
-                    categoryIndex: getKnoxCategoryIndex(totalscore),
                 };
             });
 

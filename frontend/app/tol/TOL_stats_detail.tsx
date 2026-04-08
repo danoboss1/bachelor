@@ -282,10 +282,9 @@ export default function TOLStatsDetail() {
     const totalScore = Number(best?.totalscore ?? 0);
 
     const categoryIndex =
-    selectedDay?.bestStat == null
-        ? null
-        : (selectedDay?.categoryIndex ??
-            (best ? getTolCategoryIndex(totalScore) : null));
+        selectedDay?.bestStat == null
+            ? null
+            : getTolCategoryIndex(totalScore);
     
     const trendMessage = trendData?.message ?? null;
 

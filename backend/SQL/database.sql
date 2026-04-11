@@ -59,39 +59,6 @@ ADD COLUMN totalScore SMALLINT;
 ALTER TABLE stats_knox
 ALTER COLUMN totalScore TYPE FLOAT;
 
--- -------------------------------
--- TABUĽKA LEADERBOARD_WCST
--- -------------------------------
-CREATE TABLE leaderboard_wcst (
-    id SERIAL PRIMARY KEY,
-    user_id INT,
-    stats_id INT,
-    CONSTRAINT fk_leaderboard_wcst_user_id
-        FOREIGN KEY(user_id) REFERENCES users(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_leaderboard_wcst_stats_id
-        FOREIGN KEY(stats_id) REFERENCES stats_wcst(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- -------------------------------
--- TABUĽKA LEADERBOARD_KNOX
--- -------------------------------
-CREATE TABLE leaderboard_knox (
-    id SERIAL PRIMARY KEY,
-    user_id INT,
-    stats_id INT,
-    CONSTRAINT fk_leaderboard_knox_user_id
-        FOREIGN KEY(user_id) REFERENCES users(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_leaderboard_knox_stats_id
-        FOREIGN KEY(stats_id) REFERENCES stats_knox(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
 
 -- -------------------------------
 -- TABUĽKA STATS_TOL
@@ -111,22 +78,6 @@ CREATE TABLE stats_tol (
         ON UPDATE CASCADE
 );
 
--- -------------------------------
--- TABUĽKA LEADERBOARD_TOL
--- -------------------------------
-CREATE TABLE leaderboard_tol (
-    id SERIAL PRIMARY KEY,
-    user_id INT,
-    stats_id INT,
-    CONSTRAINT fk_leaderboard_tol_user_id
-        FOREIGN KEY(user_id) REFERENCES users(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_leaderboard_tol_stats_id
-        FOREIGN KEY(stats_id) REFERENCES stats_tol(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
 
 -- CREATE TABLE users (
 -- 	id SERIAL PRIMARY KEY,
@@ -186,7 +137,6 @@ ALTER TABLE stats RENAME COLUMN number_of_categories_completed TO categories_com
 ALTER TABLE stats RENAME COLUMN total_number_of_trials_administrated TO trials_administered;
 
 ALTER TABLE stats RENAME TO stats_wcst;
-ALTER TABLE leaderboard RENAME TO leaderboard_wcst;
 
 
 -- CREATE TABLE stats (

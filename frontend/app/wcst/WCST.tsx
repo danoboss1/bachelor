@@ -5,7 +5,6 @@ import { useWCSTGame } from "../hooks/useWCSTGame";
 
 const { width, height } = Dimensions.get("window");
 
-// preco je toto skoro vzdy tvar ako prve pravidlo 
 export default function WCST_Screen() {
     const {
         timeLeft,

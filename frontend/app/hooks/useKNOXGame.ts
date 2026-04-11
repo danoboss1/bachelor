@@ -186,7 +186,7 @@ export function useKNOXGame() {
         const currentlyActive =
             activeUserTap ?? incorrectUserTap ?? correctLastUserTap;
 
-        // 🔥 iba ak klikol znovu na TEN ISTÝ štvorec
+        // clicked on the same square
         if (currentlyActive === id) {
             setActiveUserTap(null);
             setIncorrectUserTap(null);
@@ -280,9 +280,6 @@ export function useKNOXGame() {
             setUserSequence(userSequenceRef.current);
         }
 
-        // tento console log neskor vymazat
-        // console.log("IMMEDIATE:", userSequenceRef.current);
-
         timeoutRef.current = setTimeout(() => {
             setActiveUserTap(null);
             timeoutRef.current = null;
@@ -353,8 +350,6 @@ export function useKNOXGame() {
         for (let u = 0; u < uniqueLengthsInOrder.length; u++) {
             const len = uniqueLengthsInOrder[u];
 
-            // setIsLastSequence(u + 1 === uniqueLengthsInOrder.length);
-
             const correctRef = getCorrectRefByLength(len);
             const before = correctRef.current;
             
@@ -384,7 +379,6 @@ export function useKNOXGame() {
                 await delay(1500);
             }
 
-            // nie je naozaj to before zbytocne ???
             const gained = correctRef.current - before;
 
             if (gained === 0) {
@@ -399,11 +393,9 @@ export function useKNOXGame() {
             }
         }
 
-        // tu zmenit text
         if (earlyStop) {
             setIsLastSequence(true);
             setFeedback("Test ended early based on performance");
-            // prípadne vlastná hláška
         }
 
         await delay(1500);

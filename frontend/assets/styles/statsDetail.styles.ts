@@ -69,7 +69,6 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         marginLeft: width * 0.1,
-        // marginBottom: 8,
         color: "black",
         textAlign: "left",
     },

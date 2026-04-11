@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { styles } from "../../assets/styles/mainScreens.styles";
-// import { Card, Red_Triangle_Card, Gr } from "@/components/Card";
 import { GameCard } from "@/components/GameComponent";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
@@ -25,8 +24,6 @@ const gamesData = [
         path: "/wcst/WCST_info" as const,
     },
     {   
-        // takato farba bielej to je #f9f9f9
-        // velkost toho obrazku ako funguje skontrolovat
         id: "2",
         title: "Tower of London",
         subtitle: "decision-making\nplanning",
@@ -34,8 +31,6 @@ const gamesData = [
         path: "/tol/TOL_info" as const,
     },
     {
-        // #EAF4FF
-        // #DCEEFF
         id: "3",
         title: "Knox's Cube\nTest",
         subtitle: "working memory\ninhibition",

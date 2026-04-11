@@ -1,5 +1,3 @@
-// import React from "react";
-
 import { router } from "expo-router";
 import React from "react";
 import { Dimensions, ImageBackground, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -21,7 +19,7 @@ export function GameCard({ image, title, subtitle, path }: GameCardProps) {
                 <ImageBackground
                     source={image}
                     style={localStyles.imageBackground}
-                    imageStyle={{ borderRadius: 16 }} // zaoblenie rohov
+                    imageStyle={{ borderRadius: 16 }}
                 >
                     <Text style={localStyles.cardSubtitle}>{subtitle}</Text>
 
@@ -54,8 +52,6 @@ export function GameCard({ image, title, subtitle, path }: GameCardProps) {
     );
 }
 
-// tuto musim este spravit aby tie styly boli vsetky responzivne
-
 const localStyles = StyleSheet.create({
     card: {
         height: height * 0.4,
@@ -63,7 +59,7 @@ const localStyles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: 16,
         marginTop: 20,
-        overflow: "hidden", // veľmi dôležité, aby sa borderRadius aplikoval aj na obrázok
+        overflow: "hidden",
         elevation: 4,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -78,7 +74,6 @@ const localStyles = StyleSheet.create({
     },
     rowContainer: {
         flexDirection: "row",
-        // alignItems: "flex-end",
         justifyContent: "space-between",
     },
     cardTitle: {
@@ -89,10 +84,7 @@ const localStyles = StyleSheet.create({
         textAlign: "center",
         marginLeft: 24,
         marginBottom: 30,
-        // marginLeft: width * 0.1,
         fontFamily: "Gagalin",
-        // marginLeft: width * 0.1,
-        // marginBottom: height * 0.04,
     },
     cardSubtitle: {
         position: "absolute",
@@ -122,35 +114,3 @@ const localStyles = StyleSheet.create({
         alignSelf: "flex-end",
     },
 });
-
-
-
-// const localStyles = StyleSheet.create({
-//     header: {
-//         fontSize: 24,
-//         fontWeight: "bold",
-//         textAlign: "center",
-//         marginTop: 40,
-//         color: "white",
-//     },
-//     card: {
-//         backgroundColor: "#cce5ff",
-//         borderRadius: 16,
-//         padding: 20,
-//         marginBottom: 12,
-//         shadowColor: "#000",
-//         shadowOffset: { width: 0, height: 2 },
-//         shadowOpacity: 0.3,
-//         shadowRadius: 4,
-//         elevation: 5,
-//     },
-//     cardTitle: {
-//         fontSize: 18,
-//         fontWeight: "bold",
-//     },
-//     cardDescription: {
-//         fontSize: 14,
-//         color: "#333",
-//         marginTop: 4,
-//     },
-// });

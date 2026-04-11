@@ -13,10 +13,8 @@ interface AllCardProps {
 
 
 export function AllCard({ color, shape, count }: AllCardProps) {
-  // State pre rozmery karty
   const [cardSize, setCardSize] = React.useState({ width: 0, height: 0 });
 
-  // Funkcia, ktorá vráti jeden tvar podľa typu a farby
   const renderShape = () => {
     switch (shape) {
       case "triangle":
@@ -82,7 +80,6 @@ export function AllCard({ color, shape, count }: AllCardProps) {
     }
   };
 
-  // Pole tvarov podľa počtu (count)
   const shapesArray = Array.from({ length: count }, (_, i) => (
     <React.Fragment key={i}>{renderShape()}</React.Fragment>
   ));

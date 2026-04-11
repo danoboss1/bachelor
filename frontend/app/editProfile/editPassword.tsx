@@ -322,13 +322,10 @@ const localStyles = StyleSheet.create({
         width: 140,
         height: 140,
         borderRadius: 70,
-        // backgroundColor: "#FFF3EC",
-        // backgroundColor: Color.orange[50],
         backgroundColor: COLORS.primary_broskynova,
         justifyContent: "center",
         alignItems: "center",
         borderWidth: 2,
-        // borderColor: "#FFD2B8",
         borderColor: COLORS.primary_broskynova,
         alignSelf: "center",
         marginBottom: 10,
@@ -396,5 +393,4 @@ const localStyles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "500",
     },
-    // button a error text aby sedel so signup
 })

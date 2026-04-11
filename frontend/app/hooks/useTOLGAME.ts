@@ -27,9 +27,9 @@ type DiscData = {
 const STACK_CAPACITY = [3, 2, 1];
 
 const DISC_MAP: Record<string, DiscData> = {
-    M: { id: 1, size: width * 0.28, color: "#004aad" }, // modrý
-    Z: { id: 2, size: width * 0.28, color: "#00bf63" }, // zelený
-    Č: { id: 3, size: width * 0.28, color: "#ff3131" }, // červený
+    M: { id: 1, size: width * 0.28, color: "#004aad" }, 
+    Z: { id: 2, size: width * 0.28, color: "#00bf63" }, 
+    Č: { id: 3, size: width * 0.28, color: "#ff3131" }, 
 };
 
 const COEFFICIENTS = {
@@ -172,9 +172,6 @@ export function useTOLGame() {
                 return prev;
             }
             
-            // toto mozem pouzit na vizualne zvyraznenie plneho stacku
-            // const isFull = discs.length >= STACK_CAPACITY[index];
-            
             const nextMove = userMoves + 1;
             
             newStacks[stackIndex].push(discInHand);
@@ -204,13 +201,11 @@ export function useTOLGame() {
                 setShowFeedback(true);
                 
                 userAnsweredResolve.current?.();
-                // mam sem dat return;???
             } else if (nextMove === targetMoves) {
                 setFeedback("Incorrect!");
                 setShowFeedback(true);
                 
                 userAnsweredResolve.current?.();
-                // mam sem dat return;???
             }
             
             return newStacks;
@@ -227,9 +222,6 @@ export function useTOLGame() {
         usedFiveIndexesRef.current.clear();
         usedSixIndexesRef.current.clear();
         
-        // tu som skoncil odtial to pokracujem dalej 
-        // s tym aby to tu sekvenciu mohlo zobrat nanajvys raz a nie viac razy
-        
         let taskCounter = 1;
 
         for(let i = 0; i < 8; i++) {
@@ -245,8 +237,6 @@ export function useTOLGame() {
             setDiscInHand(null);
             setFeedback("");
             setShowFeedback(false);
-            
-            // fourSequenceIndex = Math.floor(Math.random() * 21);
             
             setStacks(convertStacks(level.userStack))
             setTargetStacks(convertStacks(level.targetStack))
@@ -308,7 +298,6 @@ export function useTOLGame() {
             taskCounter++;
         }
         
-        // neviem ci treba aj sem return;???
         setFinished(true);
     }
 
@@ -418,7 +407,4 @@ export function useTOLGame() {
 
         exitTest,
     };
-
-    // tu budem mozno presuvat aj to Start Game 
-    // alebo to upravim aj pri inych suboroch, aby to bolo konzistentne vsade
 }

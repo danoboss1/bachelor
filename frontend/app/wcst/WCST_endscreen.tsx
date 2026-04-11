@@ -82,8 +82,6 @@ export default function WCST_ENDSCREEN() {
     FETCH PERCENTILES
     */
 
-
-    // POTIALTO TO CHAPEM
     useEffect(() => {
         async function fetchPercentile(metric: string, value: number) {
             try {
@@ -118,7 +116,6 @@ export default function WCST_ENDSCREEN() {
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                // Blokuje návrat na predchádzajúcu hru
                 Alert.alert(
                     "Return to Home",
                     "Do you want to go back to Games Home?",
@@ -127,7 +124,7 @@ export default function WCST_ENDSCREEN() {
                         { text: "Yes", style: "destructive", onPress: () => router.replace(RETURN_HOME) }
                     ]
                 );
-                return true; // blokuje default behavior
+                return true;
             };
 
             const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
@@ -166,17 +163,16 @@ export default function WCST_ENDSCREEN() {
                                 localStyles.segment,
                                 {
                                     backgroundColor: index === categoryIndex
-                                        ? segmentColors[index] // iba aktuálna kategória svieti
-                                        : inactiveColor,       // ostatné tmavosivé
+                                        ? segmentColors[index] 
+                                        : inactiveColor,       
                                     borderRightWidth: index < labels.length - 1 ? 1 : 0,
-                                    borderRightColor: "#999" // tenká čiarka medzi segmentmi
+                                    borderRightColor: "#999"
                                 }
                             ]}
                         >
                             <Text style={[
                                 localStyles.segmentText,
                                 { color: categoryIndex === 2 && index === 2 ? "#333" : "white" }
-                                // { color: index === 2 ? "black" : "white" } // žltý segment čitateľný
                             ]}>
                                 {label}
                             </Text>
@@ -322,7 +318,7 @@ const localStyles = StyleSheet.create({
         marginTop: 20,
     },
     titleContainer: {
-        alignItems: "center",  // centrovanie nadpisu horizontálne
+        alignItems: "center", 
         marginBottom: 16,    
     },
     scaleContainer: {
@@ -389,11 +385,10 @@ const localStyles = StyleSheet.create({
     buttonContainer: {
         flexDirection: "row",
         marginBottom: 40,
-        justifyContent: "center",  // toto je dôležité
+        justifyContent: "center",
         gap: 12, 
     },
     button: {
-        // flex: 1,
         width: width * 0.4,
         alignItems: "center",
         justifyContent: "center",
@@ -405,8 +400,3 @@ const localStyles = StyleSheet.create({
         minWidth: 60,
     },
 });
-
-
-// nativne skalovanie textu bez width, height. Vyskusat potom neskor
-// fontSize: RFValue(22), // text bude škálovaný podľa veľkosti obrazovky
-// import { RFValue } from "react-native-responsive-fontsize";

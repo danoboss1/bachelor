@@ -4,10 +4,6 @@ import Svg, { Path } from "react-native-svg";
 
 const { width, height } = Dimensions.get("window");
 
-// const firstPositionLeft = width * (0.13 / 6 + 0.005);
-// const firstPositionBottom = height * 1/9 + (height * 1/10 / 3);
-
-
 
 type HandProps = {
     size?: number;
@@ -98,7 +94,6 @@ export function StackWithDiscs({
                         {
                             width: disc.size,
                             backgroundColor: disc.color,
-                            // zakladny offset + 1,5 nasobok vysky disku, aby to vyzeralo v pohode
                             bottom: height * 0.005 + index * (height * 0.06),
                         },
                     ]}
@@ -139,10 +134,7 @@ const localStyles = StyleSheet.create({
         position: "absolute",
         height: height * 0.040,
         borderRadius: 6,
-        // alignSelf: "center",
         zIndex: 2,
-        // left: width * (0.13 / 6 + 0.005),
-        // bottom: height * 1/9 + (height * 1/10 / 3),
     },
     discInHand: {
         position: "absolute",

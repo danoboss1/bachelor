@@ -418,8 +418,6 @@ export default function StatsScreen() {
                         hasData={tolHasBest}
                         primaryValue={bestTolTotalScore}
                         primaryLabel="Total score"
-                        // secondaryValue={averageTrialsAdministered}
-                        // secondaryLabel="Cards used"
                     />
 
                     <StatCard
@@ -485,8 +483,6 @@ const localStyles = StyleSheet.create({
         color: Color.gray[700],
         backgroundColor: "rgba(255,255,255,0.82)",
         paddingHorizontal: 8,
-        // paddingBottom: 8,
-        // marginBottom: 54,
         paddingVertical: 4,
         borderRadius: 10,
         overflow: "hidden",
@@ -569,7 +565,6 @@ const localStyles = StyleSheet.create({
         backgroundColor: "rgba(255,255,255,0.55)",
         borderWidth: 2,
         borderColor: "#EED7C8",
-        // borderColor: COLORS.primary
     },
     moreLinkText: {
         fontSize: 14,

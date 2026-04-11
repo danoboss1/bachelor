@@ -55,7 +55,7 @@ export default function TOL_ENDSCREEN() {
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                // Blokuje návrat na predchádzajúcu hru
+                // blocks return to a previous screen
                 Alert.alert(
                     "Return to Home",
                     "Do you want to go back to Games Home?",
@@ -64,7 +64,7 @@ export default function TOL_ENDSCREEN() {
                         { text: "Yes", style: "destructive", onPress: () => router.replace(RETURN_HOME) }
                     ]
                 );
-                return true; // blokuje default behavior
+                return true; // blocks default behavior
             };
 
             const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
@@ -101,17 +101,16 @@ export default function TOL_ENDSCREEN() {
                                 localStyles.segment,
                                 {
                                     backgroundColor: index === categoryIndex
-                                        ? segmentColors[index] // iba aktuálna kategória svieti
-                                        : inactiveColor,       // ostatné tmavosivé
+                                        ? segmentColors[index] 
+                                        : inactiveColor,       
                                     borderRightWidth: index < labels.length - 1 ? 1 : 0,
-                                    borderRightColor: "#999" // tenká čiarka medzi segmentmi
+                                    borderRightColor: "#999" 
                                 }
                             ]}
                         >
                             <Text style={[
                                 localStyles.segmentText,
                                 { color: categoryIndex === 2 && index === 2 ? "#333" : "white" }
-                                // { color: index === 2 ? "black" : "white" } // žltý segment čitateľný
                             ]}>
                                 {label}
                             </Text>
@@ -196,32 +195,15 @@ const localStyles = StyleSheet.create({
         paddingTop: height * 0.03,
         backgroundColor: COLORS.primary_broskynova
     },
-    // container: {
-    //     flex: 1,
-    //     paddingTop: height * 0.026,
-    //     alignItems: "center",
-    //     justifyContent: "space-between",
-    //     // backgroundColor: "#dceeff",
-    //     // backgroundColor: "#f9f9f9",
-    //     backgroundColor: "#d6c7b9",
-    // },
     title: {
         fontSize: Theme.typography.h1,
         fontWeight: "bold",
         marginTop: 20,
     },
     titleContainer: {
-        alignItems: "center",  // centrovanie nadpisu horizontálne
+        alignItems: "center",
         marginBottom: 16,    
     },
-    // title: {
-    //     fontSize: Theme.typography.h1,
-    //     fontWeight: "bold",
-    //     color: "#000",
-    //     marginBottom: height * 0.03,
-    //     textAlign: "center",
-    //     marginTop: height * 0.04,
-    // },
     scaleContainer: {
         width: width * 0.9,
         flex: 2,
@@ -286,11 +268,10 @@ const localStyles = StyleSheet.create({
     buttonContainer: {
         flexDirection: "row",
         marginBottom: 40,
-        justifyContent: "center",  // toto je dôležité
+        justifyContent: "center",
         gap: 12, 
     },
     button: {
-        // flex: 1,
         width: width * 0.4,
         alignItems: "center",
         justifyContent: "center",

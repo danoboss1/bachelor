@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         borderRadius: width * 0.045,
     },
     squareTargetSequenceActive: {
-        backgroundColor: "#F0B000", // tvoja zlatá
+        backgroundColor: "#F0B000", // golden
     },
     squareUserTapActive: {
         backgroundColor: "#00BFFF",

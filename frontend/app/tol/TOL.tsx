@@ -30,9 +30,9 @@ const STACK_CAPACITY = [3, 2, 1];
 ========================= */
 
 const DISC_MAP: Record<string, DiscData> = {
-    M: { id: 1, size: width * 0.28, color: "#004aad" }, // modrý
-    Z: { id: 2, size: width * 0.28, color: "#00bf63" }, // zelený
-    Č: { id: 3, size: width * 0.28, color: "#ff3131" }, // červený
+    M: { id: 1, size: width * 0.28, color: "#004aad" },
+    Z: { id: 2, size: width * 0.28, color: "#00bf63" },
+    Č: { id: 3, size: width * 0.28, color: "#ff3131" },
 };
 
 const COEFFICIENTS = {
@@ -90,7 +90,6 @@ export default function TOL_Screen() {
     } = useTOLGame();
 
     return (
-        // #f9f9f9
         <View style={localStyles.container}>
             <View style={localStyles.header}>
                 <Text style={localStyles.targetAttemptsText}>
@@ -119,9 +118,6 @@ export default function TOL_Screen() {
                         <StackWithDiscs
                             key={index}
                             stackHeight={[height * 0.24, height * 0.16, height * 0.08][index]}
-                            // backgroundColor="#4CAF50"
-                            // backgroundColor="#f9f9f9"
-                            // backgroundColor="#FFCC80"
                             backgroundColor="#e8eef5"
                             discs={targetStack}
                         />
@@ -159,8 +155,6 @@ export default function TOL_Screen() {
                         <StackWithDiscs
                             key={index}
                             stackHeight={[height * 0.24, height * 0.16, height * 0.08][index]}
-                            // backgroundColor="#FFCC80"
-                            // backgroundColor="#f9f9f9"
                             backgroundColor="#e8eef5"
                             discs={stack}
                             onPress={() => onStackPress(index)}
@@ -202,24 +196,18 @@ const localStyles = StyleSheet.create({
         flex: 1,
         height: "100%",
         backgroundColor: "#f9f9f9",
-        // backgroundColor: "orange",
-        // backgroundColor: "#706b6b",
     },
     timer: {
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        // backgroundColor: "green",
     },
     header: {
         flexDirection: "row",
-        // flex: 1,
         width: "100%",
-        // justifyContent: "flex-end",
         justifyContent: "space-between",
         alignItems: "center",
-        // paddingHorizontal: width * 0.05,
         paddingTop: height * 0.03, 
         paddingBottom: 8,
         paddingHorizontal: 8,
@@ -227,16 +215,12 @@ const localStyles = StyleSheet.create({
     targetAttemptsText: {
         fontSize: 20, 
         color: "black",
-        // marginLeft: 12,
         marginLeft: 4,
-        // marginTop: 15, 
         fontWeight: "600",
     },
     userAttemptsText: {
         fontSize: 20, 
         color: "black", 
-        // marginRight: 12,
-        // marginTop: 15,
         fontWeight: "600",
     },
     targetPegs: {
@@ -312,8 +296,6 @@ const localStyles = StyleSheet.create({
         paddingVertical: height * 0.012,
         paddingHorizontal: width * 0.04,
         borderRadius: 8,
-        // backgroundColor: "#8B593E",
-        // backgroundColor: "#c4b8a8",
         backgroundColor: "#A5A5A5",
     },
     exitButtonText: {
@@ -322,30 +304,3 @@ const localStyles = StyleSheet.create({
         fontWeight: "500",
     },
 });
-
-// {showFeedback && (
-//     <View style={localStyles.overlay}>
-//         <Text style={localStyles.overlayText}>Correct</Text>
-//     </View>
-// )}
-
-// overlay: {
-//     position: "absolute",
-//     top: 0,
-//     left: 0,
-//     right: 0,
-//     bottom: 0,
-//     backgroundColor: "rgba(0,0,0,0.45)", // stmavenie
-//     justifyContent: "center",
-//     alignItems: "center",
-//     zIndex: 100,
-// },
-// overlayText: {
-//     fontSize: 48,
-//     fontWeight: "800",
-//     color: "#4CAF50",
-//     backgroundColor: "rgba(255,255,255,0.9)",
-//     paddingHorizontal: 24,
-//     paddingVertical: 12,
-//     borderRadius: 12,
-// },

@@ -15,7 +15,6 @@ import { formatDate } from "@/components/statsDetail/utils";
 
 const { width, height } = Dimensions.get("window");
 
-// toto zmenime ked budeme mat koeficienty 
 const MAX_SCORE = 7;
 
 type TolStatRow = {

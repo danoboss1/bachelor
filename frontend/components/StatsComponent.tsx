@@ -267,7 +267,6 @@ export function StatsComponent({ title, stats, image, path }: StatsComponentProp
                     <Text style={localStyles.cardTitle}>{title}</Text>
 
                     {stats.map((item, index) => {
-                        // const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
 
                         return (
                             <View key={index} style={localStyles.statContainer}>
@@ -304,7 +303,6 @@ export function StatsComponent({ title, stats, image, path }: StatsComponentProp
                     <Text style={localStyles.cardTitle}>{title}</Text>
 
                     {stats.map((item, index) => {
-                        // const percentage = Math.min((item.value / (item.max || 100)) * 100, 100);
 
                         return (
                             <View key={index} style={localStyles.statContainer}>
@@ -366,8 +364,6 @@ const localStyles = StyleSheet.create({
         marginBottom: 12,
     },
     imageBackground: {
-        // width: "100%",
-        // height: 150,
         flex: 1,
         alignContent: "center",
         justifyContent: "center",
@@ -385,14 +381,14 @@ const stylesMini = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         color: "black",
-        textAlign: "center", // label do stredu
+        textAlign: "center",
         marginBottom: 4,
     },
     valueCentered: {
         fontSize: 16,
         fontWeight: "700",
         color: "black",
-        textAlign: "center", // hodnota do stredu
+        textAlign: "center",
         marginBottom: 8,
     },
     barRow: {
@@ -411,7 +407,6 @@ const stylesMini = StyleSheet.create({
         backgroundColor: "#4caf50",
     },
     percent: {
-        // width: 45,
         color: "black",
         textAlign: "center",
         fontWeight: "600",
@@ -431,7 +426,7 @@ const stylesMini = StyleSheet.create({
 const stylesSupplementary = StyleSheet.create({
     container: {
         flexDirection: "row",
-        justifyContent: "flex-start", // label bude úplne vľavo
+        justifyContent: "flex-start",
         alignItems: "center",
         marginVertical: 6,
         paddingVertical: 12,
@@ -440,13 +435,13 @@ const stylesSupplementary = StyleSheet.create({
     label: {
         fontSize: 16,
         color: "black",
-        flex: 1, // label zaberie čo najviac miesta
+        flex: 1, 
     },
     value: {
         fontSize: 16,
         fontWeight: "600",
         color: "black",
-        textAlign: "right", // hodnota bude zarovnaná doprava
+        textAlign: "right",
     },
 });
 
@@ -492,8 +487,6 @@ const stylesStatCard = StyleSheet.create({
         color: Color.gray[700],
         backgroundColor: "rgba(255,255,255,0.82)",
         paddingHorizontal: 8,
-        // paddingBottom: 8,
-        // marginBottom: 54,
         paddingVertical: 4,
         borderRadius: 10,
         overflow: "hidden",
@@ -576,7 +569,6 @@ const stylesStatCard = StyleSheet.create({
         backgroundColor: "rgba(255,255,255,0.55)",
         borderWidth: 2,
         borderColor: "#EED7C8",
-        // borderColor: COLORS.primary
     },
     moreLinkText: {
         fontSize: 14,

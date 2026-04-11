@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
         justifyContent: "center",
-        // paddingHorizontal: "5%",
     },
     input: {
         backgroundColor: COLORS.white,
@@ -18,12 +17,9 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.text,
         padding: 15,
-        // paddingHorizontal: "15%",
-        // toto budem chciet dat na tie prvy asi nie na ten text
     },
     header: {
         backgroundColor: COLORS.secondary_background,
-        // backgroundColor: "#ffd6a5",
     },
     body: {
         flex: 3,
@@ -61,6 +57,5 @@ export const styles = StyleSheet.create({
     inputGroup: {
         marginHorizontal: "5%",
         marginTop: height * 0.02,
-        // backgroundColor: "white",
     }
 });

@@ -6,12 +6,6 @@ import { styles } from "@/assets/styles/auth.styles";
 
 const { width, height } = Dimensions.get("window");
 
-// mozno ked stlacim velakrat za sebou rychlo
-// jedno tlacitko, tak by to malo
-// vzdy na chvilku zhasnut
-// aby bolo vidno pre uzivatela, ze
-// to stlacil viackrat 
-
 export default function KNOX_Screen() {
     const {
         timeLeft,
@@ -135,7 +129,6 @@ const localStyles = StyleSheet.create({
     },
     header: {
         flexDirection: "row",
-        // flex: 1,
         width: "100%",
         justifyContent: "flex-end",
         alignItems: "center",

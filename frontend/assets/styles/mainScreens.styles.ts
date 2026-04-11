@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     bgTop: {
-        // flex: 1,
         height: 140,
         backgroundColor: "#8B593E",
         flexDirection: "row",
@@ -15,10 +14,7 @@ export const styles = StyleSheet.create({
     },
     bgTopNew: {
         flex: 1,
-        // primary odtiene test
         backgroundColor: "#4c5ec1",
-        // primary
-        // backgroundColor: "#4c5ec1",
     },
     bgBottom: {
         flex: 5,
@@ -29,16 +25,11 @@ export const styles = StyleSheet.create({
         fontWeight: "bold",
         marginTop: height * 0.06,
         marginLeft: width * 0.05,
-        // textAlign: "left",
-        // marginTop: height * 0.07,
-        // marginLeft: width * 0.05,
         color: "white",
     },
     subheader: {
         fontSize: 14,
         marginLeft: width * 0.05,
-        // textAlign: "left",
-        // marginLeft: width * 0.05,
         color: "white",
     },
     userID: {
@@ -49,7 +40,7 @@ export const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     profileImage: {
-        width: width * 0.5, // 30 % šírky obrazovky
+        width: width * 0.5, 
         height: width * 0.5,
         borderRadius: (width * 0.3) / 2,
         borderWidth: 3,
@@ -57,8 +48,8 @@ export const styles = StyleSheet.create({
         alignItems: "center",
     },
     imageContainer: {
-        alignItems: "center", // horizontálne centrovanie
-        justifyContent: "center", // vertikálne (ak má výšku)
+        alignItems: "center",
+        justifyContent: "center",
         marginTop: height * 0.08,
     },
     imageText: {
@@ -69,8 +60,8 @@ export const styles = StyleSheet.create({
     },
     textContainer: {
         alignItems: "flex-start",
-        width: "100%",            // aby flex-start fungoval podľa celej šírky
-        marginTop: height * 0.03,            // odstup od obrázka
+        width: "100%",
+        marginTop: height * 0.03,
         paddingHorizontal: width * 0.05,
     },
     buttonContainer: {
@@ -78,14 +69,6 @@ export const styles = StyleSheet.create({
         paddingHorizontal: width * 0.07,
         gap: height * 0.03,
     },
-    // buttonContainer: {
-    //     flexDirection: "row",
-    //     justifyContent: "flex-end",
-    //     alignItems: "flex-end",
-    //     paddingHorizontal: width * 0.05,
-    //     paddingBottom: height * 0.03,
-    //     gap: width * 0.03,
-    // },
     button: {
         flexDirection: 'row',
         alignItems: "center",     
@@ -94,14 +77,13 @@ export const styles = StyleSheet.create({
         paddingVertical: height * 0.02,
         paddingHorizontal: width * 0.04,
         borderRadius: 10,
-        width: width * 0.2,       // tlačidlo bude mať cca 20% šírky obrazovky
+        width: width * 0.2,
         alignSelf: "flex-end", 
     },
     editButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // backgroundColor: "#FF6905",
         backgroundColor: "#F5F5F5",
         paddingVertical: height * 0.02,
         paddingHorizontal: width * 0.04,
@@ -111,7 +93,6 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // backgroundColor: "#FF1E1E",
         backgroundColor: "#F5F5F5",
         paddingVertical: height * 0.02,
         paddingHorizontal: width * 0.04,

@@ -169,19 +169,17 @@ export function useWCSTGame() {
         return `${m}:${s}`;
     }
     
-    // toto zmenit neskor na 6
     const endTestIfNeeded = React.useCallback((newCategoriesCompleted: number, newAttemptsUsed: number) => {
         if (newCategoriesCompleted >= 6 || newAttemptsUsed >= 128) {
             setIsLocked(true);
             
-            // zobraz finished message
+            // finished message
             setTestFinishedMessage(true);
 
-            // delay pred endscreen
+            // delay before endscreen
             setTimeout(() => {
                 setFinished(true);
             }, 1000);
-            // setFinished(true);
             return true;
         }
         return false;
@@ -290,7 +288,6 @@ export function useWCSTGame() {
                             const newCompleted = completedRef.current + 1;
                             setCategoriesCompleted(newCompleted);
                             setConsecutiveCorrect(0);
-                            // showFeedback("category");
                             
                             previousRuleRef.current = currentRule;
                             

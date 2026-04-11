@@ -5,7 +5,6 @@ import type { Request, Response } from 'express';
 // import leaderboardRoutes from '../src/routes/wcstLeaderboardRouter.js';
 import userRoutes from './routes/userRoutes.js';
 import wcstStatRoutes from './routes/wcstStatsRouter.js';
-import leaderboardRoutes from './routes/wcstLeaderboardRouter.js';
 
 import knoxStatRouter from './routes/knoxStatsRouter.js';
 import tolStatsRouter from './routes/tolStatsRouter.js';
@@ -18,7 +17,6 @@ app.use(express.json());
 
 app.use('/users', userRoutes);
 app.use('/wcstStats', wcstStatRoutes);
-app.use('/leaderboard', leaderboardRoutes);
 
 app.use('/knoxStats', knoxStatRouter);
 app.use('/tolStats', tolStatsRouter);

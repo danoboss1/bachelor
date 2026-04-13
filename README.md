@@ -73,16 +73,10 @@ adb install -r Expo-Go-SDK53.apk
 
 Before running the project, you need to create a `.env` file.
 
-1. Rename `.env.dist` to `.env`
+1. Rename `.env.example` to `.env`
 
 ```bash
-mv .env.dist .env
-```
-
-(Optional) You can also copy it instead:
-
-```bash
-cp .env.dist .env
+cp .env.example .env
 ```
 
 2. Open `.env` and set your backend URL:

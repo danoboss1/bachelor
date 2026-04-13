@@ -20,6 +20,7 @@ type LoginPayload = {
     username: string;
     password: string;
 };
+import { API_BASE_URL } from "@/constants/config";
 
 export default function TabOneScreen() {
     const router = useRouter();
@@ -45,7 +46,7 @@ export default function TabOneScreen() {
 
         try {
             const res = await axios.post(
-                "https://bachelor-pi.vercel.app/login",
+                `${API_BASE_URL}/login`,
                 login
             );
 

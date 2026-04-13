@@ -3,6 +3,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
 import { Animated, View, Alert, BackHandler, AppState, AppStateStatus } from "react-native";
 import { getToken } from "@/app/(auth)/tokenStorage";
+import { API_BASE_URL } from "@/constants/config";
 
 const WCST_ROUTE_ENDSCREEN = "/wcst/WCST_endscreen";
 
@@ -216,7 +217,7 @@ export function useWCSTGame() {
         };
         
         try {
-            await axios.post("https://bachelor-pi.vercel.app/wcstStats", payload, {
+            await axios.post(`${API_BASE_URL}/wcstStats`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -8,8 +8,9 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { getToken } from "../(auth)/tokenStorage";
 import { useEffect } from "react";
+import { API_BASE_URL } from "@/constants/config";
 
-const API_URL = "https://bachelor-pi.vercel.app";
+const API_URL = `${API_BASE_URL}`;
 
 type TokenPayload = {
     id: number;

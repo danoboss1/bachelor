@@ -6,6 +6,7 @@ import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackH
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { COLORS } from "../../constants/Colors";
 import { Theme } from "../../constants/Theme";
+import { API_BASE_URL } from "@/constants/config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -86,7 +87,7 @@ export default function WCST_ENDSCREEN() {
         async function fetchPercentile(metric: string, value: number) {
             try {
                 const response = await fetch(
-                    `https://bachelor-pi.vercel.app/stats/percentile?metric=${metric}&value=${value}`
+                    `${API_BASE_URL}/stats/percentile?metric=${metric}&value=${value}`
                 );
 
                 const data = await response.json();

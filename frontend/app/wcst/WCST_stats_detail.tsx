@@ -10,6 +10,7 @@ import { formatDate } from "@/components/statsDetail/utils";
 import { BAR_WIDTH, END_SPACING, INITIAL_SPACING, SPACING } from "@/components/statsDetail/chartConstants";
 import { StatsDetailHeader } from "@/components/statsDetail/statsDetailHeader";
 import { MonthNavigator } from "@/components/statsDetail/monthNavigator";
+import { API_BASE_URL } from "@/constants/config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -78,7 +79,7 @@ export default function WCSTStatsDetail() {
 
     const [error, setError] = useState<string | null>(null);
 
-    const trendUrl = "https://bachelor-pi.vercel.app/wcstStats/trend";
+    const trendUrl = `${API_BASE_URL}/wcstStats/trend`;
 
     const [trendData, setTrendData] = useState<TrendResponse | null>(null);
 
@@ -97,7 +98,7 @@ export default function WCSTStatsDetail() {
     };
 
     const url = useMemo(() => {
-        return `https://bachelor-pi.vercel.app/wcstStats/month?year=${currentYear}&month=${currentMonth + 1}`
+        return `${API_BASE_URL}/wcstStats/month?year=${currentYear}&month=${currentMonth + 1}`
     }, [currentYear, currentMonth]);
 
     const navigateMonth = (direction: number) => {

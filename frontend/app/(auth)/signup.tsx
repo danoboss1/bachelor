@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { styles } from "../../assets/styles/auth.styles";
 import { saveToken } from "./tokenStorage";
+import { API_BASE_URL } from "@/constants/config";
 
 const { height } = Dimensions.get("window");
 
@@ -48,7 +49,7 @@ export default function TabOneScreen() {
 
         try {
             const res = await axios.post(
-                "https://bachelor-pi.vercel.app/register",
+                `${API_BASE_URL}/register`,
                 registration
             );
 

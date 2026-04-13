@@ -3,6 +3,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import React from "react";
 import { Alert, BackHandler } from "react-native";
 import { getToken } from "@/app/(auth)/tokenStorage";
+import { API_BASE_URL } from "@/constants/config";
 
 const KNOX_ROUTE_ENDSCREEN = "/knox/KNOX_endscreen";
 
@@ -156,7 +157,7 @@ export function useKNOXGame() {
         };
 
         try {
-            await axios.post("https://bachelor-pi.vercel.app/knoxStats", payload, {
+            await axios.post(`${API_BASE_URL}/knoxStats`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { Alert, BackHandler, Dimensions, View } from "react-native";
 import { difficultyFive, difficultyFour, difficultySix } from "../tol/TOL_data";
 import { getToken } from "@/app/(auth)/tokenStorage";
+import { API_BASE_URL } from "@/constants/config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -143,7 +144,7 @@ export function useTOLGame() {
         }
         
         try {
-            await axios.post("https://bachelor-pi.vercel.app/tolStats", payload, {
+            await axios.post(`${API_BASE_URL}/tolStats`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

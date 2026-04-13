@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { styles } from "../../assets/styles/mainScreens.styles";
 import { Color } from "@/constants/TWPalette";
+import { API_BASE_URL } from "@/constants/config";
 
 const { width } = Dimensions.get("window");
 
@@ -22,7 +23,7 @@ const WCST_STATS_DETAIL_ROUTE = "/wcst/WCST_stats_detail";
 const TOL_STATS_DETAIL_ROUTE = "/tol/TOL_stats_detail";
 const KNOX_STATS_DETAIL_ROUTE = "/knox/KNOX_stats_detail";
 
-const API_URL = "https://bachelor-pi.vercel.app";
+const API_URL = `${API_BASE_URL}`;
 
 type WcstRecentSummaryResponse = {
     userId: number;

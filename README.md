@@ -17,13 +17,12 @@ Set up and run the entire project locally, including:
 
 The versions of libraries and tools used in this project were defined as part of the bachelor’s thesis requirements. The application specifically requires Expo Go with SDK 53, which must be installed manually if not available in the default store version.
 
-# Getting Started
+# Frontend-only setup (quick start)
 
 1. Make sure you are in the repo and open the frontend folder.
 
 2. Install Expo Go on your Android device or use an Android emulator. The app must support Expo SDK 53.
 
----
 
 ## 📱 Install Expo Go with SDK 53 (Android)
 
@@ -82,20 +81,12 @@ cp .env.example .env
 2. Open `.env` and set your backend URL:
 
 ```
-EXPO_PUBLIC_API_URL=https://your-backend-url.com
+EXPO_PUBLIC_API_URL=https://bachelor-pi.vercel.app
 ```
 
 To use the Vercel, which is currently running please use: EXPO_PUBLIC_API_URL=https://bachelor-pi.vercel.app
 
-You can also use a local backend:
-
-```
-EXPO_PUBLIC_API_URL=http://localhost:3000
-```
-
 > ⚠️ Important: never commit your `.env` file
-
----
 
 3. Install project dependencies:
 
@@ -116,8 +107,6 @@ If you use an Android emulator, you can also choose `Run on Android device/emula
 ```bash
 npm run android
 ```
-
----
 
 6. The app should open in Expo Go and start running.
 
